@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">QuestionnaireBuilder</string>
+    <string name="title_activity_home">HomeActivity</string>
+    <string name="title_home">Home</string>
+    <string name="title_explore">Explore</string>
+    <string name="title_my_surveys">My Surveys</string>
+    <string name="title_settings">Settings</string>
+</resources>

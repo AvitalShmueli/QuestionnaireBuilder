@@ -3,8 +3,21 @@
     <style name="Base.Theme.QuestionnaireBuilder" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <!-- Customize your light theme here. -->
         <item name="colorPrimary">@color/blue</item>
+        <item name="colorOnPrimaryContainer">@color/white</item>
         <!--item name="colorOnSurface">@color/light_blue</item-->
     </style>
 
     <style name="Theme.QuestionnaireBuilder" parent="Base.Theme.QuestionnaireBuilder" />
+
+
+    <style name="circleImageView" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item>
+    </style>
+
+    <style name="fabTransparent" parent="">
+        <item name="materialThemeOverlay">@null</item>
+        <item name="elevationOverlayColor">@android:color/transparent</item>
+    </style>
+
 </resources>

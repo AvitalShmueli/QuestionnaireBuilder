@@ -3,6 +3,7 @@ package com.example.questionnairebuilder.ui.new_question;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -17,6 +18,7 @@ import android.view.ViewGroup;
 import android.widget.PopupMenu;
 import android.widget.Toast;
 
+import com.example.questionnairebuilder.EditQuestionActivity;
 import com.example.questionnairebuilder.databinding.FragmentNewQuestionBinding;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -35,8 +37,7 @@ public class NewQuestionFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
 
-        mViewModel =
-                new ViewModelProvider(this).get(NewQuestionViewModel.class);
+        mViewModel = new ViewModelProvider(this).get(NewQuestionViewModel.class);
 
         binding = FragmentNewQuestionBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
@@ -67,12 +68,21 @@ public class NewQuestionFragment extends Fragment {
             public boolean onMenuItemClick(MenuItem item) {
                 Toast.makeText(activity, "Selected: " + item.getTitle(), Toast.LENGTH_SHORT).show();
                 // TODO: pass selection to next screen
+                changeActivity(item.getTitle().toString());
                 // Here you can navigate to the screen for that question type
                 return true;
             }
         });
 
         popupMenu.show();
+    }
+
+
+    private void changeActivity(String type) {
+        Intent editQuestionActivity = new Intent(requireActivity(), EditQuestionActivity.class);
+        editQuestionActivity.putExtra(EditQuestionActivity.KEY_TYPE,type);
+        startActivity(editQuestionActivity);
+        //requireActivity().finish();
     }
 
 

@@ -4,7 +4,9 @@
         <!-- Customize your light theme here. -->
         <item name="colorPrimary">@color/blue</item>
         <item name="colorOnPrimaryContainer">@color/white</item>
-        <!--item name="colorOnSurface">@color/light_blue</item-->
+
+        <item name="android:popupMenuStyle">@style/AppPopupMenuStyle</item>
+
     </style>
 
     <style name="Theme.QuestionnaireBuilder" parent="Base.Theme.QuestionnaireBuilder" />

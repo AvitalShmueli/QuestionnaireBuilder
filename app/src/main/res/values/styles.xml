@@ -5,4 +5,8 @@
         <item name="android:color">@color/light_blue</item>
     </style>
 
+    <style name="AppPopupMenuStyle" parent="Widget.AppCompat.PopupMenu">
+        <item name="android:popupBackground">@color/light_blue</item>
+    </style>
+
 </resources>

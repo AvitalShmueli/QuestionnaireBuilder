@@ -9,4 +9,6 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="save">Save</string>
     <string name="cancel">Cancel</string>
+    <string name="mandatory">Mandatory?</string>
+    <string name="question_title">Question Title</string>
 </resources>

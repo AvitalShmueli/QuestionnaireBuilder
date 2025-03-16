@@ -3,6 +3,7 @@
 
     <style name="bottomNavIndicator" parent="@style/Widget.Material3.BottomNavigationView.ActiveIndicator">
         <item name="android:color">@color/light_blue</item>
+
     </style>
 
     <style name="AppPopupMenuStyle" parent="Widget.AppCompat.PopupMenu">

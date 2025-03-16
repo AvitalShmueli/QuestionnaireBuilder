@@ -2,6 +2,7 @@ package com.example.questionnairebuilder;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.widget.FrameLayout;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -16,6 +17,9 @@ public class EditQuestionActivity extends AppCompatActivity {
     public static final String KEY_TYPE = "KEY_TYPE";
     private ActivityEditQuestionBinding binding;
     private MaterialTextView editQuestion_LBL_type;
+
+    private FrameLayout editQuestion_FRAME_question;
+    private OpenQuestionFragment openQuestionFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +39,11 @@ public class EditQuestionActivity extends AppCompatActivity {
 
         editQuestion_LBL_type = binding.editQuestionLBLType;
         editQuestion_LBL_type.setText(type);
+
+        editQuestion_FRAME_question = binding.editQuestionFRAMEQuestion;
+
+        openQuestionFragment = new OpenQuestionFragment();
+        getSupportFragmentManager().beginTransaction().add(R.id.editQuestion_FRAME_question,openQuestionFragment).commit();
 
     }
 }

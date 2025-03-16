@@ -51,6 +51,7 @@
             android:src="@drawable/add_24px"
             app:backgroundTint="@color/blue"
             app:maxImageSize="32dp"
+            app:shapeAppearanceOverlay="@style/circleImageView"
             app:tint="@color/white" />
 
         </LinearLayout>

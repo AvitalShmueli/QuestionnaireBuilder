@@ -51,6 +51,7 @@ public class MainActivity extends AppCompatActivity {
             public void onDestinationChanged(@NonNull NavController controller,
                                              @NonNull NavDestination destination, @Nullable Bundle arguments) {
                 toolbar_LBL_title.setText(destination.getLabel());
+                myToolbar.setNavigationIcon(null);
             }
         });
         Objects.requireNonNull(getSupportActionBar()).setDisplayShowTitleEnabled(false);

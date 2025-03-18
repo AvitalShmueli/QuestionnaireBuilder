@@ -1,4 +1,4 @@
-package com.example.questionnairebuilder;
+package com.example.questionnairebuilder.ui.question_types;
 
 import android.os.Bundle;
 
@@ -8,12 +8,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.questionnairebuilder.R;
+
 /**
  * A simple {@link Fragment} subclass.
- * Use the {@link OpenQuestionFragment#newInstance} factory method to
+ * Use the {@link ChoiceQuestionFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class OpenQuestionFragment extends Fragment {
+public class ChoiceQuestionFragment extends Fragment {
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -24,7 +26,7 @@ public class OpenQuestionFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
-    public OpenQuestionFragment() {
+    public ChoiceQuestionFragment() {
         // Required empty public constructor
     }
 
@@ -34,11 +36,11 @@ public class OpenQuestionFragment extends Fragment {
      *
      * @param param1 Parameter 1.
      * @param param2 Parameter 2.
-     * @return A new instance of fragment OpenQuestionFragment.
+     * @return A new instance of fragment ChoiceQuestionFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static OpenQuestionFragment newInstance(String param1, String param2) {
-        OpenQuestionFragment fragment = new OpenQuestionFragment();
+    public static ChoiceQuestionFragment newInstance(String param1, String param2) {
+        ChoiceQuestionFragment fragment = new ChoiceQuestionFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -53,14 +55,12 @@ public class OpenQuestionFragment extends Fragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
-
-
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_open_question, container, false);
+        return inflater.inflate(R.layout.fragment_choice_question, container, false);
     }
 }

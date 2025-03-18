@@ -11,4 +11,6 @@
     <string name="cancel">Cancel</string>
     <string name="mandatory">Mandatory?</string>
     <string name="question_title">Question Title</string>
+    <string name="new_question">New Question</string>
+    <string name="max_allowed_selections">Max. allowed selections</string>
 </resources>

@@ -4,8 +4,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".OpenQuestionFragment"
-    android:layout_margin="16dp">
+    tools:context=".ui.question_types.OpenQuestionFragment"
+    android:layout_margin="@dimen/activity_vertical_margin">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -20,10 +20,10 @@
             android:layout_weight="1"
             android:hint="@string/question_title"
             app:boxBackgroundMode="outline"
-            app:boxCornerRadiusBottomEnd="8dp"
-            app:boxCornerRadiusBottomStart="8dp"
-            app:boxCornerRadiusTopEnd="8dp"
-            app:boxCornerRadiusTopStart="8dp">
+            app:boxCornerRadiusBottomEnd="@dimen/corner_radius"
+            app:boxCornerRadiusBottomStart="@dimen/corner_radius"
+            app:boxCornerRadiusTopEnd="@dimen/corner_radius"
+            app:boxCornerRadiusTopStart="@dimen/corner_radius">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:layout_width="match_parent"
@@ -37,10 +37,11 @@
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.materialswitch.MaterialSwitch
+            android:id="@+id/openQuestion_SW_mandatory"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="@dimen/activity_vertical_margin"
             android:checked="true"
             android:text="@string/mandatory"/>
 

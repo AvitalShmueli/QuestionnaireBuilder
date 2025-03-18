@@ -4,14 +4,19 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.widget.FrameLayout;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.example.questionnairebuilder.databinding.ActivityEditQuestionBinding;
+import com.example.questionnairebuilder.ui.question_types.ChoiceQuestionFragment;
+import com.example.questionnairebuilder.ui.question_types.OpenQuestionFragment;
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textview.MaterialTextView;
+
+import java.util.Objects;
 
 public class EditQuestionActivity extends AppCompatActivity {
     public static final String KEY_TYPE = "KEY_TYPE";
@@ -20,6 +25,10 @@ public class EditQuestionActivity extends AppCompatActivity {
 
     private FrameLayout editQuestion_FRAME_question;
     private OpenQuestionFragment openQuestionFragment;
+    private ChoiceQuestionFragment choiceQuestionFragment;
+
+    private MaterialButton editQuestion_BTN_save;
+    private MaterialButton editQuestion_BTN_cancel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,13 +46,48 @@ public class EditQuestionActivity extends AppCompatActivity {
         Intent previousIntent = getIntent();
         String type = previousIntent.getStringExtra(KEY_TYPE);
 
-        editQuestion_LBL_type = binding.editQuestionLBLType;
+        initView();
         editQuestion_LBL_type.setText(type);
 
+        if(type != null) {
+            switch (type) {
+                case "Open question":
+                    openQuestionFragment = new OpenQuestionFragment();
+                    getSupportFragmentManager().beginTransaction().add(R.id.editQuestion_FRAME_question,openQuestionFragment).commit();
+                    break;
+                case "Single choice":
+                case "Multiple choice":
+                    choiceQuestionFragment = new ChoiceQuestionFragment();
+                    getSupportFragmentManager().beginTransaction().add(R.id.editQuestion_FRAME_question,choiceQuestionFragment).commit();
+                    break;
+            }
+        }
+
+
+
+    }
+
+    private void initView(){
+        editQuestion_LBL_type = binding.editQuestionLBLType;
         editQuestion_FRAME_question = binding.editQuestionFRAMEQuestion;
+        editQuestion_BTN_save = binding.editQuestionBTNSave;
+        editQuestion_BTN_cancel = binding.editQuestionBTNCancel;
 
-        openQuestionFragment = new OpenQuestionFragment();
-        getSupportFragmentManager().beginTransaction().add(R.id.editQuestion_FRAME_question,openQuestionFragment).commit();
+        Toolbar myToolbar = binding.editQuestionToolbar;
+        MaterialTextView toolbar_LBL_title = binding.toolbarLBLTitle;
+        setSupportActionBar(myToolbar);
+        toolbar_LBL_title.setText(R.string.new_question);
+        Objects.requireNonNull(getSupportActionBar()).setDisplayShowTitleEnabled(false);
 
+        // listeners
+        editQuestion_BTN_cancel.setOnClickListener(v -> finish());
+        myToolbar.setNavigationOnClickListener(v -> finish());
+    }
+
+    private void changeActivity(String type) {
+        Intent editQuestionActivity = new Intent(this, EditQuestionActivity.class);
+        editQuestionActivity.putExtra(EditQuestionActivity.KEY_TYPE,type);
+        startActivity(editQuestionActivity);
+        //requireActivity().finish();
     }
 }

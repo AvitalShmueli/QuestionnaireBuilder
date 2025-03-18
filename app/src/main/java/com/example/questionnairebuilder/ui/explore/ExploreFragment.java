@@ -26,6 +26,8 @@ public class ExploreFragment extends Fragment {
 
         final TextView textView = binding.textDashboard;
         exploreViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
+
+
         return root;
     }
 

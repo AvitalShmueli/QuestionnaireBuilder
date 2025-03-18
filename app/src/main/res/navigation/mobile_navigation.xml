@@ -26,6 +26,6 @@
     <fragment
         android:id="@+id/navigation_settings"
         android:name="com.example.questionnairebuilder.ui.new_question.NewQuestionFragment"
-        android:label="settings"
+        android:label="@string/title_settings"
         tools:layout="@layout/fragment_new_question" />
 </navigation>

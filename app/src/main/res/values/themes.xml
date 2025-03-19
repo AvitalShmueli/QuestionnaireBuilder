@@ -17,5 +17,4 @@
     </style>
 
     <style name="Theme.QuestionnaireBuilder" parent="Base.Theme.QuestionnaireBuilder" />
-
 </resources>

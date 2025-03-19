@@ -1,19 +1,17 @@
 package com.example.questionnairebuilder.ui;
 
-import android.app.DatePickerDialog;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.widget.DatePicker;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
+import androidx.core.content.ContextCompat;
+import androidx.core.graphics.ColorUtils;
 
 import com.example.questionnairebuilder.R;
-import com.google.android.material.appbar.MaterialToolbar;
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
@@ -22,65 +20,102 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
-import java.util.TimeZone;
 
 public class NewSurveyActivity extends AppCompatActivity {
     private TextInputLayout newSurvey_TIL_date;
     private TextInputEditText newSurvey_TIET_date;
+    private MaterialButton newSurvey_BTN_themeRed;
+    private MaterialButton newSurvey_BTN_themeGreen;
+    private MaterialButton newSurvey_BTN_themeBlue;
+    private MaterialButton newSurvey_BTN_themePurple;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_survey);
 
-        newSurvey_TIET_date = findViewById(R.id.newSurvey_TIET_date);
-        newSurvey_TIL_date = findViewById(R.id.newSurvey_TIL_date);
+        findViews();
+        setupDateFieldBehavior();
+        handleThemeColorSelection();
+    }
+
+    private void setupDateFieldBehavior() {
         newSurvey_TIL_date.setEndIconOnClickListener(v -> showMaterialDatePicker());
         newSurvey_TIET_date.addTextChangedListener(new TextWatcher() {
-            private boolean isEditing;
+            boolean isEditing;
 
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
 
             @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) { }
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
 
             @Override
             public void afterTextChanged(Editable s) {
-                if (isEditing) return;
+                if (isEditing)
+                    return;
                 isEditing = true;
 
                 String input = s.toString().replaceAll("[^\\d]", ""); // Only digits
                 StringBuilder formatted = new StringBuilder();
 
                 for (int i = 0; i < input.length() && i < 8; i++) {
-                    if (i == 2 || i == 4) {
+                    if (i == 2 || i == 4)
                         formatted.append("/");
-                    }
                     formatted.append(input.charAt(i));
                 }
 
                 newSurvey_TIET_date.setText(formatted.toString());
                 newSurvey_TIET_date.setSelection(formatted.length()); // Move cursor to end
 
-                // Optional validation
-                if (formatted.length() == 10 && !isValidDate(formatted.toString())) {
+                if (formatted.length() == 10 && !isValidDate(formatted.toString()))
                     newSurvey_TIL_date.setError("Invalid date");
-                } else {
+                else
                     newSurvey_TIL_date.setError(null);
-                }
 
                 isEditing = false;
             }
         });
 
         newSurvey_TIET_date.setOnFocusChangeListener((v, hasFocus) -> {
-            if (hasFocus) {
+            if (hasFocus)
                 newSurvey_TIET_date.setHint("DD/MM/YYYY");
-            } else {
-                newSurvey_TIET_date.setHint(""); // remove when not focused
-            }
+            else
+                newSurvey_TIET_date.setHint(""); // Remove when not focused
         });
+    }
+
+    private void findViews() {
+        newSurvey_TIET_date = findViewById(R.id.newSurvey_TIET_date);
+        newSurvey_TIL_date = findViewById(R.id.newSurvey_TIL_date);
+        newSurvey_BTN_themeRed = findViewById(R.id.newSurvey_BTN_themeRed);
+        newSurvey_BTN_themeGreen = findViewById(R.id.newSurvey_BTN_themeGreen);
+        newSurvey_BTN_themeBlue = findViewById(R.id.newSurvey_BTN_themeBlue);
+        newSurvey_BTN_themePurple = findViewById(R.id.newSurvey_BTN_themePurple);
+    }
+
+    private void handleThemeColorSelection() {
+        MaterialButton[] themeButtons = {newSurvey_BTN_themeRed, newSurvey_BTN_themeGreen, newSurvey_BTN_themeBlue, newSurvey_BTN_themePurple};
+
+        int[] fillColors = { // Define their corresponding fill colors
+                ColorUtils.setAlphaComponent(ContextCompat.getColor(this, R.color.theme_circle_red), 200),
+                ColorUtils.setAlphaComponent(ContextCompat.getColor(this, R.color.theme_circle_green), 200),
+                ColorUtils.setAlphaComponent(ContextCompat.getColor(this, R.color.theme_circle_blue), 200),
+                ColorUtils.setAlphaComponent(ContextCompat.getColor(this, R.color.theme_circle_purple), 200)
+        };
+
+        for (int i = 0; i < themeButtons.length; i++) { // Add click listeners
+            final int index = i;
+            themeButtons[i].setOnClickListener(v -> {
+                animateButtonClick(themeButtons[index]);
+                for (int j = 0; j < themeButtons.length; j++) // Reset background colors
+                    themeButtons[j].setBackgroundTintList(ColorStateList.valueOf(Color.TRANSPARENT));
+                themeButtons[index].setBackgroundTintList(ColorStateList.valueOf(fillColors[index])); // Fill selected one
+            });
+        }
     }
 
     private boolean isValidDate(String date) {
@@ -115,5 +150,18 @@ public class NewSurveyActivity extends AppCompatActivity {
             String formattedDate = String.format(Locale.getDefault(), "%02d/%02d/%04d", day, month, year);
             newSurvey_TIET_date.setText(formattedDate);
         });
+    }
+
+    private void animateButtonClick(MaterialButton button) {
+        button.animate()
+                .scaleX(0.85f)
+                .scaleY(0.85f)
+                .setDuration(100)
+                .withEndAction(() -> button.animate()
+                        .scaleX(1f)
+                        .scaleY(1f)
+                        .setDuration(100)
+                        .start())
+                .start();
     }
 }

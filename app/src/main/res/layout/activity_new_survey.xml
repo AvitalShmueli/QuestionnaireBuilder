@@ -37,7 +37,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
-                android:hint="Title"
+                android:hint="@string/title"
                 app:boxBackgroundMode="outline"
                 app:boxCornerRadiusBottomEnd="8dp"
                 app:boxCornerRadiusBottomStart="8dp"
@@ -58,7 +58,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
-                android:hint="Description"
+                android:hint="@string/description"
                 app:boxBackgroundMode="outline"
                 app:boxCornerRadiusBottomEnd="8dp"
                 app:boxCornerRadiusBottomStart="8dp"
@@ -81,14 +81,16 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
-                android:hint="Due Date"
+                android:hint="@string/due_date"
                 app:boxBackgroundMode="outline"
                 app:boxCornerRadiusBottomEnd="8dp"
                 app:boxCornerRadiusBottomStart="8dp"
                 app:boxCornerRadiusTopEnd="8dp"
                 app:boxCornerRadiusTopStart="8dp"
+                app:boxStrokeColor="@color/blue"
                 app:endIconDrawable="@drawable/ic_calendar"
-                app:endIconMode="custom">
+                app:endIconMode="custom"
+                app:endIconTint="@color/blue">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/newSurvey_TIET_date"
@@ -98,7 +100,8 @@
                     android:focusable="true"
                     android:gravity="top|start"
                     android:imeOptions="actionDone"
-                    android:inputType="text"
+                    android:inputType="number"
+                    android:textColorHint="@color/blue"
                     tools:text="DD/MM/YYYY" />
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -106,7 +109,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
-                android:text="Theme"
+                android:text="@string/theme"
                 android:textColor="@android:color/black"
                 android:textSize="14sp"
                 android:textStyle="bold" />
@@ -119,37 +122,51 @@
                 android:orientation="horizontal"
                 android:padding="4dp">
 
-                <com.google.android.material.imageview.ShapeableImageView
-                    android:id="@+id/themeRed"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    android:layout_marginEnd="12dp"
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/newSurvey_BTN_themeRed"
+                    android:layout_width="50dp"
+                    android:layout_height="58dp"
+                    android:layout_marginHorizontal="8dp"
+                    android:backgroundTint="@android:color/transparent"
                     android:clickable="true"
-                    android:src="@drawable/theme_circle_red" />
+                    app:shapeAppearanceOverlay="@style/circleImageView"
+                    app:strokeColor="@color/theme_circle_red"
+                    app:strokeWidth="6dp" />
 
-                <com.google.android.material.imageview.ShapeableImageView
-                    android:id="@+id/themeGreen"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    android:layout_marginEnd="12dp"
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/newSurvey_BTN_themeGreen"
+                    app:shapeAppearanceOverlay="@style/circleImageView"
+                    android:layout_width="50dp"
+                    android:layout_height="58dp"
+                    android:layout_marginHorizontal="8dp"
+                    android:backgroundTint="@android:color/transparent"
                     android:clickable="true"
-                    android:src="@drawable/theme_circle_green" />
+                    app:strokeColor="@color/theme_circle_green"
+                    app:strokeWidth="6dp" />
 
-                <com.google.android.material.imageview.ShapeableImageView
-                    android:id="@+id/themeBlue"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    android:layout_marginEnd="12dp"
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/newSurvey_BTN_themeBlue"
+                    app:shapeAppearanceOverlay="@style/circleImageView"
+                    android:layout_width="50dp"
+                    android:layout_height="58dp"
+                    android:layout_marginHorizontal="8dp"
+                    android:backgroundTint="@android:color/transparent"
                     android:clickable="true"
-                    android:src="@drawable/theme_circle_blue" />
+                    android:paddingHorizontal="4dp"
+                    app:strokeColor="@color/theme_circle_blue"
+                    app:strokeWidth="6dp" />
 
-                <com.google.android.material.imageview.ShapeableImageView
-                    android:id="@+id/themePurple"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    android:layout_marginEnd="12dp"
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/newSurvey_BTN_themePurple"
+                    app:shapeAppearanceOverlay="@style/circleImageView"
+                    android:layout_width="50dp"
+                    android:layout_height="58dp"
+                    android:layout_marginHorizontal="8dp"
+                    android:backgroundTint="@android:color/transparent"
                     android:clickable="true"
-                    android:src="@drawable/theme_circle_purple" />
+                    android:paddingHorizontal="4dp"
+                    app:strokeColor="@color/theme_circle_purple"
+                    app:strokeWidth="6dp" />
 
             </LinearLayout>
 
@@ -159,7 +176,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
-                android:text="Continue"
+                android:layout_gravity="bottom"
+                android:text="@string/continue_btn"
                 android:textAllCaps="false"
                 app:cornerRadius="20dp" />
         </LinearLayout>

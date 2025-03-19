@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".EditQuestionActivity">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/editQuestion_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorSecondary"
+        android:elevation="@dimen/toolbar_elevation"
+        app:titleTextColor="@color/blackish"
+        app:titleTextAppearance="@style/toolbarTextStyle"
+        android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+        app:navigationIcon="@drawable/arrow_back_24px">
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/toolbar_LBL_title"
+            style="@style/TextAppearance.AppCompat.Widget.ActionBar.Title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="@string/app_name"
+            android:textColor="?attr/colorOnSurface" />
+
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/toolbar_IMG_account"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/account_circle_24px"
+            android:tint="?attr/colorOnSurface"
+            android:layout_gravity="end"
+            android:layout_marginEnd="@dimen/account_image_padding"/>
+
+    </androidx.appcompat.widget.Toolbar>
+
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/editQuestion_LBL_type"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_below="@id/editQuestion_toolbar"
+        android:text="Type"
+        android:gravity="center"
+        android:textSize="@dimen/title_text_size"
+        android:textStyle="bold"/>
+
+    <FrameLayout
+        android:id="@+id/editQuestion_FRAME_question"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/editQuestion_LLC_buttons"
+        android:layout_below="@id/editQuestion_LBL_type"/>
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:id="@+id/editQuestion_LLC_buttons"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginHorizontal="@dimen/activity_horizontal_margin"
+        android:layout_marginBottom="@dimen/activity_vertical_margin"
+        android:orientation="vertical">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/editQuestion_BTN_save"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:text="@string/save"
+            app:cornerRadius="20dp"
+            android:textAllCaps="false"/>
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="8dp"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/editQuestion_BTN_cancel"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:text="@string/cancel"
+            app:strokeWidth="3dp"
+            app:strokeColor="@color/blue"
+            android:textSize="@dimen/button_text_size"
+            android:textStyle="bold"/>
+
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+
+
+</RelativeLayout>

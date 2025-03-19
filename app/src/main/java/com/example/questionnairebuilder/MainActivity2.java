@@ -9,8 +9,8 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.questionnairebuilder.Listeners.OnQuestionListChangedListener;
-import com.example.questionnairebuilder.Listeners.OnStartDragListener;
+import com.example.questionnairebuilder.listeners.OnQuestionListChangedListener;
+import com.example.questionnairebuilder.listeners.OnStartDragListener;
 
 import java.util.ArrayList;
 import java.util.List;

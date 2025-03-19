@@ -22,4 +22,10 @@
         android:name="com.example.questionnairebuilder.ui.my_surveys.MySurveysFragment"
         android:label="@string/title_my_surveys"
         tools:layout="@layout/fragment_my_surveys" />
+
+    <fragment
+        android:id="@+id/navigation_settings"
+        android:name="com.example.questionnairebuilder.ui.new_question.NewQuestionFragment"
+        android:label="@string/title_settings"
+        tools:layout="@layout/fragment_new_question" />
 </navigation>

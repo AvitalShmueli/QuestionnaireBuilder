@@ -1,4 +1,4 @@
-package com.example.questionnairebuilder;
+package com.example.questionnairebuilder.adapters;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -9,6 +9,8 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.questionnairebuilder.Question;
+import com.example.questionnairebuilder.R;
 import com.example.questionnairebuilder.listeners.OnQuestionListChangedListener;
 
 import java.util.List;
@@ -25,21 +27,21 @@ public class QuestionsAdapter extends RecyclerView.Adapter<QuestionsAdapter.View
         this.mListChangedListener = listChangedListener;
     }*/
 
-    public QuestionsAdapter( Context context, List<Question> questionList) {
+    public QuestionsAdapter(Context context, List<Question> questionList) {
         this.context = context;
         this.questionList = questionList;
     }
 
     @NonNull
     @Override
-    public QuestionsAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(context).inflate(R.layout.rv_item_layout,parent,false);
         return new ViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull QuestionsAdapter.ViewHolder holder, int position) {
-        if (questionList.size() > 0 && questionList != null) {
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+        if (!questionList.isEmpty()) {
             Question question = questionList.get(position);
             String title = question.getQuestion();
             int order = question.setOrder(position + 1).getOrder() ;

@@ -5,4 +5,22 @@
         <item name="android:color">@color/light_blue</item>
     </style>
 
+
+    <style name="AppPopupMenuStyle" parent="Widget.AppCompat.PopupMenu">
+        <item name="android:popupBackground">@color/light_blue</item>
+    </style>
+
+
+    <style name="toolbarTextStyle" parent="TextAppearance.Widget.AppCompat.Toolbar.Title">
+        <item name="android:textSize">@dimen/toolbar_title_size</item>
+        <!--item name="android:fontFamily">yourFont</item-->
+    </style>
+
+    <!-- ShapeableImageView-->
+    <style name="circleImageView" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item>
+    </style>
+
+
 </resources>

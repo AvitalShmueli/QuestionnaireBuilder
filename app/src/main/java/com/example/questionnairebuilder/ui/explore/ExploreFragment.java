@@ -18,14 +18,16 @@ public class ExploreFragment extends Fragment {
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        ExploreViewModel dashboardViewModel =
+        ExploreViewModel exploreViewModel =
                 new ViewModelProvider(this).get(ExploreViewModel.class);
 
         binding = FragmentExploreBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
         final TextView textView = binding.textDashboard;
-        dashboardViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
+        exploreViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
+
+
         return root;
     }
 

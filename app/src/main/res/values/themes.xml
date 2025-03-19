@@ -7,14 +7,22 @@
         <item name="colorPrimaryVariant">@color/blue</item>
         <item name="colorOnPrimaryContainer">@color/white</item>
         <item name="colorOnPrimary">@color/white</item>
+      
+        <item name="colorOnSurface">@color/blackish</item>
+
         <!-- Secondary brand color. -->
-        <item name="colorSecondary">@color/dark_blue</item>
+        <item name="colorSecondary">@color/light_blue</item>
         <item name="colorSecondaryVariant">@color/dark_blue</item>
         <item name="colorOnSecondary">@color/black</item>
         <!-- Status bar color. -->
+        <!--item name="android:statusBarColor">?attr/colorPrimaryVariant</item-->
         <item name="android:statusBarColor">@color/light_blue</item>
+        <item name="android:windowLightStatusBar">true</item>
+
+        <item name="android:popupMenuStyle">@style/AppPopupMenuStyle</item>
 
     </style>
 
     <style name="Theme.QuestionnaireBuilder" parent="Base.Theme.QuestionnaireBuilder" />
+
 </resources>

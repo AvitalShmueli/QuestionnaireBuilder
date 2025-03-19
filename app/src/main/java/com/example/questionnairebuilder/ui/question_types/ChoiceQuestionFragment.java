@@ -3,12 +3,20 @@ package com.example.questionnairebuilder.ui.question_types;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 
 import com.example.questionnairebuilder.R;
+import com.example.questionnairebuilder.adapters.TableAdapter;
+import com.example.questionnairebuilder.databinding.FragmentChoiceQuestionBinding;
+
+import java.util.ArrayList;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -16,6 +24,13 @@ import com.example.questionnairebuilder.R;
  * create an instance of this fragment.
  */
 public class ChoiceQuestionFragment extends Fragment {
+
+    private FragmentChoiceQuestionBinding binding;
+    private RecyclerView choiceQuestion_RV_choices;
+    private AutoCompleteTextView choiceQuestion_DD_maxAllowed;
+    private ArrayList<Integer> itemsMaxSelectionsAllowed;
+    private Integer selectedMaxSelectionsAllowed = null;
+    private TableAdapter adapter;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -61,6 +76,51 @@ public class ChoiceQuestionFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_choice_question, container, false);
+        //return inflater.inflate(R.layout.fragment_choice_question, container, false);
+        binding = FragmentChoiceQuestionBinding.inflate(inflater, container, false);
+        View root = binding.getRoot();
+
+        createBinding();
+        initDropDownValues();
+
+
+        return root;
     }
+
+
+    private void createBinding() {
+        choiceQuestion_DD_maxAllowed = binding.choiceQuestionDDMaxAllowed;
+
+        choiceQuestion_RV_choices = binding.choiceQuestionRVChoices;
+        choiceQuestion_RV_choices.setLayoutManager(new LinearLayoutManager(requireActivity()));
+
+        adapter = new TableAdapter();
+        choiceQuestion_RV_choices.setAdapter(adapter);
+    }
+
+    private void initDropDownValues() {
+        itemsMaxSelectionsAllowed = new ArrayList<>();
+        itemsMaxSelectionsAllowed.add(1);
+
+        ArrayAdapter<Integer> adapterItems_MaxSelectionsAllowed = new ArrayAdapter<>(requireActivity(), R.layout.dropdown_item, itemsMaxSelectionsAllowed);
+        choiceQuestion_DD_maxAllowed.setAdapter(adapterItems_MaxSelectionsAllowed);
+        choiceQuestion_DD_maxAllowed.setOnItemClickListener((adapterView, view, position, id) -> {
+            //selectedMaxSelectionsAllowed = (int) adapterView.getItemAtPosition(position);
+            selectedMaxSelectionsAllowed = position;
+        });
+        /*
+        itemsMaxSelectionsAllowed = new ArrayList<>();
+        for (Product.ProductType p : Product.ProductType.values()) {
+            itemsMaxSelectionsAllowed.add(p.name());
+        }
+        Log.d(TAG, "dropdown items (product type) = " + itemsMaxSelectionsAllowed.toString());
+
+        itemsProductCondition = new ArrayList<>();
+        for (Product.ProductCondition c : Product.ProductCondition.values()) {
+            itemsProductCondition.add(c.name());
+        }
+        Log.d(TAG, "dropdown items (product condition) = " + itemsProductCondition.toString());
+        */
+    }
+
 }

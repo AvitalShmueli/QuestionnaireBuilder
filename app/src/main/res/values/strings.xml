@@ -13,4 +13,6 @@
     <string name="question_title">Question Title</string>
     <string name="new_question">New Question</string>
     <string name="max_allowed_selections">Max. allowed selections</string>
+    <string name="delete_row">Delete row</string>
+    <string name="enter_text">Enter text</string>
 </resources>

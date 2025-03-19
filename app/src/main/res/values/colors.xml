@@ -5,5 +5,9 @@
     <color name="blue">#6598D2</color>
     <color name="light_blue">#E9F3FF</color>
     <color name="dark_blue">#054D9F</color>
+    <color name="theme_circle_blue">#6598D2</color>
+    <color name="theme_circle_green">#66BF46</color>
+    <color name="theme_circle_purple">#D18BF1</color>
+    <color name="theme_circle_red">#EE4949</color>
     <color name="blackish">#333333</color>
 </resources>

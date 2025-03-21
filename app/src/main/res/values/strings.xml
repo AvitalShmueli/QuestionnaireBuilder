@@ -21,5 +21,6 @@
     <string name="max_allowed_selections">Max. allowed selections</string>
     <string name="delete_row">Delete row</string>
     <string name="enter_text">Enter text</string>
+    <string name="answer_choices">Answer Choices</string>
 
 </resources>

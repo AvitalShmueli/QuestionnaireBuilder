@@ -8,7 +8,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.questionnairebuilder.R;
+import com.example.questionnairebuilder.databinding.FragmentOpenQuestionBinding;
+import com.google.android.material.button.MaterialButton;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -16,6 +17,10 @@ import com.example.questionnairebuilder.R;
  * create an instance of this fragment.
  */
 public class OpenQuestionFragment extends Fragment {
+
+    private FragmentOpenQuestionBinding binding;
+    private MaterialButton openQuestion_BTN_save;
+    private MaterialButton openQuestion_BTN_cancel;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -62,7 +67,19 @@ public class OpenQuestionFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_open_question, container, false);
+
+        binding = FragmentOpenQuestionBinding.inflate(inflater, container, false);
+        View root = binding.getRoot();
+
+        createBinding();
+
+        return root;
+    }
+
+    private void createBinding() {
+        openQuestion_BTN_save = binding.openQuestionBTNSave;
+        openQuestion_BTN_cancel = binding.openQuestionBTNCancel;
+
+        openQuestion_BTN_cancel.setOnClickListener(v -> requireActivity().finish());
     }
 }

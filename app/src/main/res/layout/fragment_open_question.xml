@@ -47,4 +47,40 @@
 
     </LinearLayout>
 
+    <LinearLayout
+        android:id="@+id/openQuestion_LLC_buttons"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:layout_marginHorizontal="@dimen/activity_horizontal_margin"
+        android:layout_marginBottom="@dimen/activity_vertical_margin"
+        android:orientation="vertical">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/openQuestion_BTN_save"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:text="@string/save"
+            app:cornerRadius="20dp"
+            android:textAllCaps="false"/>
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="8dp"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/openQuestion_BTN_cancel"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:text="@string/cancel"
+            app:strokeWidth="3dp"
+            app:strokeColor="@color/blue"
+            android:textSize="@dimen/button_text_size"
+            android:textStyle="bold"/>
+
+    </LinearLayout>
+
 </FrameLayout>

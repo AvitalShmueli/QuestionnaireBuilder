@@ -13,7 +13,7 @@
         android:theme="@style/Theme.QuestionnaireBuilder"
         tools:targetApi="31">
         <activity
-            android:name=".ui.NewSurveyActivity"
+            android:name=".NewSurveyActivity"
             android:exported="false" />
         <activity
             android:name=".EditQuestionActivity"

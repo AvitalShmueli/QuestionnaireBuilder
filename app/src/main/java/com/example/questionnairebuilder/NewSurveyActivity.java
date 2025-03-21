@@ -1,4 +1,4 @@
-package com.example.questionnairebuilder.ui;
+package com.example.questionnairebuilder;
 
 import android.content.res.ColorStateList;
 import android.graphics.Color;
@@ -10,7 +10,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.ColorUtils;
 
-import com.example.questionnairebuilder.R;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.textfield.TextInputEditText;

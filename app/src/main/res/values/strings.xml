@@ -22,5 +22,6 @@
     <string name="delete_row">Delete row</string>
     <string name="enter_text">Enter text</string>
     <string name="answer_choices">Answer Choices</string>
+    <string name="single_choice_selections_num">1</string>
 
 </resources>

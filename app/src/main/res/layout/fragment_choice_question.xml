@@ -33,6 +33,7 @@
                 app:boxCornerRadiusTopStart="@dimen/corner_radius">
 
                 <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/choiceQuestion_TXT_question"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="textMultiLine"
@@ -92,8 +93,7 @@
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_marginTop="6dp">
+                    android:layout_weight="1">
 
                     <AutoCompleteTextView
                         android:id="@+id/choiceQuestion_DD_maxAllowed"
@@ -101,10 +101,20 @@
                         android:layout_height="wrap_content"
                         android:inputType="none"
                         android:textColor="?attr/colorControlNormal"
-                        android:textSize="13sp"
+                        android:textSize="@dimen/input_text_size"
                         tools:ignore="LabelFor,SpeakableTextPresentCheck" />
 
                 </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/choiceQuestion_LBL_singleChoice"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="end"
+                    android:layout_marginEnd="@dimen/input_horizontal_margin"
+                    android:visibility="gone"
+                    android:text="@string/single_choice_selections_num"/>
 
             </LinearLayout>
 

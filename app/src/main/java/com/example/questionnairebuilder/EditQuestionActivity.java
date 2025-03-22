@@ -55,9 +55,14 @@ public class EditQuestionActivity extends AppCompatActivity {
                     break;
                 case "Single choice":
                 case "Multiple choice":
-                    choiceQuestionFragment = new ChoiceQuestionFragment();
-                    getSupportFragmentManager().beginTransaction().add(R.id.editQuestion_FRAME_question,choiceQuestionFragment).commit();
+                    choiceQuestionFragment = ChoiceQuestionFragment.newInstance(type);
+                    getSupportFragmentManager().beginTransaction()
+                            .add(R.id.editQuestion_FRAME_question, choiceQuestionFragment)
+                            .commit();
                     break;
+                    //choiceQuestionFragment = new ChoiceQuestionFragment();
+                    //getSupportFragmentManager().beginTransaction().add(R.id.editQuestion_FRAME_question,choiceQuestionFragment).commit();
+                    //break;
             }
         }
 

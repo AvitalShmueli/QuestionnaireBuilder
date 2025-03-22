@@ -77,7 +77,7 @@ public class ChoicesAdapter extends RecyclerView.Adapter<ChoicesAdapter.ViewHold
                 int currentPosition = holder.getAdapterPosition();
                 if (currentPosition == RecyclerView.NO_POSITION) return;
 
-                String text = holder.editText.getText().toString();
+                String text = holder.editText.getText().toString().trim();
                 dataList.set(currentPosition, text);
 
                 // Add a new row only if it's the last row and has content

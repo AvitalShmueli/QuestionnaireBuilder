@@ -58,7 +58,7 @@ public class ChoicesAdapter extends RecyclerView.Adapter<ChoicesAdapter.ViewHold
 
                             // Notify the activity about the new row count
                             if (rowCountListener != null) {
-                                rowCountListener.onRowCountChanged(dataList.size());
+                                rowCountListener.onRowCountChanged(getValidChoiceCount());
                             }
                         }
                     }
@@ -76,14 +76,13 @@ public class ChoicesAdapter extends RecyclerView.Adapter<ChoicesAdapter.ViewHold
         holder.deleteIcon.setOnClickListener(v -> {
             int currentPosition = holder.getAdapterPosition();
             if (currentPosition != RecyclerView.NO_POSITION && dataList.size() > 1) {
-                //String s = holder.editText.getText().toString();
                 dataList.remove(currentPosition);
                 notifyItemRemoved(currentPosition);
                 notifyItemRangeChanged(currentPosition, dataList.size()); // Ensure correct item positions
 
                 // Notify the activity about the new row count
                 if (rowCountListener != null) {
-                    rowCountListener.onRowCountChanged(dataList.size());
+                    rowCountListener.onRowCountChanged(getValidChoiceCount());
                 }
             }
         });
@@ -91,11 +90,15 @@ public class ChoicesAdapter extends RecyclerView.Adapter<ChoicesAdapter.ViewHold
     }
 
 
-
     @Override
     public int getItemCount() {
         return dataList.size();
     }
+
+    private int getValidChoiceCount(){
+        return (int) dataList.stream().filter(s -> !s.isEmpty()).count();
+    }
+
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         EditText editText;

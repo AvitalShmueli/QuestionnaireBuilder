@@ -9,21 +9,15 @@
         android:icon="@mipmap/ic_app_logo"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
-        android:supportsRtl="true"
+        android:supportsRtl="false"
         android:theme="@style/Theme.QuestionnaireBuilder"
         tools:targetApi="31">
-        <activity
-            android:name=".NewSurveyActivity"
-            android:exported="false" />
         <activity
             android:name=".EditQuestionActivity"
             android:exported="false" />
         <activity
             android:name=".MainActivity"
-            android:exported="false" />
-        <activity
-            android:name=".LauncherActivity"
-            android:exported="true">
+            android:exported="true" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -31,17 +25,15 @@
             </intent-filter>
         </activity>
         <activity
+            android:name=".LauncherActivity"
+            android:exported="false"/>
+
+        <activity
             android:name=".WelcomeActivity"
             android:exported="false" />
         <activity
             android:name=".NewSurveyActivity"
             android:exported="false" />
-        <activity
-            android:name=".EditQuestionActivity"
-            android:exported="false" />
-        <activity
-            android:name=".MainActivity"
-            android:exported="true" />
         <activity
             android:name=".MainActivity2"
             android:exported="false" />

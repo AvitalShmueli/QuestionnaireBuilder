@@ -2,11 +2,11 @@ package com.example.questionnairebuilder.ui.question_types;
 
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,7 +34,7 @@ public class ChoiceQuestionFragment extends Fragment implements OnRowCountChange
     private int choiceCount = 0;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         binding = FragmentChoiceQuestionBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
@@ -48,7 +48,6 @@ public class ChoiceQuestionFragment extends Fragment implements OnRowCountChange
     private void createBinding() {
         //max selection allowed dropdown
         choiceQuestion_DD_maxAllowed = binding.choiceQuestionDDMaxAllowed;
-
         initDropDownValues();
 
         // choices repeating table
@@ -80,10 +79,14 @@ public class ChoiceQuestionFragment extends Fragment implements OnRowCountChange
         choiceCount = count;
         if(itemsMaxSelectionsAllowed != null) {
             itemsMaxSelectionsAllowed.clear();
-            for (int i = 1; i <= choiceCount; i++) {
-                itemsMaxSelectionsAllowed.add(i);
+            if(count == 0) {
+                itemsMaxSelectionsAllowed.add(1);
+            }
+            else {
+                for (int i = 1; i <= choiceCount; i++) {
+                    itemsMaxSelectionsAllowed.add(i);
+                }
             }
         }
-        Log.d("pttt","choiceCount: " + choiceCount);
     }
 }

@@ -1,10 +1,8 @@
 package com.example.questionnairebuilder.adapters;
 
-import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 
@@ -41,36 +39,72 @@ public class ChoicesAdapter extends RecyclerView.Adapter<ChoicesAdapter.ViewHold
         holder.deleteIcon.setEnabled(dataList.size() > 1);
         holder.deleteIcon.setAlpha(dataList.size() > 1 ? 1.0f : 0.5f); // Dim icon if disabled
 
-        holder.editText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if (!hasFocus) { // User exits the EditText
-                    int currentPosition = holder.getAdapterPosition();
-                    String s = holder.editText.getText().toString();
-                    if (currentPosition != RecyclerView.NO_POSITION) {
-                        dataList.set(currentPosition, s);
+          /* close the keyboard after each row insertion */
+//        holder.editText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+//            @Override
+//            public void onFocusChange(View v, boolean hasFocus) {
+//                if (!hasFocus) { // User exits the EditText
+//                    int currentPosition = holder.getAdapterPosition();
+//                    String s = holder.editText.getText().toString();
+//                    if (currentPosition != RecyclerView.NO_POSITION) {
+//                        dataList.set(currentPosition, s);
+//
+//                        // Add a new row only if it's the last row and has content
+//                        if (currentPosition == dataList.size() - 1 && !s.isEmpty()) {
+//                            dataList.add("");
+//                            notifyItemInserted(dataList.size() - 1);
+//                            notifyItemRangeChanged(currentPosition, dataList.size()); // Ensure correct item positions
+//
+//                            // Notify the activity about the new row count
+//                            if (rowCountListener != null) {
+//                                rowCountListener.onRowCountChanged(getValidChoiceCount());
+//                            }
+//                        }
+//                    }
+//                }
+//
+//                // Hide the keyboard
+//                InputMethodManager imm = (InputMethodManager) v.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+//                if (imm != null) {
+//                    imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+//                }
+//            }
+//        });
 
-                        // Add a new row only if it's the last row and has content
-                        if (currentPosition == dataList.size() - 1 && !s.isEmpty()) {
-                            dataList.add("");
-                            notifyItemInserted(dataList.size() - 1);
-                            notifyItemRangeChanged(currentPosition, dataList.size()); // Ensure correct item positions
+        /* keep the keyboard enabled after each row insertion */
+        holder.editText.setOnFocusChangeListener((v, hasFocus) -> {
+            if (!hasFocus) { // User exits the EditText
+                int currentPosition = holder.getAdapterPosition();
+                if (currentPosition == RecyclerView.NO_POSITION) return;
 
-                            // Notify the activity about the new row count
-                            if (rowCountListener != null) {
-                                rowCountListener.onRowCountChanged(getValidChoiceCount());
-                            }
-                        }
+                String text = holder.editText.getText().toString();
+                dataList.set(currentPosition, text);
+
+                // Add a new row only if it's the last row and has content
+                if (currentPosition == dataList.size() - 1 && !text.isEmpty()) {
+                    dataList.add("");
+                    notifyItemInserted(dataList.size() - 1);
+                    notifyItemRangeChanged(currentPosition, dataList.size());
+
+                    // Notify listener about row count change
+                    if (rowCountListener != null) {
+                        rowCountListener.onRowCountChanged(getValidChoiceCount());
                     }
                 }
 
-                // Hide the keyboard
-                InputMethodManager imm = (InputMethodManager) v.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-                if (imm != null) {
-                    imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+                // Move focus to the next row
+                int nextPosition = currentPosition + 1;
+                if (nextPosition < dataList.size()) {
+                    holder.itemView.post(() -> {
+                        RecyclerView.ViewHolder nextHolder = ((RecyclerView) holder.itemView.getParent()).findViewHolderForAdapterPosition(nextPosition);
+                        if (nextHolder instanceof ViewHolder) {
+                            ((ViewHolder) nextHolder).editText.requestFocus();
+                        }
+                    });
                 }
             }
         });
+
 
         // Delete row
         holder.deleteIcon.setOnClickListener(v -> {

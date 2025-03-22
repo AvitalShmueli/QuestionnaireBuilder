@@ -13,7 +13,6 @@ import androidx.core.view.WindowInsetsCompat;
 import com.example.questionnairebuilder.databinding.ActivityEditQuestionBinding;
 import com.example.questionnairebuilder.ui.question_types.ChoiceQuestionFragment;
 import com.example.questionnairebuilder.ui.question_types.OpenQuestionFragment;
-import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textview.MaterialTextView;
 
 import java.util.Objects;
@@ -27,8 +26,7 @@ public class EditQuestionActivity extends AppCompatActivity {
     private OpenQuestionFragment openQuestionFragment;
     private ChoiceQuestionFragment choiceQuestionFragment;
 
-    private MaterialButton editQuestion_BTN_save;
-    private MaterialButton editQuestion_BTN_cancel;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,9 +55,14 @@ public class EditQuestionActivity extends AppCompatActivity {
                     break;
                 case "Single choice":
                 case "Multiple choice":
-                    choiceQuestionFragment = new ChoiceQuestionFragment();
-                    getSupportFragmentManager().beginTransaction().add(R.id.editQuestion_FRAME_question,choiceQuestionFragment).commit();
+                    choiceQuestionFragment = ChoiceQuestionFragment.newInstance(type);
+                    getSupportFragmentManager().beginTransaction()
+                            .add(R.id.editQuestion_FRAME_question, choiceQuestionFragment)
+                            .commit();
                     break;
+                    //choiceQuestionFragment = new ChoiceQuestionFragment();
+                    //getSupportFragmentManager().beginTransaction().add(R.id.editQuestion_FRAME_question,choiceQuestionFragment).commit();
+                    //break;
             }
         }
 
@@ -70,8 +73,7 @@ public class EditQuestionActivity extends AppCompatActivity {
     private void initView(){
         editQuestion_LBL_type = binding.editQuestionLBLType;
         editQuestion_FRAME_question = binding.editQuestionFRAMEQuestion;
-        editQuestion_BTN_save = binding.editQuestionBTNSave;
-        editQuestion_BTN_cancel = binding.editQuestionBTNCancel;
+
 
         Toolbar myToolbar = binding.editQuestionToolbar;
         MaterialTextView toolbar_LBL_title = binding.toolbarLBLTitle;
@@ -80,7 +82,6 @@ public class EditQuestionActivity extends AppCompatActivity {
         Objects.requireNonNull(getSupportActionBar()).setDisplayShowTitleEnabled(false);
 
         // listeners
-        editQuestion_BTN_cancel.setOnClickListener(v -> finish());
         myToolbar.setNavigationOnClickListener(v -> finish());
     }
 

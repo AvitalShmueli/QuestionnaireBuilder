@@ -9,7 +9,8 @@
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent"
+        android:fillViewport="true">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -21,8 +22,10 @@
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
+                android:layout_marginBottom="@dimen/input_vertical_margin"
                 android:hint="@string/question_title"
+                app:boxStrokeColor="?attr/colorPrimary"
+                app:hintTextColor="?attr/colorSecondaryVariant"
                 app:boxBackgroundMode="outline"
                 app:boxCornerRadiusBottomEnd="@dimen/corner_radius"
                 app:boxCornerRadiusBottomStart="@dimen/corner_radius"
@@ -30,35 +33,52 @@
                 app:boxCornerRadiusTopStart="@dimen/corner_radius">
 
                 <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/choiceQuestion_TXT_question"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="textMultiLine"
                     android:gravity="top|start"
                     android:minLines="5"
                     android:maxLines="5"
-                    tools:text="Enter text" />
+                    tools:text="Enter text"
+                    android:textSize="@dimen/input_text_size"/>
 
             </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textview.MaterialTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginVertical="@dimen/input_vertical_margin"
+                android:text="@string/answer_choices"
+                android:textColor="@color/dark_blue"
+                android:textStyle="bold"/>
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/choiceQuestion_RV_choices"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/activity_vertical_margin" />
+                android:layout_marginBottom="@dimen/input_vertical_margin"
+                tools:listitem="@layout/row_item"
+                tools:itemCount="4"/>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:layout_marginVertical="@dimen/input_vertical_margin"
+                android:background="?attr/colorSecondary"/>
 
             <com.google.android.material.materialswitch.MaterialSwitch
                 android:id="@+id/choiceQuestion_SW_mandatory"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_marginTop="@dimen/activity_vertical_margin"
+                android:layout_marginTop="@dimen/input_vertical_margin"
                 android:checked="true"
                 android:text="@string/mandatory"/>
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/activity_vertical_margin"
+                android:layout_marginTop="@dimen/input_vertical_margin"
                 android:orientation="horizontal">
 
                 <com.google.android.material.textview.MaterialTextView
@@ -73,20 +93,69 @@
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_marginTop="6dp">
+                    android:layout_weight="1">
 
                     <AutoCompleteTextView
                         android:id="@+id/choiceQuestion_DD_maxAllowed"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:inputType="none"
-                        android:paddingVertical="@dimen/padding_vertical"
                         android:textColor="?attr/colorControlNormal"
-                        android:textSize="13sp"
+                        android:textSize="@dimen/input_text_size"
                         tools:ignore="LabelFor,SpeakableTextPresentCheck" />
 
                 </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/choiceQuestion_LBL_singleChoice"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="end"
+                    android:layout_marginEnd="@dimen/input_horizontal_margin"
+                    android:visibility="gone"
+                    android:text="@string/single_choice_selections_num"/>
+
+            </LinearLayout>
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
+
+            <LinearLayout
+                android:id="@+id/choiceQuestion_LLC_buttons"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:layout_marginHorizontal="@dimen/input_vertical_margin"
+                android:layout_marginVertical="@dimen/input_vertical_margin"
+                android:orientation="vertical">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/choiceQuestion_BTN_save"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:text="@string/save"
+                    app:cornerRadius="20dp"
+                    android:textAllCaps="false"/>
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="8dp"/>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/choiceQuestion_BTN_cancel"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:text="@string/cancel"
+                    app:strokeWidth="3dp"
+                    app:strokeColor="@color/blue"
+                    android:textSize="@dimen/button_text_size"
+                    android:textStyle="bold"/>
 
             </LinearLayout>
 

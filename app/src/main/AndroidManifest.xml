@@ -12,6 +12,7 @@
         android:supportsRtl="false"
         android:theme="@style/Theme.QuestionnaireBuilder"
         tools:targetApi="31">
+
         <activity
             android:name=".EditQuestionActivity"
             android:exported="false" />

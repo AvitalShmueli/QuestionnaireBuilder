@@ -1,5 +1,7 @@
 package com.example.questionnairebuilder;
 
+import com.example.questionnairebuilder.models.Question;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;

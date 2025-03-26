@@ -25,21 +25,11 @@
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
 
 
-    <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/editQuestion_LBL_type"
-        android:layout_width="match_parent"
-        android:layout_height="40dp"
-        android:layout_below="@id/topAppBar"
-        android:text="Type"
-        android:gravity="center"
-        android:textSize="@dimen/title_text_size"
-        android:textStyle="bold"/>
-
-    <FrameLayout
+     <FrameLayout
         android:id="@+id/editQuestion_FRAME_question"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/editQuestion_LBL_type"/>
+        android:layout_below="@id/topAppBar"/>
 
 
 </RelativeLayout>

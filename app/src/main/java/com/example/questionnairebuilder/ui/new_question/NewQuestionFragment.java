@@ -16,11 +16,14 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.PopupMenu;
-import android.widget.Toast;
 
 import com.example.questionnairebuilder.EditQuestionActivity;
 import com.example.questionnairebuilder.databinding.FragmentNewQuestionBinding;
+import com.example.questionnairebuilder.models.QuestionType;
+import com.example.questionnairebuilder.models.QuestionTypeManager;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
+import java.util.Map;
 
 public class NewQuestionFragment extends Fragment {
 
@@ -32,6 +35,7 @@ public class NewQuestionFragment extends Fragment {
 
     private FragmentNewQuestionBinding binding;
     private FloatingActionButton question_FAB_add;
+    private Map<QuestionType,String> menu;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
@@ -41,6 +45,8 @@ public class NewQuestionFragment extends Fragment {
 
         binding = FragmentNewQuestionBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
+        QuestionTypeManager.init(requireActivity());
+        menu = QuestionTypeManager.getMenu();
 
         question_FAB_add = binding.questionFABAdd;
         question_FAB_add.setOnClickListener(new View.OnClickListener() {
@@ -53,23 +59,23 @@ public class NewQuestionFragment extends Fragment {
         return root;
     }
 
+
     private void showQuestionTypeMenu(View v, Activity activity) {
         PopupMenu popupMenu = new PopupMenu(this.getActivity(),v,Gravity.NO_GRAVITY);
-        popupMenu.getMenu().add("Open question");
-        popupMenu.getMenu().add("Single choice");
-        popupMenu.getMenu().add("Multiple choice");
-        popupMenu.getMenu().add("Dropdown");
-        popupMenu.getMenu().add("Rating scale");
-        popupMenu.getMenu().add("Matrix question");
+        popupMenu.getMenu().add(menu.get(QuestionType.Open_Ended_Question));
+        popupMenu.getMenu().add(menu.get(QuestionType.Single_Choice));
+        popupMenu.getMenu().add(menu.get(QuestionType.Dropdown));
+        popupMenu.getMenu().add(menu.get(QuestionType.Yes_No));
+        popupMenu.getMenu().add(menu.get(QuestionType.Multiple_Choice));
+        popupMenu.getMenu().add(menu.get(QuestionType.Rating_Scale));
+        popupMenu.getMenu().add(menu.get(QuestionType.Matrix_Question));
 
 
         popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
-                Toast.makeText(activity, "Selected: " + item.getTitle(), Toast.LENGTH_SHORT).show();
-                // TODO: pass selection to next screen
-                changeActivity(item.getTitle().toString());
-                // Here you can navigate to the screen for that question type
+                String selectedItem = item.getTitle().toString();
+                changeActivity(QuestionTypeManager.getKeyByValue(selectedItem));
                 return true;
             }
         });
@@ -78,11 +84,10 @@ public class NewQuestionFragment extends Fragment {
     }
 
 
-    private void changeActivity(String type) {
+    private void changeActivity(QuestionType type) {
         Intent editQuestionActivity = new Intent(requireActivity(), EditQuestionActivity.class);
-        editQuestionActivity.putExtra(EditQuestionActivity.KEY_TYPE,type);
+        editQuestionActivity.putExtra(EditQuestionActivity.KEY_TYPE,type.toString());
         startActivity(editQuestionActivity);
-        //requireActivity().finish();
     }
 
 

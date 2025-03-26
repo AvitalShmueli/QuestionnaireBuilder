@@ -6,11 +6,10 @@ import android.widget.FrameLayout;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
 import com.example.questionnairebuilder.databinding.ActivityEditQuestionBinding;
+import com.example.questionnairebuilder.models.QuestionType;
+import com.example.questionnairebuilder.models.QuestionTypeManager;
 import com.example.questionnairebuilder.ui.question_types.ChoiceQuestionFragment;
 import com.example.questionnairebuilder.ui.question_types.OpenQuestionFragment;
 import com.google.android.material.appbar.MaterialToolbar;
@@ -21,12 +20,10 @@ import java.util.Objects;
 public class EditQuestionActivity extends AppCompatActivity {
     public static final String KEY_TYPE = "KEY_TYPE";
     private ActivityEditQuestionBinding binding;
-    private MaterialTextView editQuestion_LBL_type;
 
     private FrameLayout editQuestion_FRAME_question;
     private OpenQuestionFragment openQuestionFragment;
     private ChoiceQuestionFragment choiceQuestionFragment;
-
 
 
     @Override
@@ -36,40 +33,45 @@ public class EditQuestionActivity extends AppCompatActivity {
         binding = ActivityEditQuestionBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        Intent previousIntent = getIntent();
-        String type = previousIntent.getStringExtra(KEY_TYPE);
+        QuestionTypeManager.init(this);
 
-        initView();
-        editQuestion_LBL_type.setText(type);
+        Intent previousIntent = getIntent();
+
+        String type = previousIntent.getStringExtra(KEY_TYPE);
+        QuestionType selectedType = QuestionType.valueOf(type);
+        type = QuestionTypeManager.getValueByKey(selectedType);
+
+        initView(type);
 
         if(type != null) {
-            switch (type) {
-                case "Open question":
+            switch (selectedType) {
+                case Open_Ended_Question:
                     openQuestionFragment = new OpenQuestionFragment();
                     getSupportFragmentManager().beginTransaction().add(R.id.editQuestion_FRAME_question,openQuestionFragment).commit();
                     break;
-                case "Single choice":
-                case "Multiple choice":
+                case Single_Choice:
+                case Dropdown:
+                case Multiple_Choice:
                     choiceQuestionFragment = ChoiceQuestionFragment.newInstance(type);
                     getSupportFragmentManager().beginTransaction()
                             .add(R.id.editQuestion_FRAME_question, choiceQuestionFragment)
                             .commit();
                     break;
-                    //choiceQuestionFragment = new ChoiceQuestionFragment();
-                    //getSupportFragmentManager().beginTransaction().add(R.id.editQuestion_FRAME_question,choiceQuestionFragment).commit();
-                    //break;
             }
         }
+
     }
 
-    private void initView(){
-        editQuestion_LBL_type = binding.editQuestionLBLType;
+    private void initView(String title){
         editQuestion_FRAME_question = binding.editQuestionFRAMEQuestion;
 
         MaterialToolbar myToolbar = binding.topAppBar;
         //MaterialTextView toolbar_LBL_title = binding.toolbarLBLTitle;
         setSupportActionBar(myToolbar);
-        myToolbar.setTitle(R.string.new_question);
+        if(title == null)
+            myToolbar.setTitle(R.string.new_question);
+        else 
+            myToolbar.setTitle(title);
         //Objects.requireNonNull(getSupportActionBar()).setDisplayShowTitleEnabled(false);
 
         // listeners
@@ -80,6 +82,5 @@ public class EditQuestionActivity extends AppCompatActivity {
         Intent editQuestionActivity = new Intent(this, EditQuestionActivity.class);
         editQuestionActivity.putExtra(EditQuestionActivity.KEY_TYPE,type);
         startActivity(editQuestionActivity);
-        //requireActivity().finish();
     }
 }

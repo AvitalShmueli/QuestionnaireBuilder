@@ -26,5 +26,8 @@
     <string name="log_in">Log In</string>
     <string name="sign_up">Sign Up</string>
     <string name="select_language">Select Language</string>
+    <string name="home">Home</string>
+    <string name="create_survey">Create Survey</string>
+    <string name="active_surveys">Active surveys</string>
 
 </resources>

@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.ColorUtils;
 
+import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.textfield.TextInputEditText;
@@ -27,6 +28,7 @@ public class NewSurveyActivity extends AppCompatActivity {
     private MaterialButton newSurvey_BTN_themeGreen;
     private MaterialButton newSurvey_BTN_themeBlue;
     private MaterialButton newSurvey_BTN_themePurple;
+    private MaterialToolbar myToolBar;
 
 
     @Override
@@ -35,8 +37,13 @@ public class NewSurveyActivity extends AppCompatActivity {
         setContentView(R.layout.activity_new_survey);
 
         findViews();
+        initViews();
         setupDateFieldBehavior();
         handleThemeColorSelection();
+    }
+
+    private void initViews() {
+        myToolBar.setNavigationOnClickListener(v -> finish());
     }
 
     private void setupDateFieldBehavior() {
@@ -94,6 +101,7 @@ public class NewSurveyActivity extends AppCompatActivity {
         newSurvey_BTN_themeGreen = findViewById(R.id.newSurvey_BTN_themeGreen);
         newSurvey_BTN_themeBlue = findViewById(R.id.newSurvey_BTN_themeBlue);
         newSurvey_BTN_themePurple = findViewById(R.id.newSurvey_BTN_themePurple);
+        myToolBar = findViewById(R.id.topAppBar);
     }
 
     private void handleThemeColorSelection() {

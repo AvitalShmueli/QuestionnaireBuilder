@@ -13,6 +13,7 @@ import androidx.core.view.WindowInsetsCompat;
 import com.example.questionnairebuilder.databinding.ActivityEditQuestionBinding;
 import com.example.questionnairebuilder.ui.question_types.ChoiceQuestionFragment;
 import com.example.questionnairebuilder.ui.question_types.OpenQuestionFragment;
+import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.textview.MaterialTextView;
 
 import java.util.Objects;
@@ -34,12 +35,6 @@ public class EditQuestionActivity extends AppCompatActivity {
 
         binding = ActivityEditQuestionBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-
-        ViewCompat.setOnApplyWindowInsetsListener(binding.getRoot(), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
 
         Intent previousIntent = getIntent();
         String type = previousIntent.getStringExtra(KEY_TYPE);
@@ -65,21 +60,17 @@ public class EditQuestionActivity extends AppCompatActivity {
                     //break;
             }
         }
-
-
-
     }
 
     private void initView(){
         editQuestion_LBL_type = binding.editQuestionLBLType;
         editQuestion_FRAME_question = binding.editQuestionFRAMEQuestion;
 
-
-        Toolbar myToolbar = binding.editQuestionToolbar;
-        MaterialTextView toolbar_LBL_title = binding.toolbarLBLTitle;
+        MaterialToolbar myToolbar = binding.topAppBar;
+        //MaterialTextView toolbar_LBL_title = binding.toolbarLBLTitle;
         setSupportActionBar(myToolbar);
-        toolbar_LBL_title.setText(R.string.new_question);
-        Objects.requireNonNull(getSupportActionBar()).setDisplayShowTitleEnabled(false);
+        myToolbar.setTitle(R.string.new_question);
+        //Objects.requireNonNull(getSupportActionBar()).setDisplayShowTitleEnabled(false);
 
         // listeners
         myToolbar.setNavigationOnClickListener(v -> finish());

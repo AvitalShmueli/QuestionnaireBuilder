@@ -8,8 +8,8 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import java.util.ArrayList;
-import java.util.Collections;
+import com.example.questionnairebuilder.models.Question;
+
 import java.util.List;
 
 public class QuestionsRecyclerView {
@@ -47,14 +47,14 @@ public class QuestionsRecyclerView {
 
             Question from = questionsList.get(fromPosition);
             Question to = questionsList.get(toPosition);
-            Log.d("TEST","1 fromPosition: " + fromPosition + " " + questionsList.get(fromPosition).getQuestion() +", #" + questionsList.get(fromPosition).getOrder());
-            Log.d("TEST","1 toPosition: " + toPosition + " " + questionsList.get(toPosition).getQuestion() +", #" + questionsList.get(toPosition).getOrder());
+            Log.d("TEST","1 fromPosition: " + fromPosition + " " + questionsList.get(fromPosition).getQuestionTitle() +", #" + questionsList.get(fromPosition).getOrder());
+            Log.d("TEST","1 toPosition: " + toPosition + " " + questionsList.get(toPosition).getQuestionTitle() +", #" + questionsList.get(toPosition).getOrder());
             questionsList.set(toPosition,from).setOrder(toPosition+1);
             questionsList.set(fromPosition,to).setOrder(fromPosition+1);
 
 
-            Log.d("TEST","2 fromPosition: " + fromPosition + " " + questionsList.get(fromPosition).getQuestion() +", #" + questionsList.get(fromPosition).getOrder());
-            Log.d("TEST","2 toPosition: " + toPosition + " " + questionsList.get(toPosition).getQuestion() +", #" + questionsList.get(toPosition).getOrder());
+            Log.d("TEST","2 fromPosition: " + fromPosition + " " + questionsList.get(fromPosition).getQuestionTitle() +", #" + questionsList.get(fromPosition).getOrder());
+            Log.d("TEST","2 toPosition: " + toPosition + " " + questionsList.get(toPosition).getQuestionTitle() +", #" + questionsList.get(toPosition).getOrder());
 
 
             if( recyclerView.getAdapter() != null)

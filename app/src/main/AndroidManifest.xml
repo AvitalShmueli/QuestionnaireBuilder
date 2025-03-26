@@ -12,12 +12,13 @@
         android:supportsRtl="false"
         android:theme="@style/Theme.QuestionnaireBuilder"
         tools:targetApi="31">
+
         <activity
             android:name=".EditQuestionActivity"
             android:exported="false" />
         <activity
             android:name=".MainActivity"
-            android:exported="true" >
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -26,8 +27,7 @@
         </activity>
         <activity
             android:name=".LauncherActivity"
-            android:exported="false"/>
-
+            android:exported="false" />
         <activity
             android:name=".WelcomeActivity"
             android:exported="false" />

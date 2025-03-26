@@ -1,6 +1,6 @@
 package com.example.questionnairebuilder.listeners;
 
-import com.example.questionnairebuilder.Question;
+import com.example.questionnairebuilder.models.Question;
 
 import java.util.List;
 

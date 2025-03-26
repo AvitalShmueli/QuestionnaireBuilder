@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.questionnairebuilder.listeners.OnQuestionListChangedListener;
+import com.example.questionnairebuilder.models.Question;
 
 import java.util.List;
 
@@ -41,7 +42,7 @@ public class QuestionsAdapter extends RecyclerView.Adapter<QuestionsAdapter.View
     public void onBindViewHolder(@NonNull QuestionsAdapter.ViewHolder holder, int position) {
         if (questionList.size() > 0 && questionList != null) {
             Question question = questionList.get(position);
-            String title = question.getQuestion();
+            String title = question.getQuestionTitle();
             int order = question.setOrder(position + 1).getOrder() ;
             holder.rv_title.setText(title + " | " + order);
         }

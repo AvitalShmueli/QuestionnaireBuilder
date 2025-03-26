@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="title_activity_home">מסך הבית</string>
+    <string name="title_home">בית</string>
+    <string name="title_explore">גלה</string>
+    <string name="title_my_surveys">הסקרים שלי</string>
+    <string name="title_settings">הגדרות</string>
+    <string name="title">כותרת</string>
+    <string name="description">תיאור</string>
+    <string name="due_date">תאריך יעד</string>
+    <string name="theme">ערכת נושא</string>
+    <string name="continue_btn">המשך</string>
+    <string name="save">שמירה</string>
+    <string name="cancel">ביטול</string>
+    <string name="mandatory">שדה חובה?</string>
+    <string name="question_title">כותרת שאלה</string>
+    <string name="new_question">שאלה חדשה</string>
+    <string name="max_allowed_selections">מס\' מקסימלי של בחירות</string>
+    <string name="delete_row">מחיקת שורה</string>
+    <string name="enter_text">הכנס/י טקסט</string>
+    <string name="answer_choices">אפשרויות בחירה</string>
+    <string name="log_in">התחברות</string>
+    <string name="sign_up">הרשמה</string>
+    <string name="select_language">בחירת שפה</string>
+    <string name="show_other_option">הצגת אפשרות \"אחר\"</string>
+    <string name="open_ended_question">שאלה פתוחה</string>
+    <string name="single_choice">בחירה יחידה</string>
+    <string name="dropdown">רשימה נפתחת</string>
+    <string name="yes_no">כן / לא</string>
+    <string name="multiple_choice">בחירה מרובה</string>
+    <string name="rating_scale">סולם דירוג</string>
+    <string name="matrix_question">מטריצה</string>
+    <string name="add_your_first_question">הוספת שאלה ראשונה</string>
+</resources>

@@ -1,26 +1,33 @@
 package com.example.questionnairebuilder.ui.question_types;
 
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
+
 import android.os.Bundle;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
+import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
-
 import com.example.questionnairebuilder.R;
 import com.example.questionnairebuilder.adapters.ChoicesAdapter;
 import com.example.questionnairebuilder.databinding.FragmentChoiceQuestionBinding;
 import com.example.questionnairebuilder.listeners.OnRowCountChangeListener;
+import com.example.questionnairebuilder.models.MultipleChoiceQuestion;
+import com.example.questionnairebuilder.models.Question;
+import com.example.questionnairebuilder.models.SingleChoiceQuestion;
+import com.example.questionnairebuilder.models.SingleChoiceType;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.materialswitch.MaterialSwitch;
 import com.google.android.material.textfield.TextInputEditText;
-import com.google.android.material.textfield.TextInputLayout;
 import com.google.android.material.textview.MaterialTextView;
 
 import java.util.ArrayList;
@@ -31,11 +38,12 @@ public class ChoiceQuestionFragment extends Fragment implements OnRowCountChange
     private TextInputEditText choiceQuestion_TXT_question;
     private RecyclerView choiceQuestion_RV_choices;
     private MaterialSwitch choiceQuestion_SW_mandatory;
-    private TextInputLayout choiceQuestion_DD_layout_maxAllowed;
+    private MaterialSwitch choiceQuestion_SW_other;
+    private LinearLayout choiceQuestion_LL_maxAllowed;
     private AutoCompleteTextView choiceQuestion_DD_maxAllowed;
     private MaterialTextView choiceQuestion_LBL_singleChoice;
     private ArrayList<Integer> itemsMaxSelectionsAllowed;
-    private Integer selectedMaxSelectionsAllowed = null;
+    private Integer selectedMaxSelectionsAllowed = 1;
     private ChoicesAdapter choicesAdapter;
     private MaterialButton choiceQuestion_BTN_save;
     private MaterialButton choiceQuestion_BTN_cancel;
@@ -92,13 +100,13 @@ public class ChoiceQuestionFragment extends Fragment implements OnRowCountChange
         // the question
         choiceQuestion_TXT_question = binding.choiceQuestionTXTQuestion;
         choiceQuestion_SW_mandatory = binding.choiceQuestionSWMandatory;
+        choiceQuestion_SW_other = binding.choiceQuestionSWOther;
 
         // max selection allowed dropdown
-        choiceQuestion_DD_layout_maxAllowed = binding.choiceQuestionDDLayoutMaxAllowed;
         choiceQuestion_DD_maxAllowed = binding.choiceQuestionDDMaxAllowed;
         choiceQuestion_LBL_singleChoice = binding.choiceQuestionLBLSingleChoice;
-        //choiceQuestion_DD_layout_maxAllowed.setVisibility(type.equals("Single choice") ? GONE : VISIBLE);
-        //choiceQuestion_LBL_singleChoice.setVisibility(type.equals("Single choice") ? VISIBLE : GONE);
+        choiceQuestion_LL_maxAllowed = binding.choiceQuestionLLMaxAllowed;
+        choiceQuestion_LL_maxAllowed.setVisibility(type.equals(getString(R.string.multiple_choice)) ? VISIBLE : GONE);
         initDropDownValues();
 
         // choices repeating table
@@ -111,17 +119,38 @@ public class ChoiceQuestionFragment extends Fragment implements OnRowCountChange
         choiceQuestion_BTN_save = binding.choiceQuestionBTNSave;
         choiceQuestion_BTN_cancel = binding.choiceQuestionBTNCancel;
         choiceQuestion_BTN_cancel.setOnClickListener(v -> requireActivity().finish());
-        choiceQuestion_BTN_save.setOnClickListener(v -> {});
+        choiceQuestion_BTN_save.setOnClickListener(v -> {
+            Question q;
+            String questionTitle = choiceQuestion_TXT_question.getText().toString().trim();
+            ArrayList<String> theChoices = choicesAdapter.getDataList();
+            boolean other = choiceQuestion_SW_other.isChecked();
+            switch (type){
+                case "Single choice":
+                    q = new SingleChoiceQuestion(questionTitle,theChoices,other, SingleChoiceType.RADIO);
+                    break;
+                case "Dropdown":
+                    q = new SingleChoiceQuestion(questionTitle,theChoices,other, SingleChoiceType.DROPDOWN);
+                    break;
+                default:
+                    q = new MultipleChoiceQuestion(questionTitle,theChoices,other)
+                            .setAllowedSelectionNum(selectedMaxSelectionsAllowed);
+                    Log.d("pttt","max selections: "+selectedMaxSelectionsAllowed);
+                    break;
+            }
+            Log.d("pttt","the choices: "+theChoices);
+            q.save();
+        });
     }
 
     private void initDropDownValues() {
         itemsMaxSelectionsAllowed = new ArrayList<>();
         itemsMaxSelectionsAllowed.add(1);
 
+        choiceQuestion_DD_maxAllowed.setText(""+selectedMaxSelectionsAllowed);
         ArrayAdapter<Integer> adapterItems_MaxSelectionsAllowed = new ArrayAdapter<>(requireActivity(), R.layout.dropdown_item, itemsMaxSelectionsAllowed);
         choiceQuestion_DD_maxAllowed.setAdapter(adapterItems_MaxSelectionsAllowed);
         choiceQuestion_DD_maxAllowed.setOnItemClickListener((adapterView, view, position, id) -> {
-            selectedMaxSelectionsAllowed = position;
+            selectedMaxSelectionsAllowed = adapterItems_MaxSelectionsAllowed.getItem(position);
         });
     }
 

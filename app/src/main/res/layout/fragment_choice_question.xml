@@ -68,6 +68,14 @@
                 android:background="?attr/colorSecondary"/>
 
             <com.google.android.material.materialswitch.MaterialSwitch
+                android:id="@+id/choiceQuestion_SW_other"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/input_vertical_margin"
+                android:checked="false"
+                android:text="@string/show_other_option"/>
+
+            <com.google.android.material.materialswitch.MaterialSwitch
                 android:id="@+id/choiceQuestion_SW_mandatory"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -76,6 +84,7 @@
                 android:text="@string/mandatory"/>
 
             <LinearLayout
+                android:id="@+id/choiceQuestion_LL_maxAllowed"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/input_vertical_margin"

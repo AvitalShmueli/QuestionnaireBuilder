@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.widget.FrameLayout;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 
 import com.example.questionnairebuilder.databinding.ActivityEditQuestionBinding;
 import com.example.questionnairebuilder.models.QuestionType;
@@ -13,9 +12,6 @@ import com.example.questionnairebuilder.models.QuestionTypeManager;
 import com.example.questionnairebuilder.ui.question_types.ChoiceQuestionFragment;
 import com.example.questionnairebuilder.ui.question_types.OpenQuestionFragment;
 import com.google.android.material.appbar.MaterialToolbar;
-import com.google.android.material.textview.MaterialTextView;
-
-import java.util.Objects;
 
 public class EditQuestionActivity extends AppCompatActivity {
     public static final String KEY_TYPE = "KEY_TYPE";

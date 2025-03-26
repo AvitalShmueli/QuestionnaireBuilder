@@ -37,5 +37,8 @@
     <string name="rating_scale">Rating scale</string>
     <string name="matrix_question">Matrix question</string>
     <string name="add_your_first_question">Add your first question</string>
+    <string name="home">Home</string>
+    <string name="create_survey">Create Survey</string>
+    <string name="active_surveys">Active surveys</string>
 
 </resources>

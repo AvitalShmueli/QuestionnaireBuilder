@@ -2,6 +2,7 @@ package com.example.questionnairebuilder;
 
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
@@ -36,6 +37,13 @@ public class WelcomeActivity extends AppCompatActivity {
         animateEntrance(welcome_BTN_signUp, 0);
 
         welcome_IMG_language.setOnClickListener(view -> showLanguageDialog());
+        welcome_BTN_login.setOnClickListener(view -> moveToHome());
+    }
+
+    private void moveToHome() {
+        Intent intent = new Intent(WelcomeActivity.this, MainActivity.class);
+        startActivity(intent);
+        finish();
     }
 
     private void findViews() {

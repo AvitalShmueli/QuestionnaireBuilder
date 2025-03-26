@@ -12,6 +12,7 @@ import com.example.questionnairebuilder.models.QuestionType;
 import com.example.questionnairebuilder.models.QuestionTypeManager;
 import com.example.questionnairebuilder.ui.question_types.ChoiceQuestionFragment;
 import com.example.questionnairebuilder.ui.question_types.OpenQuestionFragment;
+import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.textview.MaterialTextView;
 
 import java.util.Objects;
@@ -64,13 +65,14 @@ public class EditQuestionActivity extends AppCompatActivity {
     private void initView(String title){
         editQuestion_FRAME_question = binding.editQuestionFRAMEQuestion;
 
-        Toolbar myToolbar = binding.editQuestionToolbar;
-        MaterialTextView toolbar_LBL_title = binding.toolbarLBLTitle;
+        MaterialToolbar myToolbar = binding.topAppBar;
+        //MaterialTextView toolbar_LBL_title = binding.toolbarLBLTitle;
         setSupportActionBar(myToolbar);
         if(title == null)
-            toolbar_LBL_title.setText(R.string.new_question);
-        else toolbar_LBL_title.setText(title);
-        Objects.requireNonNull(getSupportActionBar()).setDisplayShowTitleEnabled(false);
+            myToolbar.setTitle(R.string.new_question);
+        else 
+            myToolbar.setTitle(title);
+        //Objects.requireNonNull(getSupportActionBar()).setDisplayShowTitleEnabled(false);
 
         // listeners
         myToolbar.setNavigationOnClickListener(v -> finish());

@@ -9,14 +9,20 @@
 
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/topAppBar"
+        app:menu="@menu/top_app_bar_menu"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:background="?attr/colorSurface"
+        android:background="?attr/android:statusBarColor"
         android:backgroundTint="@color/light_blue"
         android:titleTextColor="@android:color/black"
-        app:navigationIcon="@drawable/ic_arrow_back"
+        app:navigationIcon="@drawable/arrow_back_24px"
         app:title="New Survey"
-        app:titleCentered="true" />
+        app:titleCentered="true"
+        android:elevation="@dimen/toolbar_elevation"
+        app:titleTextColor="@color/blackish"
+        app:titleTextAppearance="@style/toolbarTextStyle"
+        android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
 
     <ScrollView
         android:id="@+id/surveyScroll"

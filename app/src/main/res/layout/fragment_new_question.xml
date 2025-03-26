@@ -32,13 +32,13 @@
             android:id="@+id/question_LBL_add"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:text="Add your first question"
+            android:text="@string/add_your_first_question"
             android:paddingHorizontal="16dp"
             android:textColor="@color/blue"
             android:textStyle="bold"
             android:textSize="18sp"
             android:gravity="center_vertical"
-            android:layout_weight="1"/>
+            android:layout_weight="1" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/question_FAB_add"

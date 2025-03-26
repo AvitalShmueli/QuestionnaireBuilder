@@ -1,10 +1,10 @@
 package com.example.questionnairebuilder;
 
 import android.os.Bundle;
+import android.view.Menu;
 
 import com.example.questionnairebuilder.databinding.ActivityMainBinding;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.android.material.textview.MaterialTextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -16,13 +16,10 @@ import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
-import java.util.Objects;
-
 public class MainActivity extends AppCompatActivity {
 
     private ActivityMainBinding binding;
     private Toolbar myToolbar;
-    //private MaterialTextView toolbar_LBL_title;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,20 +40,21 @@ public class MainActivity extends AppCompatActivity {
         NavigationUI.setupWithNavController(binding.navView, navController);
 
         myToolbar = binding.topAppBar;
-        //toolbar_LBL_title = binding.toolbarLBLTitle;
         setSupportActionBar(myToolbar);
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         navController.addOnDestinationChangedListener(new NavController.OnDestinationChangedListener() {
             @Override
             public void onDestinationChanged(@NonNull NavController controller,
                                              @NonNull NavDestination destination, @Nullable Bundle arguments) {
-                //toolbar_LBL_title.setText(destination.getLabel());
                 myToolbar.setNavigationIcon(null);
             }
         });
-        //Objects.requireNonNull(getSupportActionBar()).setDisplayShowTitleEnabled(false);
         myToolbar.setNavigationIcon(null);
     }
 
-
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.top_app_bar_menu, menu);
+        return true;
+    }
 }

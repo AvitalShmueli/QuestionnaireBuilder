@@ -6,13 +6,13 @@ public abstract class ChoiceQuestion extends Question{
     private ArrayList<String> choices;
     private boolean other;
 
-    public ChoiceQuestion(String question, String type) {
+    public ChoiceQuestion(String question, QuestionType type) {
         super(question, type);
         this.choices = new ArrayList<>();
         this.other = false;
     }
 
-    public ChoiceQuestion(String question, String type, ArrayList<String> choices, boolean other) {
+    public ChoiceQuestion(String question, QuestionType type, ArrayList<String> choices, boolean other) {
         super(question, type);
         this.choices = choices;
         this.other = other;

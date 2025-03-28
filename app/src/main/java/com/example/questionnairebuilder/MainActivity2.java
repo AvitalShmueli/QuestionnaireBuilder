@@ -11,12 +11,11 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.questionnairebuilder.listeners.OnQuestionListChangedListener;
 import com.example.questionnairebuilder.listeners.OnStartDragListener;
-import com.example.questionnairebuilder.models.ChoiceQuestion;
 import com.example.questionnairebuilder.models.MultipleChoiceQuestion;
-import com.example.questionnairebuilder.models.OpenQuestion;
+import com.example.questionnairebuilder.models.OpenEndedQuestion;
 import com.example.questionnairebuilder.models.Question;
+import com.example.questionnairebuilder.models.QuestionType;
 import com.example.questionnairebuilder.models.SingleChoiceQuestion;
-import com.example.questionnairebuilder.models.SingleChoiceType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,21 +26,21 @@ public class MainActivity2 extends AppCompatActivity implements OnQuestionListCh
 
     private List<Question> questionListDemo(){
         List<Question> list = new ArrayList<>();
-        list.add(new OpenQuestion("Q1 - What is your name?","open"));
-        list.add(new OpenQuestion("Q2 - How old are you?","number"));
-        list.add(new OpenQuestion("Q3?","open"));
-        list.add(new OpenQuestion("Q4?","open"));
-        list.add(new OpenQuestion("Q5?","open"));
-        list.add(new OpenQuestion("Q6?","open"));
-        list.add(new OpenQuestion("Q7?","open"));
-        list.add(new OpenQuestion("Q8?","open"));
-        list.add(new OpenQuestion("Q9?","open"));
-        list.add(new OpenQuestion("Q10?","open"));
-        list.add(new OpenQuestion("Q11?","open"));
-        list.add(new OpenQuestion("Q12?","open"));
+        list.add(new OpenEndedQuestion("Q1 - What is your name?"));
+        list.add(new OpenEndedQuestion("Q2 - How old are you?"));
+        list.add(new OpenEndedQuestion("Q3?"));
+        list.add(new OpenEndedQuestion("Q4?"));
+        list.add(new OpenEndedQuestion("Q5?"));
+        list.add(new OpenEndedQuestion("Q6?"));
+        list.add(new OpenEndedQuestion("Q7?"));
+        list.add(new OpenEndedQuestion("Q8?"));
+        list.add(new OpenEndedQuestion("Q9?"));
+        list.add(new OpenEndedQuestion("Q10?"));
+        list.add(new OpenEndedQuestion("Q11?"));
+        list.add(new OpenEndedQuestion("Q12?"));
         list.add(new MultipleChoiceQuestion("Q13?"));
-        list.add(new SingleChoiceQuestion("Q14?",SingleChoiceType.DROPDOWN));
-        list.add(new SingleChoiceQuestion("Q15?", SingleChoiceType.YES_NO));
+        list.add(new SingleChoiceQuestion("Q14?", QuestionType.DROPDOWN));
+        list.add(new SingleChoiceQuestion("Q15?", QuestionType.YES_NO));
         return list;
     }
 

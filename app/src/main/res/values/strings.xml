@@ -9,12 +9,6 @@
     <string name="description">Description</string>
     <string name="due_date">Due Date</string>
     <string name="theme">Theme</string>
-    <string name="continue_btn">Continue</string>
-
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment" translatable="false">Hello blank fragment</string>
-    <string name="save">Save</string>
-    <string name="cancel">Cancel</string>
     <string name="mandatory">Mandatory?</string>
     <string name="question_title">Question Title</string>
     <string name="new_question">New Question</string>
@@ -23,10 +17,20 @@
     <string name="enter_text">Enter text</string>
     <string name="answer_choices">Answer Choices</string>
     <string name="single_choice_selections_num" translatable="false">1</string>
-    <string name="log_in">Log In</string>
-    <string name="sign_up">Sign Up</string>
     <string name="select_language">Select Language</string>
     <string name="show_other_option">Show \"Other\" option</string>
+    <string name="create_survey">Create Survey</string>
+    <string name="active_surveys">Active surveys</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="add_the_first_question">Add the first question</string>
+
+    <!-- Buttons -->
+    <string name="log_in">Log In</string>
+    <string name="sign_up">Sign Up</string>
+    <string name="continue_btn">Continue</string>
+    <string name="save">Save</string>
+    <string name="cancel">Cancel</string>
 
     <!-- Question types -->
     <string name="open_ended_question">Open-ended question</string>
@@ -34,11 +38,9 @@
     <string name="dropdown">Dropdown</string>
     <string name="yes_no">Yes/No</string>
     <string name="multiple_choice">Multiple choice</string>
+    <string name="date">Date</string>
     <string name="rating_scale">Rating scale</string>
     <string name="matrix_question">Matrix question</string>
-    <string name="add_your_first_question">Add your first question</string>
-    <string name="home">Home</string>
-    <string name="create_survey">Create Survey</string>
-    <string name="active_surveys">Active surveys</string>
+
 
 </resources>

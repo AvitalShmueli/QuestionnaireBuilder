@@ -24,13 +24,13 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="@dimen/input_vertical_margin"
                 android:hint="@string/question_title"
-                app:boxStrokeColor="?attr/colorPrimary"
-                app:hintTextColor="?attr/colorSecondaryVariant"
                 app:boxBackgroundMode="outline"
                 app:boxCornerRadiusBottomEnd="@dimen/corner_radius"
                 app:boxCornerRadiusBottomStart="@dimen/corner_radius"
                 app:boxCornerRadiusTopEnd="@dimen/corner_radius"
-                app:boxCornerRadiusTopStart="@dimen/corner_radius">
+                app:boxCornerRadiusTopStart="@dimen/corner_radius"
+                app:boxStrokeColor="?attr/colorPrimary"
+                app:hintTextColor="?attr/colorSecondaryVariant">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/choiceQuestion_TXT_question"
@@ -114,16 +114,6 @@
                         tools:ignore="LabelFor,SpeakableTextPresentCheck" />
 
                 </com.google.android.material.textfield.TextInputLayout>
-
-                <com.google.android.material.textview.MaterialTextView
-                    android:id="@+id/choiceQuestion_LBL_singleChoice"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="end"
-                    android:layout_marginEnd="@dimen/input_horizontal_margin"
-                    android:visibility="gone"
-                    android:text="@string/single_choice_selections_num"/>
 
             </LinearLayout>
 

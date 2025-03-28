@@ -1,11 +1,19 @@
 package com.example.questionnairebuilder.models;
 
 public enum QuestionType {
-    Open_Ended_Question,
-    Single_Choice,
-    Yes_No,
-    Dropdown,
-    Multiple_Choice,
-    Rating_Scale,
-    Matrix_Question
+    OPEN_ENDED_QUESTION,
+    SINGLE_CHOICE,
+    YES_NO,
+    DROPDOWN,
+    MULTIPLE_CHOICE,
+    DATE,
+    RATING_SCALE,
+    MATRIX_QUESTION;
+
+    public boolean isSingleSelection() {
+        return this == SINGLE_CHOICE || this == YES_NO || this == DROPDOWN || this == RATING_SCALE;
+    }
+
 }
+
+

@@ -7,6 +7,7 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 
 import androidx.annotation.NonNull;
@@ -57,7 +58,13 @@ public class ChoicesAdapter extends RecyclerView.Adapter<ChoicesAdapter.ViewHold
         holder.rowItemEditText.setText(dataList.get(position));
         holder.rowItemEditText.setEnabled(!isFixedMode);
 
-        /* keep the keyboard enabled after each row insertion */
+        // Update IME options: last row should have "Done", others should have "Next"
+        if (position == dataList.size() - 1) {
+            holder.rowItemEditText.setImeOptions(EditorInfo.IME_ACTION_DONE);
+        } else {
+            holder.rowItemEditText.setImeOptions(EditorInfo.IME_ACTION_NEXT);
+        }
+
         holder.rowItemEditText.setOnEditorActionListener((v, actionId, event) -> {
             if (actionId == android.view.inputmethod.EditorInfo.IME_ACTION_DONE) {
                 int currentPosition = holder.getAdapterPosition();

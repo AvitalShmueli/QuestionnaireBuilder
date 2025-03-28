@@ -9,12 +9,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.questionnairebuilder.R;
 import com.example.questionnairebuilder.databinding.FragmentOpenQuestionBinding;
 import com.example.questionnairebuilder.models.OpenEndedQuestion;
 import com.example.questionnairebuilder.models.Question;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.materialswitch.MaterialSwitch;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -24,6 +26,7 @@ import com.google.android.material.textfield.TextInputEditText;
 public class OpenQuestionFragment extends Fragment {
 
     private FragmentOpenQuestionBinding binding;
+    private TextInputLayout openQuestion_TIL_question;
     private TextInputEditText openQuestion_TXT_question;
     private MaterialSwitch openQuestion_SW_mandatory;
     private MaterialButton openQuestion_BTN_save;
@@ -84,6 +87,7 @@ public class OpenQuestionFragment extends Fragment {
     private void createBinding() {
         openQuestion_BTN_save = binding.openQuestionBTNSave;
         openQuestion_BTN_cancel = binding.openQuestionBTNCancel;
+        openQuestion_TIL_question = binding.openQuestionTILQuestion;
         openQuestion_TXT_question = binding.openQuestionTXTQuestion;
         openQuestion_SW_mandatory = binding.openQuestionSWMandatory;
 
@@ -93,10 +97,19 @@ public class OpenQuestionFragment extends Fragment {
 
     private void save(){
         {
-            String questionTitle = openQuestion_TXT_question.getText().toString().trim();
-            boolean mandatory = openQuestion_SW_mandatory.isChecked();
-            Question q = new OpenEndedQuestion(questionTitle).setMandatory(mandatory);
-            q.save();
+            if (!isValid())
+                openQuestion_TIL_question.setError(getString(R.string.error_required));
+            else {
+                openQuestion_TIL_question.setError(null);
+                String questionTitle = openQuestion_TXT_question.getText().toString().trim();
+                boolean mandatory = openQuestion_SW_mandatory.isChecked();
+                Question q = new OpenEndedQuestion(questionTitle).setMandatory(mandatory);
+                q.save();
+            }
         }
+    }
+
+    private boolean isValid(){
+        return !openQuestion_TXT_question.getText().toString().trim().isEmpty();
     }
 }

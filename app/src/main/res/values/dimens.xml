@@ -13,4 +13,5 @@
     <dimen name="toolbar_elevation">4dp</dimen>
     <dimen name="corner_radius">8dp</dimen>
     <dimen name="padding_vertical">10dp</dimen>
+    <dimen name="supporting_text_margins">16dp</dimen>
 </resources>

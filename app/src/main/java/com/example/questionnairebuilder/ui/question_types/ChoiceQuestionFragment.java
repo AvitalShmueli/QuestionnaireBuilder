@@ -29,6 +29,7 @@ import com.example.questionnairebuilder.models.SingleChoiceQuestion;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.materialswitch.MaterialSwitch;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 import com.google.android.material.textview.MaterialTextView;
 
 import java.util.ArrayList;
@@ -36,8 +37,10 @@ import java.util.ArrayList;
 public class ChoiceQuestionFragment extends Fragment implements OnRowCountChangeListener{
 
     private FragmentChoiceQuestionBinding binding;
+    private TextInputLayout choiceQuestion_TIL_question;
     private TextInputEditText choiceQuestion_TXT_question;
     private RecyclerView choiceQuestion_RV_choices;
+    private MaterialTextView choiceQuestion_LBL_ErrorRV;
     private MaterialSwitch choiceQuestion_SW_mandatory;
     private MaterialSwitch choiceQuestion_SW_other;
     private LinearLayout choiceQuestion_LL_maxAllowed;
@@ -102,6 +105,7 @@ public class ChoiceQuestionFragment extends Fragment implements OnRowCountChange
 
     private void createBinding() {
         // the question
+        choiceQuestion_TIL_question = binding.choiceQuestionTILQuestion;
         choiceQuestion_TXT_question = binding.choiceQuestionTXTQuestion;
         choiceQuestion_SW_mandatory = binding.choiceQuestionSWMandatory;
         choiceQuestion_SW_other = binding.choiceQuestionSWOther;
@@ -114,6 +118,7 @@ public class ChoiceQuestionFragment extends Fragment implements OnRowCountChange
 
         // choices repeating table
         choiceQuestion_RV_choices = binding.choiceQuestionRVChoices;
+        choiceQuestion_LBL_ErrorRV = binding.choiceQuestionLBLErrorRV;
         choiceQuestion_RV_choices.setLayoutManager(new LinearLayoutManager(requireActivity()));
 
         ArrayList<String> choices = new ArrayList<>();
@@ -171,13 +176,16 @@ public class ChoiceQuestionFragment extends Fragment implements OnRowCountChange
 
 
     private void save(){
-        {
+        if (isValid()) {
+            choiceQuestion_TIL_question.setError(null);
+            choiceQuestion_LBL_ErrorRV.setVisibility(GONE);
+
             Question q;
             String questionTitle = choiceQuestion_TXT_question.getText().toString().trim();
             boolean mandatory = choiceQuestion_SW_mandatory.isChecked();
             ArrayList<String> theChoices = choicesAdapter.getDataList();
             boolean other = choiceQuestion_SW_other.isChecked();
-            switch (questionType){
+            switch (questionType) {
                 case SINGLE_CHOICE:
                     q = new SingleChoiceQuestion(questionTitle, QuestionType.SINGLE_CHOICE, theChoices, other);
                     break;
@@ -188,15 +196,23 @@ public class ChoiceQuestionFragment extends Fragment implements OnRowCountChange
                     q = new SingleChoiceQuestion(questionTitle, QuestionType.YES_NO, theChoices, other);
                     break;
                 default:
-                    q = new MultipleChoiceQuestion(questionTitle,theChoices,other)
+                    q = new MultipleChoiceQuestion(questionTitle, theChoices, other)
                             .setAllowedSelectionNum(selectedMaxSelectionsAllowed);
-                    Log.d("pttt","max selections: "+selectedMaxSelectionsAllowed);
+                    Log.d("pttt", "max selections: " + selectedMaxSelectionsAllowed);
                     break;
             }
             q.setMandatory(mandatory);
-            Log.d("pttt","the choices: " + theChoices);
+            Log.d("pttt", "the choices: " + theChoices);
             q.save();
         }
+        else{
+            choiceQuestion_TIL_question.setError(choiceQuestion_TXT_question.getText().toString().trim().isEmpty()? getString(R.string.error_required) : null);
+            choiceQuestion_LBL_ErrorRV.setVisibility(choicesAdapter.getDataList().isEmpty() ? VISIBLE : GONE);
+        }
+    }
+
+    private boolean isValid(){
+        return !choiceQuestion_TXT_question.getText().toString().trim().isEmpty() && !choicesAdapter.getDataList().isEmpty();
     }
 
 }

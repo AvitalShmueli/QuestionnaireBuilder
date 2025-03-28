@@ -109,6 +109,28 @@ public class ChoicesAdapter extends RecyclerView.Adapter<ChoicesAdapter.ViewHold
             return false;
         });
 
+        holder.rowItemEditText.setOnFocusChangeListener((v, hasFocus) -> {
+            if (!hasFocus) { // When EditText loses focus
+                int currentPosition = holder.getAdapterPosition();
+                if (currentPosition == RecyclerView.NO_POSITION) return;
+
+                String text = holder.rowItemEditText.getText().toString();
+                dataList.set(currentPosition, text);
+
+                // Add a new row only if it's the last row and has content
+                if (currentPosition == dataList.size() - 1 && !text.isEmpty()) {
+                    dataList.add("");
+                    notifyItemInserted(dataList.size() - 1);
+                    notifyItemRangeChanged(currentPosition, dataList.size());
+
+                    // Notify listener about row count change
+                    if (rowCountListener != null) {
+                        rowCountListener.onRowCountChanged(getValidChoiceCount());
+                    }
+                }
+            }
+        });
+
         holder.deleteIcon.setVisibility(!isFixedMode? VISIBLE : GONE);
         holder.deleteIcon.setEnabled(!isFixedMode && dataList.size() > 1);
         holder.deleteIcon.setAlpha(!isFixedMode && dataList.size() > 1 ? 1.0f : 0.5f); // Dim icon if disabled

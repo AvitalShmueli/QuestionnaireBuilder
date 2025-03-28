@@ -108,7 +108,9 @@ public class ChoiceQuestionFragment extends Fragment implements OnRowCountChange
         choiceQuestion_TIL_question = binding.choiceQuestionTILQuestion;
         choiceQuestion_TXT_question = binding.choiceQuestionTXTQuestion;
         choiceQuestion_SW_mandatory = binding.choiceQuestionSWMandatory;
+        choiceQuestion_SW_mandatory.setOnClickListener(v -> choiceQuestion_RV_choices.clearFocus());
         choiceQuestion_SW_other = binding.choiceQuestionSWOther;
+        choiceQuestion_SW_other.setOnClickListener(v -> choiceQuestion_RV_choices.clearFocus());
 
         // max selection allowed dropdown
         choiceQuestion_DD_maxAllowed = binding.choiceQuestionDDMaxAllowed;
@@ -134,7 +136,10 @@ public class ChoiceQuestionFragment extends Fragment implements OnRowCountChange
         choiceQuestion_BTN_save = binding.choiceQuestionBTNSave;
         choiceQuestion_BTN_cancel = binding.choiceQuestionBTNCancel;
         choiceQuestion_BTN_cancel.setOnClickListener(v -> requireActivity().finish());
-        choiceQuestion_BTN_save.setOnClickListener(v -> save());
+        choiceQuestion_BTN_save.setOnClickListener(v -> {
+            choiceQuestion_RV_choices.clearFocus();
+            save();
+        });
     }
 
     private void initDropDownValues() {
@@ -145,9 +150,7 @@ public class ChoiceQuestionFragment extends Fragment implements OnRowCountChange
         choiceQuestion_DD_maxAllowed.setText(maxSelections);
         ArrayAdapter<Integer> adapterItems_MaxSelectionsAllowed = new ArrayAdapter<>(requireActivity(), R.layout.dropdown_item, itemsMaxSelectionsAllowed);
         choiceQuestion_DD_maxAllowed.setAdapter(adapterItems_MaxSelectionsAllowed);
-        choiceQuestion_DD_maxAllowed.setOnItemClickListener((adapterView, view, position, id) -> {
-            selectedMaxSelectionsAllowed = adapterItems_MaxSelectionsAllowed.getItem(position);
-        });
+        choiceQuestion_DD_maxAllowed.setOnItemClickListener((adapterView, view, position, id) -> selectedMaxSelectionsAllowed = adapterItems_MaxSelectionsAllowed.getItem(position));
     }
 
 

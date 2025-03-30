@@ -23,7 +23,7 @@ import com.example.questionnairebuilder.databinding.FragmentChoiceQuestionBindin
 import com.example.questionnairebuilder.listeners.OnRowCountChangeListener;
 import com.example.questionnairebuilder.models.MultipleChoiceQuestion;
 import com.example.questionnairebuilder.models.Question;
-import com.example.questionnairebuilder.models.QuestionType;
+import com.example.questionnairebuilder.models.QuestionTypeEnum;
 import com.example.questionnairebuilder.models.QuestionTypeManager;
 import com.example.questionnairebuilder.models.SingleChoiceQuestion;
 import com.google.android.material.button.MaterialButton;
@@ -57,7 +57,7 @@ public class ChoiceQuestionFragment extends Fragment implements OnRowCountChange
     private static final String ARG_TYPE = "ARG_TYPE";
 
     private String strType;
-    private QuestionType questionType;
+    private QuestionTypeEnum questionTypeEnum;
 
 
     public ChoiceQuestionFragment() {
@@ -86,7 +86,7 @@ public class ChoiceQuestionFragment extends Fragment implements OnRowCountChange
         if (getArguments() != null) {
             strType = getArguments().getString(ARG_TYPE);
             if(strType != null)
-                questionType = QuestionTypeManager.getKeyByValue(strType);
+                questionTypeEnum = QuestionTypeManager.getKeyByValue(strType);
         }
     }
 
@@ -124,7 +124,7 @@ public class ChoiceQuestionFragment extends Fragment implements OnRowCountChange
         choiceQuestion_RV_choices.setLayoutManager(new LinearLayoutManager(requireActivity()));
 
         ArrayList<String> choices = new ArrayList<>();
-        if(questionType == QuestionType.YES_NO){
+        if(questionTypeEnum == QuestionTypeEnum.YES_NO){
             choices.add(requireContext().getString(R.string.yes));
             choices.add(requireContext().getString(R.string.no));
         }
@@ -159,7 +159,7 @@ public class ChoiceQuestionFragment extends Fragment implements OnRowCountChange
         choiceCount = count;
         if (itemsMaxSelectionsAllowed != null) {
             itemsMaxSelectionsAllowed.clear();
-            if (count == 0 || questionType == QuestionType.SINGLE_CHOICE) {
+            if (count == 0 || questionTypeEnum == QuestionTypeEnum.SINGLE_CHOICE) {
                 itemsMaxSelectionsAllowed.add(1);
             } else {
                 for (int i = 1; i <= choiceCount; i++) {
@@ -171,8 +171,8 @@ public class ChoiceQuestionFragment extends Fragment implements OnRowCountChange
 
 
     private void loadQuestionDetails(Question q){
-        questionType = q.getType();
-        if(questionType.isSingleSelection()){
+        questionTypeEnum = q.getType();
+        if(questionTypeEnum.isSingleSelection()){
             // TODO: complete
         }
     }
@@ -188,15 +188,15 @@ public class ChoiceQuestionFragment extends Fragment implements OnRowCountChange
             boolean mandatory = choiceQuestion_SW_mandatory.isChecked();
             ArrayList<String> theChoices = choicesAdapter.getDataList();
             boolean other = choiceQuestion_SW_other.isChecked();
-            switch (questionType) {
+            switch (questionTypeEnum) {
                 case SINGLE_CHOICE:
-                    q = new SingleChoiceQuestion(questionTitle, QuestionType.SINGLE_CHOICE, theChoices, other);
+                    q = new SingleChoiceQuestion(questionTitle, QuestionTypeEnum.SINGLE_CHOICE, theChoices, other);
                     break;
                 case DROPDOWN:
-                    q = new SingleChoiceQuestion(questionTitle, QuestionType.DROPDOWN, theChoices, other);
+                    q = new SingleChoiceQuestion(questionTitle, QuestionTypeEnum.DROPDOWN, theChoices, other);
                     break;
                 case YES_NO:
-                    q = new SingleChoiceQuestion(questionTitle, QuestionType.YES_NO, theChoices, other);
+                    q = new SingleChoiceQuestion(questionTitle, QuestionTypeEnum.YES_NO, theChoices, other);
                     break;
                 default:
                     q = new MultipleChoiceQuestion(questionTitle, theChoices, other)

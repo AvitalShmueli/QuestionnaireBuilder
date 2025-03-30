@@ -19,7 +19,7 @@ import android.widget.PopupMenu;
 
 import com.example.questionnairebuilder.EditQuestionActivity;
 import com.example.questionnairebuilder.databinding.FragmentNewQuestionBinding;
-import com.example.questionnairebuilder.models.QuestionType;
+import com.example.questionnairebuilder.models.QuestionTypeEnum;
 import com.example.questionnairebuilder.models.QuestionTypeManager;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -35,7 +35,7 @@ public class NewQuestionFragment extends Fragment {
 
     private FragmentNewQuestionBinding binding;
     private FloatingActionButton question_FAB_add;
-    private Map<QuestionType,String> menu;
+    private Map<QuestionTypeEnum,String> menu;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
@@ -61,15 +61,10 @@ public class NewQuestionFragment extends Fragment {
 
 
     private void showQuestionTypeMenu(View v, Activity activity) {
-        PopupMenu popupMenu = new PopupMenu(this.getActivity(),v,Gravity.NO_GRAVITY);
-        popupMenu.getMenu().add(menu.get(QuestionType.OPEN_ENDED_QUESTION));
-        popupMenu.getMenu().add(menu.get(QuestionType.SINGLE_CHOICE));
-        popupMenu.getMenu().add(menu.get(QuestionType.DROPDOWN));
-        popupMenu.getMenu().add(menu.get(QuestionType.YES_NO));
-        popupMenu.getMenu().add(menu.get(QuestionType.MULTIPLE_CHOICE));
-        popupMenu.getMenu().add(menu.get(QuestionType.RATING_SCALE));
-        popupMenu.getMenu().add(menu.get(QuestionType.MATRIX_QUESTION));
-
+        PopupMenu popupMenu = new PopupMenu(this.getActivity(),v,Gravity.FILL_VERTICAL);
+        for (Map.Entry<QuestionTypeEnum, String> entry : menu.entrySet()) {
+            popupMenu.getMenu().add(entry.getValue());
+        }
 
         popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             @Override
@@ -84,7 +79,7 @@ public class NewQuestionFragment extends Fragment {
     }
 
 
-    private void changeActivity(QuestionType type) {
+    private void changeActivity(QuestionTypeEnum type) {
         Intent editQuestionActivity = new Intent(requireActivity(), EditQuestionActivity.class);
         editQuestionActivity.putExtra(EditQuestionActivity.KEY_TYPE,type.toString());
         startActivity(editQuestionActivity);

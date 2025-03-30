@@ -7,9 +7,10 @@ import android.widget.FrameLayout;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.questionnairebuilder.databinding.ActivityEditQuestionBinding;
-import com.example.questionnairebuilder.models.QuestionType;
+import com.example.questionnairebuilder.models.QuestionTypeEnum;
 import com.example.questionnairebuilder.models.QuestionTypeManager;
 import com.example.questionnairebuilder.ui.question_types.ChoiceQuestionFragment;
+import com.example.questionnairebuilder.ui.question_types.DateQuestionFragment;
 import com.example.questionnairebuilder.ui.question_types.OpenQuestionFragment;
 import com.google.android.material.appbar.MaterialToolbar;
 
@@ -20,6 +21,7 @@ public class EditQuestionActivity extends AppCompatActivity {
     private FrameLayout editQuestion_FRAME_question;
     private OpenQuestionFragment openQuestionFragment;
     private ChoiceQuestionFragment choiceQuestionFragment;
+    private DateQuestionFragment dateQuestionFragment;
 
 
     @Override
@@ -34,7 +36,7 @@ public class EditQuestionActivity extends AppCompatActivity {
         Intent previousIntent = getIntent();
 
         String type = previousIntent.getStringExtra(KEY_TYPE);
-        QuestionType selectedType = QuestionType.valueOf(type);
+        QuestionTypeEnum selectedType = QuestionTypeEnum.valueOf(type);
         type = QuestionTypeManager.getValueByKey(selectedType);
 
         initView(type);
@@ -43,7 +45,9 @@ public class EditQuestionActivity extends AppCompatActivity {
             switch (selectedType) {
                 case OPEN_ENDED_QUESTION:
                     openQuestionFragment = new OpenQuestionFragment();
-                    getSupportFragmentManager().beginTransaction().add(R.id.editQuestion_FRAME_question,openQuestionFragment).commit();
+                    getSupportFragmentManager().beginTransaction()
+                            .add(R.id.editQuestion_FRAME_question,openQuestionFragment)
+                            .commit();
                     break;
                 case SINGLE_CHOICE:
                 case DROPDOWN:
@@ -52,6 +56,12 @@ public class EditQuestionActivity extends AppCompatActivity {
                     choiceQuestionFragment = ChoiceQuestionFragment.newInstance(type);
                     getSupportFragmentManager().beginTransaction()
                             .add(R.id.editQuestion_FRAME_question, choiceQuestionFragment)
+                            .commit();
+                    break;
+                case DATE:
+                    dateQuestionFragment = new DateQuestionFragment();
+                    getSupportFragmentManager().beginTransaction()
+                            .add(R.id.editQuestion_FRAME_question,dateQuestionFragment)
                             .commit();
                     break;
             }
@@ -66,7 +76,7 @@ public class EditQuestionActivity extends AppCompatActivity {
         setSupportActionBar(myToolbar);
         if(title == null)
             myToolbar.setTitle(R.string.new_question);
-        else 
+        else
             myToolbar.setTitle(title);
 
         // listeners

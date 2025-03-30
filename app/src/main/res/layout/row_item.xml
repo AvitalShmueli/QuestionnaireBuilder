@@ -6,7 +6,7 @@
     android:orientation="horizontal">
 
     <com.google.android.material.textfield.TextInputEditText
-        android:id="@+id/editText"
+        android:id="@+id/row_TXT_item"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:inputType="text"
@@ -15,8 +15,8 @@
         android:textSize="@dimen/input_text_size"
         android:hint="@string/enter_text"/>
 
-    <ImageView
-        android:id="@+id/deleteIcon"
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/row_IC_delete"
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:padding="@dimen/padding_vertical"

@@ -6,7 +6,7 @@ public abstract class Question {
     private UUID questionID;
     private String surveyID;
     private String questionTitle;
-    private String type;
+    private QuestionType type;
     private boolean mandatory;
     private int order;
     private String image;
@@ -14,7 +14,7 @@ public abstract class Question {
     public Question() {
     }
 
-    public Question(String question, String type) {
+    public Question(String question, QuestionType type) {
         this.questionTitle = question;
         this.type = type;
     }
@@ -35,11 +35,11 @@ public abstract class Question {
         return this;
     }
 
-    public String getType() {
+    public QuestionType getType() {
         return type;
     }
 
-    public Question setType(String type) {
+    public Question setType(QuestionType type) {
         this.type = type;
         return this;
     }

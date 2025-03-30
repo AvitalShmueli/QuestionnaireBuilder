@@ -14,7 +14,7 @@ import com.example.questionnairebuilder.listeners.OnStartDragListener;
 import com.example.questionnairebuilder.models.MultipleChoiceQuestion;
 import com.example.questionnairebuilder.models.OpenEndedQuestion;
 import com.example.questionnairebuilder.models.Question;
-import com.example.questionnairebuilder.models.QuestionType;
+import com.example.questionnairebuilder.models.QuestionTypeEnum;
 import com.example.questionnairebuilder.models.SingleChoiceQuestion;
 
 import java.util.ArrayList;
@@ -39,8 +39,8 @@ public class MainActivity2 extends AppCompatActivity implements OnQuestionListCh
         list.add(new OpenEndedQuestion("Q11?"));
         list.add(new OpenEndedQuestion("Q12?"));
         list.add(new MultipleChoiceQuestion("Q13?"));
-        list.add(new SingleChoiceQuestion("Q14?", QuestionType.DROPDOWN));
-        list.add(new SingleChoiceQuestion("Q15?", QuestionType.YES_NO));
+        list.add(new SingleChoiceQuestion("Q14?", QuestionTypeEnum.DROPDOWN));
+        list.add(new SingleChoiceQuestion("Q15?", QuestionTypeEnum.YES_NO));
         return list;
     }
 

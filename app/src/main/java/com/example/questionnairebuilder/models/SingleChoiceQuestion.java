@@ -4,11 +4,14 @@ import java.util.ArrayList;
 
 public class SingleChoiceQuestion extends ChoiceQuestion{
 
-    public SingleChoiceQuestion(String question, QuestionType type) {
+    public SingleChoiceQuestion() {
+    }
+
+    public SingleChoiceQuestion(String question, QuestionTypeEnum type) {
         super(question, type);
     }
 
-    public SingleChoiceQuestion(String question, QuestionType type, ArrayList<String> choices, boolean other) {
+    public SingleChoiceQuestion(String question, QuestionTypeEnum type, ArrayList<String> choices, boolean other) {
         super(question, type, choices, other);
     }
 

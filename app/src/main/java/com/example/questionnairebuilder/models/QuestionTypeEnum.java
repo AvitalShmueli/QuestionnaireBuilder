@@ -1,6 +1,6 @@
 package com.example.questionnairebuilder.models;
 
-public enum QuestionType {
+public enum QuestionTypeEnum {
     OPEN_ENDED_QUESTION,
     SINGLE_CHOICE,
     YES_NO,

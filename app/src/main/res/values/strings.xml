@@ -25,6 +25,8 @@
     <string name="no">No</string>
     <string name="add_the_first_question">Add the first question</string>
     <string name="error_required">Required</string>
+    <string name="single_date">Single Date</string>
+    <string name="date_range">Date Range</string>
 
     <!-- Buttons -->
     <string name="log_in">Log In</string>
@@ -44,5 +46,5 @@
     <string name="rating_scale">Rating scale</string>
     <string name="matrix_question">Matrix question</string>
 
-    
+
 </resources>

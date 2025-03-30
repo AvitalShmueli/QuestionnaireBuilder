@@ -1,15 +1,18 @@
 package com.example.questionnairebuilder;
 
+import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.ColorUtils;
 
+import com.example.questionnairebuilder.ui.new_question.NewQuestionFragment;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.datepicker.MaterialDatePicker;
@@ -29,6 +32,10 @@ public class NewSurveyActivity extends AppCompatActivity {
     private MaterialButton newSurvey_BTN_themeBlue;
     private MaterialButton newSurvey_BTN_themePurple;
     private MaterialToolbar myToolBar;
+    private MaterialButton newSurvey_BTN_continue;
+    private TextInputEditText newSurvey_TXT_title;
+    private TextInputEditText newSurvey_TXT_description;
+    private String selectedTheme = null;
 
 
     @Override
@@ -44,6 +51,58 @@ public class NewSurveyActivity extends AppCompatActivity {
 
     private void initViews() {
         myToolBar.setNavigationOnClickListener(v -> finish());
+
+        newSurvey_BTN_continue.setOnClickListener(v -> {
+            if (validateForm()) {
+                Intent intent = new Intent(NewSurveyActivity.this, QuestionsActivity.class);
+                startActivity(intent);
+                finish();
+            }
+        });
+    }
+
+    private boolean validateForm() {
+        boolean valid = true;
+
+        String title = newSurvey_TXT_title.getText().toString().trim();
+        String desc = newSurvey_TXT_description.getText().toString().trim();
+        String date = newSurvey_TIET_date.getText().toString().trim();
+
+        TextInputLayout titleLayout = findViewById(R.id.newSurvey_TIL_title);
+        TextInputLayout descLayout = findViewById(R.id.newSurvey_TIL_description);
+
+        if (title.isEmpty()) {
+            titleLayout.setError("Title is required");
+            newSurvey_TXT_title.requestFocus();
+            valid = false;
+        }
+        else
+            titleLayout.setError(null);
+
+        if (desc.isEmpty()) {
+            descLayout.setError("Description is required");
+            valid = false;
+        }
+        else
+            descLayout.setError(null);
+
+        if (date.isEmpty()) {
+            newSurvey_TIL_date.setError("Due date is required");
+            valid = false;
+        }
+        else if (!isValidDate(date)) {
+            newSurvey_TIL_date.setError("Invalid date format");
+            valid = false;
+        }
+        else
+            newSurvey_TIL_date.setError(null);
+
+        if (selectedTheme == null) {
+            Toast.makeText(this, "Please select a theme", Toast.LENGTH_SHORT).show();
+            valid = false;
+        }
+
+        return valid;
     }
 
     private void setupDateFieldBehavior() {
@@ -102,6 +161,9 @@ public class NewSurveyActivity extends AppCompatActivity {
         newSurvey_BTN_themeBlue = findViewById(R.id.newSurvey_BTN_themeBlue);
         newSurvey_BTN_themePurple = findViewById(R.id.newSurvey_BTN_themePurple);
         myToolBar = findViewById(R.id.topAppBar);
+        newSurvey_BTN_continue = findViewById(R.id.newSurvey_BTN_continue);
+        newSurvey_TXT_title = findViewById(R.id.newSurvey_TXT_title);
+        newSurvey_TXT_description = findViewById(R.id.newSurvey_TXT_description);
     }
 
     private void handleThemeColorSelection() {
@@ -114,6 +176,8 @@ public class NewSurveyActivity extends AppCompatActivity {
                 ColorUtils.setAlphaComponent(ContextCompat.getColor(this, R.color.theme_circle_purple), 200)
         };
 
+        final String[] themeIds = {"red", "green", "blue", "purple"};
+
         for (int i = 0; i < themeButtons.length; i++) { // Add click listeners
             final int index = i;
             themeButtons[i].setOnClickListener(v -> {
@@ -121,6 +185,7 @@ public class NewSurveyActivity extends AppCompatActivity {
                 for (int j = 0; j < themeButtons.length; j++) // Reset background colors
                     themeButtons[j].setBackgroundTintList(ColorStateList.valueOf(Color.TRANSPARENT));
                 themeButtons[index].setBackgroundTintList(ColorStateList.valueOf(fillColors[index])); // Fill selected one
+                selectedTheme = themeIds[index]; // Save selected theme
             });
         }
     }

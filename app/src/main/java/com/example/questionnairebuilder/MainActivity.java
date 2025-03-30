@@ -38,6 +38,11 @@ public class MainActivity extends AppCompatActivity {
         //NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(binding.navView, navController);
 
+        String destination = getIntent().getStringExtra("navigateTo");
+        if ("navigation_my_surveys".equals(destination)) {
+            navController.navigate(R.id.navigation_my_surveys);
+        }
+
         myToolbar = binding.topAppBar;
         setSupportActionBar(myToolbar);
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);

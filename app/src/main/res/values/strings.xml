@@ -40,5 +40,6 @@
     <string name="home">Home</string>
     <string name="create_survey">Create Survey</string>
     <string name="active_surveys">Active surveys</string>
+    <string name="skip">Skip</string>
 
 </resources>

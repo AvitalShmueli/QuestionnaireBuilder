@@ -8,6 +8,8 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.ColorUtils;
@@ -47,6 +49,13 @@ public class NewSurveyActivity extends AppCompatActivity {
         initViews();
         setupDateFieldBehavior();
         handleThemeColorSelection();
+
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                showCancelConfirmationDialog();
+            }
+        });
     }
 
     private void initViews() {
@@ -62,14 +71,14 @@ public class NewSurveyActivity extends AppCompatActivity {
     }
 
     private void showCancelConfirmationDialog() {
-        new androidx.appcompat.app.AlertDialog.Builder(this)
-                .setTitle("Cancel Survey")
-                .setMessage("Are you sure you want to cancel creating this survey?")
-                .setPositiveButton("Yes", (dialog, which) -> {
+        new AlertDialog.Builder(this)
+                .setTitle(R.string.cancel_survey_title)
+                .setMessage(R.string.cancel_survey_message)
+                .setPositiveButton(R.string.yes, (dialog, which) -> {
                     dialog.dismiss();
                     finish();
                 })
-                .setNegativeButton("No", (dialog, which) -> dialog.dismiss())
+                .setNegativeButton(R.string.no, (dialog, which) -> dialog.dismiss())
                 .setCancelable(true)
                 .show();
     }
@@ -100,12 +109,12 @@ public class NewSurveyActivity extends AppCompatActivity {
             descLayout.setError(null);
 
         if (date.isEmpty()) {
-            newSurvey_TIL_date.setError("Due date is required");
+            newSurvey_TIL_date.setError(getString(R.string.date_required_alert));
             newSurvey_TIET_date.setHintTextColor(ContextCompat.getColor(this, R.color.theme_circle_red));
             valid = false;
         }
         else if (!isValidDate(date)) {
-            newSurvey_TIL_date.setError("Invalid date format");
+            newSurvey_TIL_date.setError(getString(R.string.invalid_date_format));
             newSurvey_TIET_date.setHintTextColor(ContextCompat.getColor(this, R.color.theme_circle_red));
             valid = false;
         }
@@ -147,7 +156,7 @@ public class NewSurveyActivity extends AppCompatActivity {
                 newSurvey_TIET_date.setSelection(formatted.length()); // Move cursor to end
 
                 if (formatted.length() == 10 && !isValidDate(formatted.toString()))
-                    newSurvey_TIL_date.setError("Invalid date");
+                    newSurvey_TIL_date.setError(getString(R.string.invalid_date));
                 else
                     newSurvey_TIL_date.setError(null);
 
@@ -218,7 +227,7 @@ public class NewSurveyActivity extends AppCompatActivity {
     private void showMaterialDatePicker() {
         MaterialDatePicker<Long> datePicker = MaterialDatePicker.Builder
                 .datePicker()
-                .setTitleText("Select Due Date")
+                .setTitleText(R.string.select_due_date)
                 .setSelection(MaterialDatePicker.todayInUtcMilliseconds())
                 .build();
 

@@ -14,9 +14,10 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.questionnairebuilder.NewSurveyActivity;
-import com.example.questionnairebuilder.Survey;
+
 import com.example.questionnairebuilder.adapters.SurveyAdapter;
 import com.example.questionnairebuilder.databinding.FragmentHomeBinding;
+import com.example.questionnairebuilder.models.Survey;
 
 import java.util.ArrayList;
 import java.util.Date;

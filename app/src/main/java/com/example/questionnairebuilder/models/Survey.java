@@ -1,4 +1,4 @@
-package com.example.questionnairebuilder;
+package com.example.questionnairebuilder.models;
 
 import com.example.questionnairebuilder.models.Question;
 

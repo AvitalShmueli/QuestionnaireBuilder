@@ -7,7 +7,8 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.questionnairebuilder.R;
-import com.example.questionnairebuilder.Survey;
+
+import com.example.questionnairebuilder.models.Survey;
 import com.google.android.material.textview.MaterialTextView;
 
 import android.view.LayoutInflater;

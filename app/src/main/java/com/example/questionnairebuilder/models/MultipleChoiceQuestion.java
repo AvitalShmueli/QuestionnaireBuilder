@@ -6,11 +6,11 @@ public class MultipleChoiceQuestion extends ChoiceQuestion{
     private int allowedSelectionNum;
 
     public MultipleChoiceQuestion(String question) {
-        super(question, "Multiple choice");
+        super(question, QuestionType.MULTIPLE_CHOICE);
     }
 
     public MultipleChoiceQuestion(String question, ArrayList<String> choices, boolean other) {
-        super(question, "Multiple choice", choices, other);
+        super(question, QuestionType.MULTIPLE_CHOICE, choices, other);
     }
 
     public int getAllowedSelectionNum() {

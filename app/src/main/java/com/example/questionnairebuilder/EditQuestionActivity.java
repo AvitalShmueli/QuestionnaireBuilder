@@ -41,13 +41,14 @@ public class EditQuestionActivity extends AppCompatActivity {
 
         if(type != null) {
             switch (selectedType) {
-                case Open_Ended_Question:
+                case OPEN_ENDED_QUESTION:
                     openQuestionFragment = new OpenQuestionFragment();
                     getSupportFragmentManager().beginTransaction().add(R.id.editQuestion_FRAME_question,openQuestionFragment).commit();
                     break;
-                case Single_Choice:
-                case Dropdown:
-                case Multiple_Choice:
+                case SINGLE_CHOICE:
+                case DROPDOWN:
+                case YES_NO:
+                case MULTIPLE_CHOICE:
                     choiceQuestionFragment = ChoiceQuestionFragment.newInstance(type);
                     getSupportFragmentManager().beginTransaction()
                             .add(R.id.editQuestion_FRAME_question, choiceQuestionFragment)
@@ -62,13 +63,11 @@ public class EditQuestionActivity extends AppCompatActivity {
         editQuestion_FRAME_question = binding.editQuestionFRAMEQuestion;
 
         MaterialToolbar myToolbar = binding.topAppBar;
-        //MaterialTextView toolbar_LBL_title = binding.toolbarLBLTitle;
         setSupportActionBar(myToolbar);
         if(title == null)
             myToolbar.setTitle(R.string.new_question);
         else 
             myToolbar.setTitle(title);
-        //Objects.requireNonNull(getSupportActionBar()).setDisplayShowTitleEnabled(false);
 
         // listeners
         myToolbar.setNavigationOnClickListener(v -> finish());

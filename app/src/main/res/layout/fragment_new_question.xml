@@ -32,7 +32,7 @@
             android:id="@+id/question_LBL_add"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:text="@string/add_your_first_question"
+            android:text="@string/add_the_first_question"
             android:paddingHorizontal="16dp"
             android:textColor="@color/blue"
             android:textStyle="bold"

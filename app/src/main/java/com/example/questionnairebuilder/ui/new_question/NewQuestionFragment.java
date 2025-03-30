@@ -62,13 +62,13 @@ public class NewQuestionFragment extends Fragment {
 
     private void showQuestionTypeMenu(View v, Activity activity) {
         PopupMenu popupMenu = new PopupMenu(this.getActivity(),v,Gravity.NO_GRAVITY);
-        popupMenu.getMenu().add(menu.get(QuestionType.Open_Ended_Question));
-        popupMenu.getMenu().add(menu.get(QuestionType.Single_Choice));
-        popupMenu.getMenu().add(menu.get(QuestionType.Dropdown));
-        popupMenu.getMenu().add(menu.get(QuestionType.Yes_No));
-        popupMenu.getMenu().add(menu.get(QuestionType.Multiple_Choice));
-        popupMenu.getMenu().add(menu.get(QuestionType.Rating_Scale));
-        popupMenu.getMenu().add(menu.get(QuestionType.Matrix_Question));
+        popupMenu.getMenu().add(menu.get(QuestionType.OPEN_ENDED_QUESTION));
+        popupMenu.getMenu().add(menu.get(QuestionType.SINGLE_CHOICE));
+        popupMenu.getMenu().add(menu.get(QuestionType.DROPDOWN));
+        popupMenu.getMenu().add(menu.get(QuestionType.YES_NO));
+        popupMenu.getMenu().add(menu.get(QuestionType.MULTIPLE_CHOICE));
+        popupMenu.getMenu().add(menu.get(QuestionType.RATING_SCALE));
+        popupMenu.getMenu().add(menu.get(QuestionType.MATRIX_QUESTION));
 
 
         popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {

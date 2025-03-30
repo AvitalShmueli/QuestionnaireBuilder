@@ -17,22 +17,27 @@
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/input_vertical_margin"
             android:layout_weight="1"
             android:hint="@string/question_title"
             app:boxBackgroundMode="outline"
             app:boxCornerRadiusBottomEnd="@dimen/corner_radius"
             app:boxCornerRadiusBottomStart="@dimen/corner_radius"
             app:boxCornerRadiusTopEnd="@dimen/corner_radius"
-            app:boxCornerRadiusTopStart="@dimen/corner_radius">
+            app:boxCornerRadiusTopStart="@dimen/corner_radius"
+            app:boxStrokeColor="?attr/colorPrimary"
+            app:hintTextColor="?attr/colorSecondaryVariant">
 
             <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/openQuestion_TXT_question"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="textMultiLine"
                 android:gravity="top|start"
                 android:minLines="5"
                 android:maxLines="5"
-                tools:text="Enter text" />
+                tools:text="Enter text"
+                android:textSize="@dimen/input_text_size"/>
 
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -41,7 +46,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:layout_marginTop="@dimen/activity_vertical_margin"
+            android:layout_marginTop="@dimen/input_vertical_margin"
             android:checked="true"
             android:text="@string/mandatory"/>
 

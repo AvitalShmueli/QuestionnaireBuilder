@@ -50,7 +50,7 @@ public class NewSurveyActivity extends AppCompatActivity {
     }
 
     private void initViews() {
-        myToolBar.setNavigationOnClickListener(v -> finish());
+        myToolBar.setNavigationOnClickListener(v -> showCancelConfirmationDialog());
 
         newSurvey_BTN_continue.setOnClickListener(v -> {
             if (validateForm()) {
@@ -59,6 +59,19 @@ public class NewSurveyActivity extends AppCompatActivity {
                 finish();
             }
         });
+    }
+
+    private void showCancelConfirmationDialog() {
+        new androidx.appcompat.app.AlertDialog.Builder(this)
+                .setTitle("Cancel Survey")
+                .setMessage("Are you sure you want to cancel creating this survey?")
+                .setPositiveButton("Yes", (dialog, which) -> {
+                    dialog.dismiss();
+                    finish();
+                })
+                .setNegativeButton("No", (dialog, which) -> dialog.dismiss())
+                .setCancelable(true)
+                .show();
     }
 
     private boolean validateForm() {
@@ -88,19 +101,16 @@ public class NewSurveyActivity extends AppCompatActivity {
 
         if (date.isEmpty()) {
             newSurvey_TIL_date.setError("Due date is required");
+            newSurvey_TIET_date.setHintTextColor(ContextCompat.getColor(this, R.color.theme_circle_red));
             valid = false;
         }
         else if (!isValidDate(date)) {
             newSurvey_TIL_date.setError("Invalid date format");
+            newSurvey_TIET_date.setHintTextColor(ContextCompat.getColor(this, R.color.theme_circle_red));
             valid = false;
         }
         else
             newSurvey_TIL_date.setError(null);
-
-        if (selectedTheme == null) {
-            Toast.makeText(this, "Please select a theme", Toast.LENGTH_SHORT).show();
-            valid = false;
-        }
 
         return valid;
     }
@@ -188,6 +198,9 @@ public class NewSurveyActivity extends AppCompatActivity {
                 selectedTheme = themeIds[index]; // Save selected theme
             });
         }
+
+        int defaultIndex = 2;
+        themeButtons[defaultIndex].setBackgroundTintList(ColorStateList.valueOf(fillColors[defaultIndex]));
     }
 
     private boolean isValidDate(String date) {
@@ -221,6 +234,9 @@ public class NewSurveyActivity extends AppCompatActivity {
 
             String formattedDate = String.format(Locale.getDefault(), "%02d/%02d/%04d", day, month, year);
             newSurvey_TIET_date.setText(formattedDate);
+
+            newSurvey_TIET_date.requestFocus();
+            newSurvey_TIET_date.setSelection(formattedDate.length());
         });
     }
 

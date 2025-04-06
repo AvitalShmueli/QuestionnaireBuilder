@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.question_types.DateQuestionFragment"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".ui.question_types.RatingQuestionFragment"
     android:layout_margin="@dimen/activity_vertical_margin">
 
     <LinearLayout
@@ -13,7 +13,7 @@
         android:orientation="vertical">
 
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/dateQuestion_TIL_question"
+            android:id="@+id/ratingQuestion_TIL_question"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -29,7 +29,7 @@
             app:hintTextColor="?attr/colorSecondaryVariant">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/dateQuestion_TXT_question"
+                android:id="@+id/ratingQuestion_TXT_question"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="textMultiLine"
@@ -42,7 +42,7 @@
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.materialswitch.MaterialSwitch
-            android:id="@+id/dateQuestion_SW_mandatory"
+            android:id="@+id/ratingQuestion_SW_mandatory"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -51,28 +51,28 @@
             android:text="@string/mandatory"/>
 
         <LinearLayout
-            android:id="@+id/dateQuestion_LL_DateSelectionMode"
+            android:id="@+id/ratingQuestion_LL_RatingScaleLevel"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/input_vertical_margin"
             android:orientation="horizontal">
 
             <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/dateQuestion_LBL_DateSelectionMode"
+                android:id="@+id/ratingQuestion_LBL_RatingScaleLevel"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/date_selection_mode"/>
+                android:layout_weight="3"
+                android:text="@string/rating_scale_level"/>
 
             <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/dateQuestion_DD_layout_DateSelectionMode"
+                android:id="@+id/ratingQuestion_DD_layout_RatingScaleLevel"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1">
 
                 <AutoCompleteTextView
-                    android:id="@+id/dateQuestion_DD_DateSelectionMode"
+                    android:id="@+id/ratingQuestion_DD_RatingScaleLevel"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="none"
@@ -84,10 +84,61 @@
 
         </LinearLayout>
 
+
+        <LinearLayout
+            android:id="@+id/ratingQuestion_LL_RatingScaleIcon"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/input_vertical_margin"
+            android:orientation="horizontal">
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/ratingQuestion_LBL_RatingScaleIcon"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="3"
+                android:text="@string/icon"/>
+
+            <RelativeLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1">
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/ratingQuestion_DD_layout_RatingScaleIcon"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <AutoCompleteTextView
+                        android:id="@+id/ratingQuestion_DD_RatingScaleIcon"
+                        android:layout_marginTop="0dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="none"
+                        android:textColor="?attr/colorControlNormal"
+                        android:textSize="@dimen/input_text_size"
+                        tools:ignore="LabelFor,SpeakableTextPresentCheck" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.imageview.ShapeableImageView
+                    android:id="@+id/ratingQuestion_IMG_selectedIcon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_centerVertical="true"
+                    android:paddingTop="4dp"
+                    android:tint="?attr/colorControlNormal"
+                    android:src="@drawable/ic_heart"/>
+            </RelativeLayout>
+
+        </LinearLayout>
+
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/dateQuestion_LLC_buttons"
+        android:id="@+id/ratingQuestion_LLC_buttons"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
@@ -96,7 +147,7 @@
         android:orientation="vertical">
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/dateQuestion_BTN_save"
+            android:id="@+id/ratingQuestion_BTN_save"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
@@ -109,7 +160,7 @@
             android:layout_height="8dp"/>
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/dateQuestion_BTN_cancel"
+            android:id="@+id/ratingQuestion_BTN_cancel"
             style="@style/Widget.Material3.Button.OutlinedButton"
             android:layout_width="match_parent"
             android:layout_height="0dp"

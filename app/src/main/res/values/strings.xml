@@ -27,6 +27,8 @@
     <string name="error_required">Required</string>
     <string name="single_date">Single Date</string>
     <string name="date_range">Date Range</string>
+    <string name="date_selection_mode">Date Selection Mode</string>
+    <string name="icon">Icon</string>
 
     <!-- Buttons -->
     <string name="log_in">Log In</string>
@@ -45,6 +47,6 @@
     <string name="date">Date</string>
     <string name="rating_scale">Rating scale</string>
     <string name="matrix_question">Matrix question</string>
-
+    <string name="rating_scale_level">Rating scale level</string>
 
 </resources>

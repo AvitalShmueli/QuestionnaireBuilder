@@ -2,6 +2,7 @@ package com.example.questionnairebuilder.ui.question_types;
 
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
@@ -9,7 +10,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
-import android.widget.LinearLayout;
 
 import com.example.questionnairebuilder.R;
 import com.example.questionnairebuilder.databinding.FragmentDateQuestionBinding;
@@ -33,9 +33,7 @@ public class DateQuestionFragment extends Fragment {
     private MaterialSwitch dateQuestion_SW_mandatory;
     private MaterialButton dateQuestion_BTN_save;
     private MaterialButton dateQuestion_BTN_cancel;
-    private LinearLayout dateQuestion_LL_DateSelectionMode;
     private AutoCompleteTextView dateQuestion_DD_DateSelectionMode;
-    private Map<DateSelectionModeEnum,String> itemsDateSelectionMode;
     private DateSelectionModeEnum selectedMode;
 
 
@@ -49,7 +47,7 @@ public class DateQuestionFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
         binding = FragmentDateQuestionBinding.inflate(inflater, container, false);
@@ -69,7 +67,6 @@ public class DateQuestionFragment extends Fragment {
 
         // Date Selection Mode dropdown
         dateQuestion_DD_DateSelectionMode = binding.dateQuestionDDDateSelectionMode;
-        dateQuestion_LL_DateSelectionMode = binding.choiceQuestionLLMaxAllowed;
         initDropDownValues();
 
         dateQuestion_BTN_cancel.setOnClickListener(v -> requireActivity().finish());
@@ -78,7 +75,7 @@ public class DateQuestionFragment extends Fragment {
     }
 
     private void initDropDownValues() {
-        itemsDateSelectionMode = new LinkedHashMap<>();
+        Map<DateSelectionModeEnum, String> itemsDateSelectionMode = new LinkedHashMap<>();
         itemsDateSelectionMode.put(DateSelectionModeEnum.SINGLE_DATE, getString(R.string.single_date));
         itemsDateSelectionMode.put(DateSelectionModeEnum.DATE_RANGE, getString(R.string.date_range));
 
@@ -100,11 +97,13 @@ public class DateQuestionFragment extends Fragment {
 
 
     private void save() {
+        String questionTitle = null;
         if (!isValid())
             dateQuestion_TIL_question.setError(getString(R.string.error_required));
         else {
             dateQuestion_TIL_question.setError(null);
-            String questionTitle = dateQuestion_TXT_question.getText().toString().trim();
+            if(dateQuestion_TXT_question.getText() != null)
+                questionTitle = dateQuestion_TXT_question.getText().toString().trim();
             boolean mandatory = dateQuestion_SW_mandatory.isChecked();
             Question q = new DateQuestion(questionTitle).setDateMode(selectedMode).setMandatory(mandatory);
             q.save();
@@ -112,6 +111,7 @@ public class DateQuestionFragment extends Fragment {
     }
 
     private boolean isValid(){
-        return !dateQuestion_TXT_question.getText().toString().trim().isEmpty();
+        return dateQuestion_TXT_question.getText() != null &&
+                !dateQuestion_TXT_question.getText().toString().trim().isEmpty();
     }
 }

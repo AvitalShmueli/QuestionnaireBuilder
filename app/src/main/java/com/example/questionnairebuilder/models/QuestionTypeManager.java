@@ -23,7 +23,7 @@ public class QuestionTypeManager {
         menu.put(QuestionTypeEnum.MULTIPLE_CHOICE, context.getString(R.string.multiple_choice));
         menu.put(QuestionTypeEnum.DATE, context.getString(R.string.date));
         menu.put(QuestionTypeEnum.RATING_SCALE, context.getString(R.string.rating_scale));
-        menu.put(QuestionTypeEnum.MATRIX_QUESTION, context.getString(R.string.matrix_question));
+        //menu.put(QuestionTypeEnum.MATRIX_QUESTION, context.getString(R.string.matrix_question));
 
         // Reverse lookup map
         for (Map.Entry<QuestionTypeEnum, String> entry : menu.entrySet()) {

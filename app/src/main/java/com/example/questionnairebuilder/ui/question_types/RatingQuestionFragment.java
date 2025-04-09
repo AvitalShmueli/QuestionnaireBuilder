@@ -2,6 +2,7 @@ package com.example.questionnairebuilder.ui.question_types;
 
 import android.os.Bundle;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
@@ -11,9 +12,11 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 
+import com.example.questionnairebuilder.EditQuestionActivity;
 import com.example.questionnairebuilder.R;
 import com.example.questionnairebuilder.adapters.IconsAdapter;
 import com.example.questionnairebuilder.databinding.FragmentRatingQuestionBinding;
+import com.example.questionnairebuilder.interfaces.UnsavedChangesHandler;
 import com.example.questionnairebuilder.models.IconItem;
 import com.example.questionnairebuilder.models.Question;
 import com.example.questionnairebuilder.models.RatingScaleQuestion;
@@ -26,7 +29,7 @@ import com.google.android.material.textfield.TextInputLayout;
 import java.util.ArrayList;
 
 
-public class RatingQuestionFragment extends Fragment {
+public class RatingQuestionFragment extends Fragment implements UnsavedChangesHandler {
 
     private FragmentRatingQuestionBinding binding;
     private TextInputLayout ratingQuestion_TIL_question;
@@ -44,10 +47,25 @@ public class RatingQuestionFragment extends Fragment {
         // Required empty public constructor
     }
 
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        requireActivity().getOnBackPressedDispatcher().addCallback(this,
+                new OnBackPressedCallback(true) {
+                    @Override
+                    public void handleOnBackPressed() {
+                        if (hasUnsavedChanges()) {
+                            // Call the dialog from the activity
+                            ((EditQuestionActivity) requireActivity()).showCancelConfirmationDialog();
+                        } else {
+                            requireActivity().finish();
+                        }
+                    }
+                });
     }
+
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
@@ -60,6 +78,7 @@ public class RatingQuestionFragment extends Fragment {
 
         return root;
     }
+
 
     private void createBinding() {
         ratingQuestion_BTN_save = binding.ratingQuestionBTNSave;
@@ -77,7 +96,7 @@ public class RatingQuestionFragment extends Fragment {
         ratingQuestion_IMG_selectedIcon = binding.ratingQuestionIMGSelectedIcon;
         initIconsDropDownValues();
 
-        ratingQuestion_BTN_cancel.setOnClickListener(v -> requireActivity().finish());
+        ratingQuestion_BTN_cancel.setOnClickListener(v -> cancel());
         ratingQuestion_BTN_save.setOnClickListener(v -> save());
     }
 
@@ -93,6 +112,7 @@ public class RatingQuestionFragment extends Fragment {
         ratingQuestion_DD_RatingScaleLevel.setAdapter(adapterItems_RatingScaleLevel);
         ratingQuestion_DD_RatingScaleLevel.setOnItemClickListener((adapterView, view, position, id) -> selectedRatingScaleLevel = adapterItems_RatingScaleLevel.getItem(position));
     }
+
 
     private void initIconsDropDownValues() {
         IconItem[] iconItems = {
@@ -116,6 +136,12 @@ public class RatingQuestionFragment extends Fragment {
 
     }
 
+
+    private void loadQuestionDetails(Question q){
+        //TODO
+    }
+
+
     private void save() {
         String questionTitle = null;
         if (!isValid())
@@ -133,8 +159,25 @@ public class RatingQuestionFragment extends Fragment {
         }
     }
 
+
     private boolean isValid(){
         return ratingQuestion_TXT_question.getText() != null &&
                 !ratingQuestion_TXT_question.getText().toString().trim().isEmpty();
     }
+
+
+    private void cancel(){
+        if(hasUnsavedChanges())
+            ((EditQuestionActivity) requireActivity()).showCancelConfirmationDialog();
+        else
+            requireActivity().finish();
+    }
+
+
+    @Override
+    public boolean hasUnsavedChanges() {
+        return ratingQuestion_TXT_question.getText() != null &&
+                !ratingQuestion_TXT_question.getText().toString().trim().isEmpty();
+    }
+
 }

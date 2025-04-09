@@ -12,12 +12,15 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.LinearLayout;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.questionnairebuilder.EditQuestionActivity;
 import com.example.questionnairebuilder.R;
+import com.example.questionnairebuilder.interfaces.UnsavedChangesHandler;
 import com.example.questionnairebuilder.adapters.ChoicesAdapter;
 import com.example.questionnairebuilder.databinding.FragmentChoiceQuestionBinding;
 import com.example.questionnairebuilder.listeners.OnRowCountChangeListener;
@@ -34,7 +37,7 @@ import com.google.android.material.textview.MaterialTextView;
 
 import java.util.ArrayList;
 
-public class ChoiceQuestionFragment extends Fragment implements OnRowCountChangeListener{
+public class ChoiceQuestionFragment extends Fragment implements OnRowCountChangeListener, UnsavedChangesHandler {
 
     private FragmentChoiceQuestionBinding binding;
     private TextInputLayout choiceQuestion_TIL_question;
@@ -88,6 +91,19 @@ public class ChoiceQuestionFragment extends Fragment implements OnRowCountChange
             if(strType != null)
                 questionTypeEnum = QuestionTypeManager.getKeyByValue(strType);
         }
+
+        requireActivity().getOnBackPressedDispatcher().addCallback(this,
+                new OnBackPressedCallback(true) {
+                    @Override
+                    public void handleOnBackPressed() {
+                        if (hasUnsavedChanges()) {
+                            // Call the dialog from the activity
+                            ((EditQuestionActivity) requireActivity()).showCancelConfirmationDialog();
+                        } else {
+                            requireActivity().finish();
+                        }
+                    }
+                });
     }
 
 
@@ -135,12 +151,16 @@ public class ChoiceQuestionFragment extends Fragment implements OnRowCountChange
         // save & cancel buttons
         choiceQuestion_BTN_save = binding.choiceQuestionBTNSave;
         choiceQuestion_BTN_cancel = binding.choiceQuestionBTNCancel;
-        choiceQuestion_BTN_cancel.setOnClickListener(v -> requireActivity().finish());
+        choiceQuestion_BTN_cancel.setOnClickListener(v -> {
+            choiceQuestion_RV_choices.clearFocus();
+            cancel();
+        });
         choiceQuestion_BTN_save.setOnClickListener(v -> {
             choiceQuestion_RV_choices.clearFocus();
             save();
         });
     }
+
 
     private void initDropDownValues() {
         itemsMaxSelectionsAllowed = new ArrayList<>();
@@ -214,8 +234,27 @@ public class ChoiceQuestionFragment extends Fragment implements OnRowCountChange
         }
     }
 
+
     private boolean isValid(){
-        return !choiceQuestion_TXT_question.getText().toString().trim().isEmpty() && !choicesAdapter.getDataList().isEmpty();
+        return choiceQuestion_TXT_question.getText() != null &&
+                !choiceQuestion_TXT_question.getText().toString().trim().isEmpty() &&
+                !choicesAdapter.getDataList().isEmpty();
+    }
+
+
+    private void cancel(){
+        if(hasUnsavedChanges())
+            ((EditQuestionActivity) requireActivity()).showCancelConfirmationDialog();
+        else
+            requireActivity().finish();
+    }
+
+
+    public boolean hasUnsavedChanges() {
+        if(choiceQuestion_TXT_question.getText() != null &&
+                !choiceQuestion_TXT_question.getText().toString().trim().isEmpty())
+            return true;
+        else return !choicesAdapter.getDataList().isEmpty() && questionTypeEnum != QuestionTypeEnum.YES_NO;
     }
 
 }

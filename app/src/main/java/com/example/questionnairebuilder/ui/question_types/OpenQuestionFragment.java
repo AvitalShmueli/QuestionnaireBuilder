@@ -2,6 +2,7 @@ package com.example.questionnairebuilder.ui.question_types;
 
 import android.os.Bundle;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
@@ -9,8 +10,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.questionnairebuilder.EditQuestionActivity;
 import com.example.questionnairebuilder.R;
 import com.example.questionnairebuilder.databinding.FragmentOpenQuestionBinding;
+import com.example.questionnairebuilder.interfaces.UnsavedChangesHandler;
 import com.example.questionnairebuilder.models.OpenEndedQuestion;
 import com.example.questionnairebuilder.models.Question;
 import com.google.android.material.button.MaterialButton;
@@ -23,7 +26,7 @@ import com.google.android.material.textfield.TextInputLayout;
  * Use the {@link OpenQuestionFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class OpenQuestionFragment extends Fragment {
+public class OpenQuestionFragment extends Fragment implements UnsavedChangesHandler {
 
     private FragmentOpenQuestionBinding binding;
     private TextInputLayout openQuestion_TIL_question;
@@ -45,6 +48,7 @@ public class OpenQuestionFragment extends Fragment {
         // Required empty public constructor
     }
 
+
     /**
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
@@ -63,6 +67,7 @@ public class OpenQuestionFragment extends Fragment {
         return fragment;
     }
 
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -70,7 +75,21 @@ public class OpenQuestionFragment extends Fragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+
+        requireActivity().getOnBackPressedDispatcher().addCallback(this,
+                new OnBackPressedCallback(true) {
+                    @Override
+                    public void handleOnBackPressed() {
+                        if (hasUnsavedChanges()) {
+                            // Call the dialog from the activity
+                            ((EditQuestionActivity) requireActivity()).showCancelConfirmationDialog();
+                        } else {
+                            requireActivity().finish();
+                        }
+                    }
+                });
     }
+
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
@@ -84,6 +103,7 @@ public class OpenQuestionFragment extends Fragment {
         return root;
     }
 
+
     private void createBinding() {
         openQuestion_BTN_save = binding.openQuestionBTNSave;
         openQuestion_BTN_cancel = binding.openQuestionBTNCancel;
@@ -91,17 +111,25 @@ public class OpenQuestionFragment extends Fragment {
         openQuestion_TXT_question = binding.openQuestionTXTQuestion;
         openQuestion_SW_mandatory = binding.openQuestionSWMandatory;
 
-        openQuestion_BTN_cancel.setOnClickListener(v -> requireActivity().finish());
+        openQuestion_BTN_cancel.setOnClickListener(v -> cancel());
         openQuestion_BTN_save.setOnClickListener(v -> save());
     }
 
+
+    private void loadQuestionDetails(Question q){
+        //TODO
+    }
+
+
     private void save(){
         {
+            String questionTitle = null;
             if (!isValid())
                 openQuestion_TIL_question.setError(getString(R.string.error_required));
             else {
                 openQuestion_TIL_question.setError(null);
-                String questionTitle = openQuestion_TXT_question.getText().toString().trim();
+                if(openQuestion_TXT_question.getText() != null)
+                    questionTitle = openQuestion_TXT_question.getText().toString().trim();
                 boolean mandatory = openQuestion_SW_mandatory.isChecked();
                 Question q = new OpenEndedQuestion(questionTitle).setMandatory(mandatory);
                 q.save();
@@ -109,7 +137,24 @@ public class OpenQuestionFragment extends Fragment {
         }
     }
 
+
     private boolean isValid(){
-        return !openQuestion_TXT_question.getText().toString().trim().isEmpty();
+        return openQuestion_TXT_question.getText() != null &&
+                !openQuestion_TXT_question.getText().toString().trim().isEmpty();
+    }
+
+
+    private void cancel(){
+        if(hasUnsavedChanges())
+            ((EditQuestionActivity) requireActivity()).showCancelConfirmationDialog();
+        else
+            requireActivity().finish();
+    }
+
+
+    @Override
+    public boolean hasUnsavedChanges() {
+        return openQuestion_TXT_question.getText() != null &&
+                !openQuestion_TXT_question.getText().toString().trim().isEmpty();
     }
 }

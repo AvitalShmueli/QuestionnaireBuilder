@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.questionnairebuilder.NewSurveyActivity;
 
+import com.example.questionnairebuilder.SurveyManagementActivity;
 import com.example.questionnairebuilder.adapters.SurveyAdapter;
 import com.example.questionnairebuilder.databinding.FragmentHomeBinding;
 import com.example.questionnairebuilder.models.Survey;
@@ -59,7 +60,12 @@ public class HomeFragment extends Fragment {
         // Setup RecyclerView
         RecyclerView recyclerView = binding.homeLSTSurveys;
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        recyclerView.setAdapter(new SurveyAdapter(fakeSurveys));
+        recyclerView.setAdapter(new SurveyAdapter(fakeSurveys, survey -> {
+            Intent intent = new Intent(getActivity(), SurveyManagementActivity.class);
+            intent.putExtra("survey_title", survey.getSurveyTitle());
+            // add other extras here
+            startActivity(intent);
+        }));
 
         return root;
     }

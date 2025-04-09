@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
@@ -19,7 +19,7 @@
         app:menu="@menu/top_app_bar_menu"
         app:navigationIcon="@drawable/arrow_back_24px"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-        app:title="New Survey"
+        app:title="Survey Title #1"
         app:titleCentered="true"
         app:titleTextAppearance="@style/toolbarTextStyle"
         app:titleTextColor="@color/blackish" />
@@ -40,6 +40,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
                 android:gravity="center"
+                android:layout_marginHorizontal="96dp"
                 android:orientation="horizontal"
                 android:weightSum="2">
 
@@ -54,16 +55,16 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="26"
-                        android:textColor="@color/blue"
-                        android:textSize="28sp"
-                        android:textStyle="bold" />
+                        android:textColor="@color/dark_blue"
+                        android:textSize="36sp"
+                        android:textStyle="normal" />
 
                     <com.google.android.material.textview.MaterialTextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:gravity="center"
                         android:text="Total\nResponses"
-                        android:textSize="12sp" />
+                        android:textSize="8sp" />
 
                 </LinearLayout>
 
@@ -78,16 +79,16 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="5"
-                        android:textColor="@color/blue"
-                        android:textSize="28sp"
-                        android:textStyle="bold" />
+                        android:textColor="@color/dark_blue"
+                        android:textSize="36sp"
+                        android:textStyle="normal" />
 
                     <com.google.android.material.textview.MaterialTextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:gravity="center"
                         android:text="Completed\nResponses"
-                        android:textSize="12sp" />
+                        android:textSize="8sp" />
 
                 </LinearLayout>
             </LinearLayout>
@@ -97,16 +98,16 @@
                 android:layout_height="wrap_content"
                 android:divider="?android:attr/dividerHorizontal"
                 android:dividerPadding="8dp"
-                android:orientation="vertical"
-                android:showDividers="middle">
+                android:orientation="vertical">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:paddingVertical="12dp">
+                    android:layout_marginTop="16dp"
+                    android:orientation="horizontal">
 
                     <com.google.android.material.imageview.ShapeableImageView
+                        android:id="@+id/management_IMG_edit"
                         android:layout_width="24dp"
                         android:layout_height="24dp"
                         android:src="@drawable/edit_24px"
@@ -121,13 +122,20 @@
 
                 </LinearLayout>
 
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="3dp"
+                    android:alpha="0.3"
+                    android:background="@color/blue" />
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:paddingVertical="12dp">
+                    android:layout_marginTop="16dp"
+                    android:orientation="horizontal">
 
                     <com.google.android.material.imageview.ShapeableImageView
+                        android:id="@+id/management_IMG_share"
                         android:layout_width="24dp"
                         android:layout_height="24dp"
                         android:src="@drawable/share_24px"
@@ -142,13 +150,20 @@
 
                 </LinearLayout>
 
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="3dp"
+                    android:alpha="0.3"
+                    android:background="@color/blue" />
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:paddingVertical="12dp">
+                    android:layout_marginTop="16dp"
+                    android:orientation="horizontal">
 
                     <com.google.android.material.imageview.ShapeableImageView
+                        android:id="@+id/management_IMG_analyze"
                         android:layout_width="24dp"
                         android:layout_height="24dp"
                         android:src="@drawable/monitoring_24px"
@@ -164,22 +179,27 @@
 
             </LinearLayout>
 
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="3dp"
+                android:alpha="0.3"
+                android:background="@color/blue" />
+
             <com.google.android.material.textview.MaterialTextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
                 android:text="Settings"
                 android:textColor="@color/blue"
-                android:textSize="14sp"
+                android:textSize="8sp"
                 android:textStyle="bold" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
                 android:gravity="center_vertical"
-                android:showDividers="middle"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:showDividers="middle">
 
                 <com.google.android.material.textview.MaterialTextView
                     android:layout_width="0dp"
@@ -198,9 +218,18 @@
                 <com.google.android.material.materialswitch.MaterialSwitch
                     android:id="@+id/switch_status"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    app:thumbTint="@color/blue"
+                    app:trackDecorationTint="@color/blue"
+                    app:trackTint="@color/white" />
 
             </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="3dp"
+                android:alpha="0.3"
+                android:background="@color/blue" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -218,15 +247,18 @@
                 <com.google.android.material.materialswitch.MaterialSwitch
                     android:id="@+id/switch_alert"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    app:thumbTint="@color/blue"
+                    app:trackDecorationTint="@color/blue"
+                    app:trackTint="@color/white" />
 
             </LinearLayout>
 
             <View
                 android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginTop="16dp"
-                android:background="@color/black" />
+                android:layout_height="3dp"
+                android:alpha="0.3"
+                android:background="@color/blue" />
 
             <com.google.android.material.textview.MaterialTextView
                 android:layout_width="wrap_content"
@@ -237,24 +269,113 @@
                 android:textSize="14sp"
                 android:textStyle="bold" />
 
-            <com.google.android.material.textview.MaterialTextView
-                style="@style/DetailRow"
-                android:text="Created\t\t\t\t\t31/12/2024" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:showDividers="middle">
 
-            <com.google.android.material.textview.MaterialTextView
-                style="@style/DetailRow"
-                android:text="Modified\t\t\t\t06/01/2025" />
+                <com.google.android.material.textview.MaterialTextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Created" />
 
-            <com.google.android.material.textview.MaterialTextView
-                style="@style/DetailRow"
-                android:text="Questions\t\t\t\t8" />
+                <com.google.android.material.textview.MaterialTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:text="31/12/2024" />
 
-            <com.google.android.material.textview.MaterialTextView
-                style="@style/DetailRow"
-                android:text="Pages\t\t\t\t\t\t\t2" />
+            </LinearLayout>
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="3dp"
+                android:alpha="0.3"
+                android:background="@color/blue" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:showDividers="middle">
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Modified" />
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:text="06/01/2025" />
+
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="3dp"
+                android:alpha="0.3"
+                android:background="@color/blue" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:showDividers="middle">
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Questions" />
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:text="8" />
+
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="3dp"
+                android:alpha="0.3"
+                android:background="@color/blue" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:showDividers="middle">
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Pages" />
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:text="2" />
+
+            </LinearLayout>
 
         </LinearLayout>
 
     </ScrollView>
 
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+</RelativeLayout>

@@ -29,6 +29,8 @@
     <string name="date_range">Date Range</string>
     <string name="date_selection_mode">Date Selection Mode</string>
     <string name="icon">Icon</string>
+    <string name="discard_changes_title">Discard changes</string>
+    <string name="discard_changes_msg">Are you sure you want to discard the changes?</string>
 
     <!-- Buttons -->
     <string name="log_in">Log In</string>
@@ -48,5 +50,6 @@
     <string name="rating_scale">Rating scale</string>
     <string name="matrix_question">Matrix question</string>
     <string name="rating_scale_level">Rating scale level</string>
+
 
 </resources>

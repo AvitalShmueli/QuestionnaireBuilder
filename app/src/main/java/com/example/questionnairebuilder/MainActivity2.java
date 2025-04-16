@@ -1,16 +1,20 @@
 package com.example.questionnairebuilder;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 
-import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
+import androidx.recyclerview.widget.ItemTouchHelper;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.questionnairebuilder.adapters.QuestionsAdapter;
+import com.example.questionnairebuilder.interfaces.Callback_questionSelected;
 import com.example.questionnairebuilder.listeners.OnQuestionListChangedListener;
 import com.example.questionnairebuilder.listeners.OnStartDragListener;
+import com.example.questionnairebuilder.models.ChoiceQuestion;
 import com.example.questionnairebuilder.models.MultipleChoiceQuestion;
 import com.example.questionnairebuilder.models.OpenEndedQuestion;
 import com.example.questionnairebuilder.models.Question;
@@ -22,11 +26,10 @@ import java.util.List;
 
 public class MainActivity2 extends AppCompatActivity implements OnQuestionListChangedListener, OnStartDragListener {
     private RecyclerView recyclerView;
-    private QuestionsRecyclerView questionsRecyclerView;
 
     private List<Question> questionListDemo(){
         List<Question> list = new ArrayList<>();
-        list.add(new OpenEndedQuestion("Q1 - What is your name?"));
+        list.add(new OpenEndedQuestion("Q1 - What is your name?").setMandatory(true));
         list.add(new OpenEndedQuestion("Q2 - How old are you?"));
         list.add(new OpenEndedQuestion("Q3?"));
         list.add(new OpenEndedQuestion("Q4?"));
@@ -38,25 +41,45 @@ public class MainActivity2 extends AppCompatActivity implements OnQuestionListCh
         list.add(new OpenEndedQuestion("Q10?"));
         list.add(new OpenEndedQuestion("Q11?"));
         list.add(new OpenEndedQuestion("Q12?"));
-        list.add(new MultipleChoiceQuestion("Q13?"));
+        list.add(new MultipleChoiceQuestion("Q13? Multi selection")
+                .setAllowedSelectionNum(2)
+                .addChoice("Option A")
+                .addChoice("Option B")
+                .addChoice("Option C")
+                .addChoice("Option D")
+                .setMandatory(true)
+        );
         list.add(new SingleChoiceQuestion("Q14?", QuestionTypeEnum.DROPDOWN));
-        list.add(new SingleChoiceQuestion("Q15?", QuestionTypeEnum.YES_NO));
+        list.add(new SingleChoiceQuestion("Q15? Yes No Question?", QuestionTypeEnum.YES_NO)
+                .addChoice("Yes")
+                .addChoice("No")
+        );
         return list;
     }
+
+    private List<Question> questionList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main2);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
 
         findViews();
-        questionsRecyclerView = new QuestionsRecyclerView(this,recyclerView,questionListDemo());
+        questionList = questionListDemo();
+        QuestionsAdapter questionsAdapter = new QuestionsAdapter(this,questionList);
+        questionsAdapter.setCallbackQuestionSelected(new Callback_questionSelected() {
+            @Override
+            public void select(Question question) {
+                changeActivity(question);
+            }
+        });
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+        linearLayoutManager.setOrientation(RecyclerView.VERTICAL);
+        recyclerView.setLayoutManager(linearLayoutManager);
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleCallback);
+        itemTouchHelper.attachToRecyclerView(recyclerView);
+        recyclerView.setAdapter(questionsAdapter);
+        //questionsRecyclerView = new QuestionsRecyclerView(this,recyclerView,questionListDemo());
     }
 
     private void findViews() {
@@ -73,5 +96,61 @@ public class MainActivity2 extends AppCompatActivity implements OnQuestionListCh
 
     }
 
+    private void changeActivity(Question q) {
+        Intent intent = new Intent(this, QuestionResponseActivity.class);
 
+        String questionOrder = "Q" + q.getOrder();
+        intent.putExtra(QuestionResponseActivity.KEY_QUESTION_HEADER, questionOrder);
+
+        Bundle args = new Bundle();
+        args.putString("questionTitle",q.getQuestionTitle());
+        args.putString("questionID",q.getQuestionID());
+        args.putString("surveyID",q.getSurveyID());
+        args.putString("questionType", q.getType().toString());
+        args.putBoolean("mandatory",q.isMandatory());
+        args.putInt("order",q.getOrder());
+        args.putString("image",q.getImage());
+        if(q instanceof OpenEndedQuestion)
+            args.putBoolean("multipleLineAnswer",((OpenEndedQuestion)q).isMultipleLineAnswer());
+        if(q instanceof ChoiceQuestion)
+            args.putStringArrayList("choices",((ChoiceQuestion)q).getChoices());
+        if(q instanceof MultipleChoiceQuestion)
+            args.putInt("allowedSelectionNum",((MultipleChoiceQuestion)q).getAllowedSelectionNum());
+        intent.putExtra(QuestionResponseActivity.KEY_QUESTION_ARGS,args);
+
+        startActivity(intent);
+    }
+
+
+    ItemTouchHelper.SimpleCallback simpleCallback = new ItemTouchHelper
+            .SimpleCallback(ItemTouchHelper.UP | ItemTouchHelper.DOWN | ItemTouchHelper.START | ItemTouchHelper.END, 0) {
+        @Override
+        public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
+
+            int fromPosition = viewHolder.getAdapterPosition();
+            int toPosition = target.getAdapterPosition();
+            //Collections.swap(questionListDemo(), fromPosition, toPosition);
+
+            Question from = questionList.get(fromPosition);
+            Question to = questionList.get(toPosition);
+            Log.d("TEST","1 fromPosition: " + fromPosition + " " + questionList.get(fromPosition).getQuestionTitle() +", #" + questionList.get(fromPosition).getOrder());
+            Log.d("TEST","1 toPosition: " + toPosition + " " + questionList.get(toPosition).getQuestionTitle() +", #" + questionList.get(toPosition).getOrder());
+            questionList.set(toPosition,from).setOrder(toPosition+1);
+            questionList.set(fromPosition,to).setOrder(fromPosition+1);
+
+
+            Log.d("TEST","2 fromPosition: " + fromPosition + " " + questionList.get(fromPosition).getQuestionTitle() +", #" + questionList.get(fromPosition).getOrder());
+            Log.d("TEST","2 toPosition: " + toPosition + " " + questionList.get(toPosition).getQuestionTitle() +", #" + questionList.get(toPosition).getOrder());
+
+
+            if( recyclerView.getAdapter() != null)
+                recyclerView.getAdapter().notifyItemMoved(fromPosition, toPosition);
+            return false;
+        }
+
+        @Override
+        public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+
+        }
+    };
 }

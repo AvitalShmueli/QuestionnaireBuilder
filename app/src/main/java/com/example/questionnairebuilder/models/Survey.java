@@ -1,6 +1,4 @@
-package com.example.questionnairebuilder;
-
-import com.example.questionnairebuilder.models.Question;
+package com.example.questionnairebuilder.models;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -15,7 +13,7 @@ public class Survey {
         Blue, Red, Green, Purple
     }
 
-    private int ID;
+    private String ID;
     private String surveyTitle;
     private String description;
     private Date dueDate;
@@ -37,11 +35,11 @@ public class Survey {
     }
 
     // Getter and Setter Methods
-    public int getID() {
+    public String getID() {
         return ID;
     }
 
-    public void setID(int ID) {
+    public void setID(String ID) {
         this.ID = ID;
     }
 

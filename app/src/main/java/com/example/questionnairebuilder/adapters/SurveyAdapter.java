@@ -7,7 +7,8 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.questionnairebuilder.R;
-import com.example.questionnairebuilder.Survey;
+
+import com.example.questionnairebuilder.models.Survey;
 import com.google.android.material.textview.MaterialTextView;
 
 import android.view.LayoutInflater;
@@ -17,9 +18,15 @@ import java.util.Locale;
 
 public class SurveyAdapter extends RecyclerView.Adapter<SurveyAdapter.SurveyViewHolder> {
     private List<Survey> surveys;
+    private OnSurveyClickListener listener;
 
-    public SurveyAdapter(List<Survey> surveys) {
+    public interface OnSurveyClickListener {
+        void onSurveyClick(Survey survey);
+    }
+
+    public SurveyAdapter(List<Survey> surveys, OnSurveyClickListener listener) {
         this.surveys = surveys;
+        this.listener = listener;
     }
 
     @NonNull
@@ -38,6 +45,12 @@ public class SurveyAdapter extends RecyclerView.Adapter<SurveyAdapter.SurveyView
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
         holder.date.setText("Date: " + sdf.format(survey.getDueDate()));
         holder.responses.setText("Responses: " + (survey.getSurveyViewers() != null ? survey.getSurveyViewers().size() : 0));
+
+        holder.itemView.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.onSurveyClick(survey);
+            }
+        });
     }
 
     @Override

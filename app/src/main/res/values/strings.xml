@@ -45,6 +45,7 @@
     <string name="date">Date</string>
     <string name="rating_scale">Rating scale</string>
     <string name="matrix_question">Matrix question</string>
+    <string name="rating_scale_level">Rating scale level</string>
     <string name="cancel_survey_title">Cancel Survey</string>
     <string name="cancel_survey_message">Are you sure you want to cancel creating this survey?</string>
     <string name="date_required_alert">Due date is required</string>

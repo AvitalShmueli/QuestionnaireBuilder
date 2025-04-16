@@ -27,6 +27,25 @@
     <string name="error_required">Required</string>
     <string name="single_date">Single Date</string>
     <string name="date_range">Date Range</string>
+    <string name="date_selection_mode">Date Selection Mode</string>
+    <string name="icon">Icon</string>
+    <string name="discard_changes_title">Discard changes</string>
+    <string name="discard_changes_msg">Are you sure you want to discard the changes?</string>
+    <string name="cancel_survey_title">Cancel Survey</string>
+    <string name="cancel_survey_message">Are you sure you want to cancel creating this survey?</string>
+    <string name="date_required_alert">Due date is required</string>
+    <string name="invalid_date_format">Invalid date format</string>
+    <string name="invalid_date">Invalid date</string>
+    <string name="select_due_date">Select Due Date</string>
+    <string name="add_survey">Add Survey</string>
+    <string name="survey_status">Survey Status:</string>
+    <string name="new_response_alert">New Response Alert</string>
+    <string name="created">Created</string>
+    <string name="modified">Modified</string>
+    <string name="questions">Questions</string>
+    <string name="pages">Pages</string>
+    <string name="open">Open</string>
+    <string name="closed">Closed</string>
 
     <!-- Buttons -->
     <string name="log_in">Log In</string>
@@ -46,21 +65,5 @@
     <string name="rating_scale">Rating scale</string>
     <string name="matrix_question">Matrix question</string>
     <string name="rating_scale_level">Rating scale level</string>
-    <string name="cancel_survey_title">Cancel Survey</string>
-    <string name="cancel_survey_message">Are you sure you want to cancel creating this survey?</string>
-    <string name="date_required_alert">Due date is required</string>
-    <string name="invalid_date_format">Invalid date format</string>
-    <string name="invalid_date">Invalid date</string>
-    <string name="select_due_date">Select Due Date</string>
-    <string name="add_survey">Add Survey</string>
-    <string name="survey_status">Survey Status:</string>
-    <string name="new_response_alert">New Response Alert</string>
-    <string name="created">Created</string>
-    <string name="modified">Modified</string>
-    <string name="questions">Questions</string>
-    <string name="pages">Pages</string>
-    <string name="open">Open</string>
-    <string name="closed">Closed</string>
-
 
 </resources>

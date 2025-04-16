@@ -5,11 +5,9 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -17,11 +15,14 @@ import com.example.questionnairebuilder.SurveyManagementActivity;
 import com.example.questionnairebuilder.adapters.SurveyAdapter;
 import com.example.questionnairebuilder.databinding.FragmentMySurveysBinding;
 import com.example.questionnairebuilder.models.Survey;
+import com.example.questionnairebuilder.utilities.FirebaseManager;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
+import java.util.UUID;
 
 public class MySurveysFragment extends Fragment {
 
@@ -37,7 +38,7 @@ public class MySurveysFragment extends Fragment {
 
         for (int i = 1; i <= 10; i++) {
             Survey survey = new Survey();
-            survey.setID(i);
+            survey.setID(UUID.randomUUID().toString());
             survey.setSurveyTitle("Survey Title " + i);
             survey.setDescription("This is description " + i);
             survey.setDueDate(new Date());
@@ -48,18 +49,18 @@ public class MySurveysFragment extends Fragment {
         // Setup RecyclerView
         RecyclerView recyclerView = binding.mySurveysRecyclerView;
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        recyclerView.setAdapter(new SurveyAdapter(dummySurveys, survey -> {
-            Intent intent = new Intent(getActivity(), SurveyManagementActivity.class);
-            intent.putExtra("survey_title", survey.getSurveyTitle());
-            intent.putExtra("status", survey.getStatus().toString());
-            intent.putExtra("created_date", "31/12/2024"); // replace with actual if available
-            intent.putExtra("modified_date", "06/01/2025"); // replace with actual if available
-            intent.putExtra("questions", 8); // replace if needed
-            intent.putExtra("pages", 2); // replace if needed
-            intent.putExtra("responses_total", survey.getSurveyViewers() != null ? survey.getSurveyViewers().size() : 0);
-            intent.putExtra("responses_completed", 5); // hardcoded for now
-            startActivity(intent);
-        }));
+
+        FirebaseManager.getInstance().getAllSurveys(surveys -> {
+            recyclerView.setAdapter(new SurveyAdapter(surveys, survey -> {
+                Intent intent = new Intent(getActivity(), SurveyManagementActivity.class);
+                intent.putExtra("survey_title", survey.getSurveyTitle());
+                intent.putExtra("status", survey.getStatus().toString());
+                intent.putExtra("created_date", new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(survey.getCreated()));
+                intent.putExtra("modified_date", new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(survey.getModified()));
+                intent.putExtra("responses_total", survey.getSurveyViewers() != null ? survey.getSurveyViewers().size() : 0);
+                startActivity(intent);
+            }));
+        });
 
         // FAB action (optional)
         binding.mySurveysFABAdd.setOnClickListener(v -> {

@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -19,10 +18,12 @@ import com.example.questionnairebuilder.SurveyManagementActivity;
 import com.example.questionnairebuilder.adapters.SurveyAdapter;
 import com.example.questionnairebuilder.databinding.FragmentHomeBinding;
 import com.example.questionnairebuilder.models.Survey;
+import com.example.questionnairebuilder.utilities.FirebaseManager;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 public class HomeFragment extends Fragment {
 
@@ -49,7 +50,7 @@ public class HomeFragment extends Fragment {
 
         for (int i = 1; i <= 5; i++) {
             Survey survey = new Survey();
-            survey.setID(i);
+            survey.setID(UUID.randomUUID().toString());
             survey.setSurveyTitle("Survey Title " + i);
             survey.setDescription("This is description " + i);
             survey.setDueDate(new Date());
@@ -60,12 +61,14 @@ public class HomeFragment extends Fragment {
         // Setup RecyclerView
         RecyclerView recyclerView = binding.homeLSTSurveys;
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        recyclerView.setAdapter(new SurveyAdapter(fakeSurveys, survey -> {
-            Intent intent = new Intent(getActivity(), SurveyManagementActivity.class);
-            intent.putExtra("survey_title", survey.getSurveyTitle());
-            // add other extras here
-            startActivity(intent);
-        }));
+
+        FirebaseManager.getInstance().getAllSurveys(surveys -> {
+            recyclerView.setAdapter(new SurveyAdapter(surveys, survey -> {
+                Intent intent = new Intent(getActivity(), SurveyManagementActivity.class);
+                intent.putExtra("survey_title", survey.getSurveyTitle());
+                startActivity(intent);
+            }));
+        });
 
         return root;
     }

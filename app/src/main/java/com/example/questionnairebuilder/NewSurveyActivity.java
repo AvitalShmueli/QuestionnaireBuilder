@@ -6,7 +6,6 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.widget.Toast;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AlertDialog;
@@ -14,7 +13,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.ColorUtils;
 
-import com.example.questionnairebuilder.ui.new_question.NewQuestionFragment;
+import com.example.questionnairebuilder.models.Survey;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.datepicker.MaterialDatePicker;
@@ -23,8 +22,11 @@ import com.google.android.material.textfield.TextInputLayout;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Locale;
+import java.util.UUID;
 
 public class NewSurveyActivity extends AppCompatActivity {
     private TextInputLayout newSurvey_TIL_date;
@@ -47,6 +49,7 @@ public class NewSurveyActivity extends AppCompatActivity {
 
         findViews();
         initViews();
+
         setupDateFieldBehavior();
         handleThemeColorSelection();
 
@@ -63,11 +66,49 @@ public class NewSurveyActivity extends AppCompatActivity {
 
         newSurvey_BTN_continue.setOnClickListener(v -> {
             if (validateForm()) {
+                String dateStr = newSurvey_TIET_date.getText().toString().trim();
+                Date dueDate = null;
+                try {
+                    SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+                    dueDate = sdf.parse(dateStr);
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                    newSurvey_TIL_date.setError(getString(R.string.invalid_date_format));
+                    return;
+                }
+
+                Date now = new Date(); // current timestamp
+
+                Survey survey = new Survey()
+                        .setID(UUID.randomUUID().toString())
+                        .setSurveyTitle(newSurvey_TXT_title.getText().toString().trim())
+                        .setDescription(newSurvey_TXT_description.getText().toString().trim())
+                        .setDueDate(dueDate)
+                        .setStatus(Survey.SurveyStatus.Draft)
+                        .setAuthor(null)
+                        .setCreated(now)
+                        .setModified(now)
+                        .setTheme(getThemeEnumFromString(selectedTheme))
+                        .setQuestions(new ArrayList<>())
+                        .setSurveyViewers(new ArrayList<>());;
+
+                survey.save();
+
                 Intent intent = new Intent(NewSurveyActivity.this, QuestionsActivity.class);
                 startActivity(intent);
                 finish();
             }
         });
+    }
+
+    private Survey.Theme getThemeEnumFromString(String selectedTheme) {
+        switch (selectedTheme != null ? selectedTheme.toLowerCase() : "") {
+            case "red": return Survey.Theme.Red;
+            case "green": return Survey.Theme.Green;
+            case "blue": return Survey.Theme.Blue;
+            case "purple": return Survey.Theme.Purple;
+            default: return Survey.Theme.Blue; // fallback
+        }
     }
 
     private void showCancelConfirmationDialog() {
@@ -97,28 +138,24 @@ public class NewSurveyActivity extends AppCompatActivity {
             titleLayout.setError("Title is required");
             newSurvey_TXT_title.requestFocus();
             valid = false;
-        }
-        else
+        } else
             titleLayout.setError(null);
 
         if (desc.isEmpty()) {
             descLayout.setError("Description is required");
             valid = false;
-        }
-        else
+        } else
             descLayout.setError(null);
 
         if (date.isEmpty()) {
             newSurvey_TIL_date.setError(getString(R.string.date_required_alert));
             newSurvey_TIET_date.setHintTextColor(ContextCompat.getColor(this, R.color.theme_circle_red));
             valid = false;
-        }
-        else if (!isValidDate(date)) {
+        } else if (!isValidDate(date)) {
             newSurvey_TIL_date.setError(getString(R.string.invalid_date_format));
             newSurvey_TIET_date.setHintTextColor(ContextCompat.getColor(this, R.color.theme_circle_red));
             valid = false;
-        }
-        else
+        } else
             newSurvey_TIL_date.setError(null);
 
         return valid;

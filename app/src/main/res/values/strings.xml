@@ -65,5 +65,9 @@
     <string name="rating_scale">Rating scale</string>
     <string name="matrix_question">Matrix question</string>
     <string name="rating_scale_level">Rating scale level</string>
+    <string name="email">Email</string>
+    <string name="sign_up_msg">Don\'t have an account? Sign up</string>
+    <string name="password">Password</string>
+    <string name="username">Username</string>
 
 </resources>

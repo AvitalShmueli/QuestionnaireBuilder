@@ -52,8 +52,6 @@
     <string name="rating_scale">Rating scale</string>
     <string name="matrix_question">Matrix question</string>
     <string name="rating_scale_level">Rating scale level</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 
 </resources>

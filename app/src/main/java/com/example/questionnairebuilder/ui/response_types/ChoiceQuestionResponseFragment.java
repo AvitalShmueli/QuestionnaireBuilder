@@ -46,8 +46,10 @@ public class ChoiceQuestionResponseFragment extends Fragment {
     private MaterialButton responseChoiceQuestion_BTN_skip;
     private RadioGroup responseChoiceQuestion_RadioGroup;
     private LinearLayout responseChoiceQuestion_LL_checkBoxContainer;
+    private MaterialTextView responseChoiceQuestion_LBL_error;
     private Question question;
     private int currentSelectionCount = 0;
+    private final List<String> selectedChoices = new ArrayList<>();
 
     public ChoiceQuestionResponseFragment() {
         // Required empty public constructor
@@ -107,6 +109,7 @@ public class ChoiceQuestionResponseFragment extends Fragment {
         responseChoiceQuestion_BTN_skip = binding.responseChoiceQuestionBTNSkip;
         responseChoiceQuestion_RadioGroup = binding.responseChoiceQuestionRadioGroup;
         responseChoiceQuestion_LL_checkBoxContainer = binding.responseChoiceQuestionLLCheckBoxContainer;
+        responseChoiceQuestion_LBL_error = binding.responseChoiceQuestionLBLError;
 
         if(question != null) {
             responseChoiceQuestion_LBL_question.setText(question.getQuestionTitle());
@@ -118,8 +121,13 @@ public class ChoiceQuestionResponseFragment extends Fragment {
                 responseChoiceQuestion_BTN_skip.setVisibility(VISIBLE);
             }
             initChoices();
+
+            // listeners
+            responseChoiceQuestion_BTN_save.setOnClickListener(v -> save());
+            responseChoiceQuestion_BTN_skip.setOnClickListener(v -> skipQuestion());
         }
     }
+
 
     private void initChoices(){
         ArrayList<String> options = ((ChoiceQuestion)question).getChoices();
@@ -133,6 +141,7 @@ public class ChoiceQuestionResponseFragment extends Fragment {
         }
     }
 
+
     private void initRadioButtons(List<String> options){
         for (String option : options) {
             RadioButton radioButton = new RadioButton(getContext());
@@ -144,6 +153,11 @@ public class ChoiceQuestionResponseFragment extends Fragment {
                     ViewGroup.LayoutParams.WRAP_CONTENT);
             params.setMargins(0, 0, 0, dpToPx(8));
             radioButton.setLayoutParams(params);
+
+            if (selectedChoices.contains(option)) {
+                radioButton.setChecked(true);
+            }
+
             responseChoiceQuestion_RadioGroup.addView(radioButton);
         }
         responseChoiceQuestion_RadioGroup.setVisibility(VISIBLE);
@@ -155,24 +169,33 @@ public class ChoiceQuestionResponseFragment extends Fragment {
                 RadioButton selectedButton = group.findViewById(checkedId);
                 if (selectedButton != null) {
                     String selectedText = selectedButton.getText().toString();
+                    selectedChoices.clear();
+                    selectedChoices.add(selectedText);
                     Log.d("RadioGroup", "Selected: " + selectedText);
                 }
             }
         });
     }
 
+
     private void initCheckboxes(List<String> options, int maxSelections){
+        selectedChoices.clear();
         currentSelectionCount = 0;
         for (String option : options) {
             CheckBox checkBox = new CheckBox(getContext());
             checkBox.setText(option);
             checkBox.setId(View.generateViewId());
+            checkBox.setButtonTintList(ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.blue)));
 
             // Optional spacing
             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                     ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
             params.setMargins(0, 0, 0, dpToPx(8));
             checkBox.setLayoutParams(params);
+
+            if (selectedChoices.contains(option)) {
+                checkBox.setChecked(true);
+            }
 
             checkBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
                 if (isChecked) {
@@ -182,10 +205,12 @@ public class ChoiceQuestionResponseFragment extends Fragment {
                         Toast.makeText(getContext(), "You can select up to " + maxSelections + " options.", Toast.LENGTH_SHORT).show();
                     } else {
                         currentSelectionCount++;
+                        selectedChoices.add(option);
                         Log.d("CheckBox", checkBox.getText() + " selected");
                     }
                 } else {
                     currentSelectionCount--;
+                    selectedChoices.remove(option);
                     Log.d("CheckBox", checkBox.getText() + " unselected");
                 }
             });
@@ -196,9 +221,30 @@ public class ChoiceQuestionResponseFragment extends Fragment {
         responseChoiceQuestion_LL_checkBoxContainer.setVisibility(VISIBLE);
     }
 
+
     private int dpToPx(int dp) {
         return (int) TypedValue.applyDimension(
                 TypedValue.COMPLEX_UNIT_DIP, dp, getResources().getDisplayMetrics());
+    }
+
+
+    private void skipQuestion() {
+        // TODO
+    }
+
+
+    private void save() {
+        if (isValidResponse()) {
+            responseChoiceQuestion_LBL_error.setVisibility(GONE);
+            // TODO
+        }
+        else{
+            responseChoiceQuestion_LBL_error.setVisibility(VISIBLE);
+        }
+    }
+
+    private boolean isValidResponse() {
+        return !question.isMandatory() || !selectedChoices.isEmpty();
     }
 
 }

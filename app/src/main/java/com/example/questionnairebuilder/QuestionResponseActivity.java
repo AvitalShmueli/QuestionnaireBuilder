@@ -12,7 +12,9 @@ import com.example.questionnairebuilder.interfaces.UnsavedChangesHandler;
 import com.example.questionnairebuilder.models.QuestionTypeEnum;
 import com.example.questionnairebuilder.models.QuestionTypeManager;
 import com.example.questionnairebuilder.ui.response_types.ChoiceQuestionResponseFragment;
+import com.example.questionnairebuilder.ui.response_types.DateQuestionResponseFragment;
 import com.example.questionnairebuilder.ui.response_types.OpenQuestionResponseFragment;
+import com.example.questionnairebuilder.ui.response_types.RatingQuestionResponseFragment;
 import com.google.android.material.appbar.MaterialToolbar;
 
 public class QuestionResponseActivity extends AppCompatActivity {
@@ -22,6 +24,8 @@ public class QuestionResponseActivity extends AppCompatActivity {
 
     private OpenQuestionResponseFragment openQuestionResponseFragment;
     private ChoiceQuestionResponseFragment choiceQuestionResponseFragment;
+    private DateQuestionResponseFragment dateQuestionResponseFragment;
+    private RatingQuestionResponseFragment ratingQuestionResponseFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,8 +64,16 @@ public class QuestionResponseActivity extends AppCompatActivity {
                                 .commit();
                         break;
                     case DATE:
+                        dateQuestionResponseFragment = DateQuestionResponseFragment.newInstance(args);
+                        getSupportFragmentManager().beginTransaction()
+                                .add(R.id.questionResponse_FRAME_question,dateQuestionResponseFragment)
+                                .commit();
                         break;
                     case RATING_SCALE:
+                        ratingQuestionResponseFragment = RatingQuestionResponseFragment.newInstance(args);
+                        getSupportFragmentManager().beginTransaction()
+                                .add(R.id.questionResponse_FRAME_question,ratingQuestionResponseFragment)
+                                .commit();
                         break;
                 }
             }

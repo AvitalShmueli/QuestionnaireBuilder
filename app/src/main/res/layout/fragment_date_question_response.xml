@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".ui.response_types.OpenQuestionResponseFragment"
+    tools:context=".ui.response_types.DateQuestionResponseFragment"
     android:layout_margin="@dimen/activity_vertical_margin">
 
     <LinearLayout
@@ -14,13 +14,13 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
             android:orientation="horizontal"
             android:layout_marginVertical="@dimen/input_vertical_margin"
             android:layout_weight="1">
 
             <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/responseOpenQuestion_LBL_mandatory"
+                android:id="@+id/responseDateQuestion_LBL_mandatory"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/mandatory_star"
@@ -29,7 +29,7 @@
                 android:textSize="@dimen/input_text_size"/>
 
             <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/responseOpenQuestion_LBL_question"
+                android:id="@+id/responseDateQuestion_LBL_question"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 tools:text="The question"
@@ -38,38 +38,69 @@
         </LinearLayout>
 
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/responseOpenQuestion_TIL_answer"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:id="@+id/responseDateQuestion_TIL_date"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/input_vertical_margin"
+            android:hint="@string/date"
+            app:boxBackgroundMode="outline"
+            app:boxCornerRadiusBottomEnd="8dp"
+            app:boxCornerRadiusBottomStart="8dp"
+            app:boxCornerRadiusTopEnd="8dp"
+            app:boxCornerRadiusTopStart="8dp"
+            app:boxStrokeColor="@color/blue"
+            app:endIconDrawable="@drawable/ic_calendar"
+            app:endIconMode="custom"
+            app:endIconTint="@color/blue">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/responseDateQuestion_TXT_date"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="top|start"
+                android:imeOptions="actionDone"
+                android:inputType="number"
+                android:textColorHint="@color/blue"
+                tools:text="DD/MM/YYYY" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/responseDateQuestion_TIL_date2"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginVertical="@dimen/input_vertical_margin"
-            android:layout_weight="1"
-            android:hint="@string/answer"
+            android:hint="@string/date"
             app:boxBackgroundMode="outline"
-            app:boxCornerRadiusBottomEnd="@dimen/corner_radius"
-            app:boxCornerRadiusBottomStart="@dimen/corner_radius"
-            app:boxCornerRadiusTopEnd="@dimen/corner_radius"
-            app:boxCornerRadiusTopStart="@dimen/corner_radius"
-            app:boxStrokeColor="?attr/colorPrimary"
-            app:hintTextColor="?attr/colorSecondaryVariant">
+            app:boxCornerRadiusBottomEnd="8dp"
+            app:boxCornerRadiusBottomStart="8dp"
+            app:boxCornerRadiusTopEnd="8dp"
+            app:boxCornerRadiusTopStart="8dp"
+            app:boxStrokeColor="@color/blue"
+            app:endIconDrawable="@drawable/ic_calendar"
+            app:endIconMode="custom"
+            app:endIconTint="@color/blue">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/responseOpenQuestion_TXT_answer"
+                android:id="@+id/responseDateQuestion_TXT_date2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="textMultiLine"
+                android:clickable="true"
+                android:focusable="true"
                 android:gravity="top|start"
-                android:minLines="5"
-                android:maxLines="5"
-                tools:text="Enter text"
-                android:textSize="@dimen/input_text_size"/>
-
+                android:imeOptions="actionDone"
+                android:inputType="number"
+                android:textColorHint="@color/blue"
+                tools:text="DD/MM/YYYY" />
         </com.google.android.material.textfield.TextInputLayout>
 
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/responseOpenQuestion_LLC_buttons"
+        android:id="@+id/responseDateQuestion_LLC_buttons"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
@@ -78,7 +109,7 @@
         android:orientation="vertical">
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/responseOpenQuestion_BTN_save"
+            android:id="@+id/responseDateQuestion_BTN_save"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
@@ -91,7 +122,7 @@
             android:layout_height="8dp"/>
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/responseOpenQuestion_BTN_skip"
+            android:id="@+id/responseDateQuestion_BTN_skip"
             style="@style/Widget.Material3.Button.OutlinedButton"
             android:layout_width="match_parent"
             android:layout_height="0dp"

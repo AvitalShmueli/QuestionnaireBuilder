@@ -116,17 +116,17 @@ public class RatingQuestionFragment extends Fragment implements UnsavedChangesHa
 
     private void initIconsDropDownValues() {
         IconItem[] iconItems = {
-                new IconItem(R.drawable.ic_heart),
-                new IconItem(R.drawable.ic_star),
-                new IconItem(R.drawable.ic_thumb_up)
+                new IconItem(R.drawable.ic_heart_filled),
+                new IconItem(R.drawable.ic_star_filled),
+                new IconItem(R.drawable.ic_thumb_up_filled)
         };
 
         IconsAdapter adapter = new IconsAdapter(requireContext(), iconItems);
         ratingQuestion_DD_RatingScaleIcon.setAdapter(adapter);
 
         if(selectedRatingScaleIcon == null) {
-            selectedRatingScaleIcon = R.drawable.ic_star;
-            ratingQuestion_IMG_selectedIcon.setImageResource(R.drawable.ic_star);
+            selectedRatingScaleIcon = R.drawable.ic_star_filled;
+            ratingQuestion_IMG_selectedIcon.setImageResource(R.drawable.ic_star_filled);
         }
         ratingQuestion_DD_RatingScaleIcon.setOnItemClickListener((parent, view, position, id) -> {
             IconItem selected = (IconItem) parent.getItemAtPosition(position);

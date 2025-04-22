@@ -13,7 +13,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.questionnairebuilder.NewSurveyActivity;
-
 import com.example.questionnairebuilder.SurveyManagementActivity;
 import com.example.questionnairebuilder.adapters.SurveyAdapter;
 import com.example.questionnairebuilder.databinding.FragmentHomeBinding;

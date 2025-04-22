@@ -31,6 +31,8 @@
     <string name="icon">Icon</string>
     <string name="discard_changes_title">Discard changes</string>
     <string name="discard_changes_msg">Are you sure you want to discard the changes?</string>
+    <string name="answer">Answer</string>
+    <string name="mandatory_star">*</string>
     <string name="cancel_survey_title">Cancel Survey</string>
     <string name="cancel_survey_message">Are you sure you want to cancel creating this survey?</string>
     <string name="date_required_alert">Due date is required</string>

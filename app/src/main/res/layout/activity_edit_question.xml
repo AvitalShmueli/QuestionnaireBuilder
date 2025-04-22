@@ -19,7 +19,8 @@
         app:title="New Question"
         app:titleCentered="true"
         android:elevation="@dimen/toolbar_elevation"
-        app:titleTextColor="@color/blackish"
+        app:titleTextColor="?attr/colorOnSurface"
+        app:navigationIconTint="?attr/colorOnSurface"
         app:titleTextAppearance="@style/toolbarTextStyle"
         android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>

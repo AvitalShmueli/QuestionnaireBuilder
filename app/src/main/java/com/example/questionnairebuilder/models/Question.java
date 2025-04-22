@@ -1,9 +1,7 @@
 package com.example.questionnairebuilder.models;
 
-import java.util.UUID;
-
 public abstract class Question {
-    private UUID questionID;
+    private String questionID;
     private String surveyID;
     private String questionTitle;
     private QuestionTypeEnum type;
@@ -44,11 +42,11 @@ public abstract class Question {
         return this;
     }
 
-    public UUID getQuestionID() {
+    public String getQuestionID() {
         return questionID;
     }
 
-    public Question setQuestionID(UUID questionID) {
+    public Question setQuestionID(String questionID) {
         this.questionID = questionID;
         return this;
     }

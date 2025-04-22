@@ -15,6 +15,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.questionnairebuilder.QuestionResponseActivity;
 import com.example.questionnairebuilder.databinding.FragmentDateQuestionResponseBinding;
 import com.example.questionnairebuilder.models.DateQuestion;
 import com.example.questionnairebuilder.models.DateSelectionModeEnum;
@@ -222,12 +223,13 @@ public class DateQuestionResponseFragment extends Fragment {
 
     private void skipQuestion() {
         // TODO
+        ((QuestionResponseActivity) requireActivity()).skipQuestion();
     }
 
 
     private void save() {
         if (isValidResponse()) {
-            // TODO
+            // TODO: save to firebase + update question order
         }
     }
 

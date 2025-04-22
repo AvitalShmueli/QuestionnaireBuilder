@@ -20,6 +20,7 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
+import com.example.questionnairebuilder.QuestionResponseActivity;
 import com.example.questionnairebuilder.R;
 import com.example.questionnairebuilder.databinding.FragmentChoiceQuestionResponseBinding;
 import com.example.questionnairebuilder.models.ChoiceQuestion;
@@ -230,13 +231,14 @@ public class ChoiceQuestionResponseFragment extends Fragment {
 
     private void skipQuestion() {
         // TODO
+        ((QuestionResponseActivity) requireActivity()).skipQuestion();
     }
 
 
     private void save() {
         if (isValidResponse()) {
             responseChoiceQuestion_LBL_error.setVisibility(GONE);
-            // TODO
+            // TODO: save to firebase + update question order
         }
         else{
             responseChoiceQuestion_LBL_error.setVisibility(VISIBLE);

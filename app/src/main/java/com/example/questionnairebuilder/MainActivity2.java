@@ -107,12 +107,21 @@ public class MainActivity2 extends AppCompatActivity implements OnQuestionListCh
 
     }
 
+
     private void changeActivity(Question q) {
         Intent intent = new Intent(this, QuestionResponseActivity.class);
 
         String questionOrder = "Q" + q.getOrder();
         intent.putExtra(QuestionResponseActivity.KEY_QUESTION_HEADER, questionOrder);
 
+        Bundle args = createQuestionArgsBundle(q);
+        intent.putExtra(QuestionResponseActivity.KEY_QUESTION_ARGS,args);
+
+        startActivity(intent);
+    }
+
+
+    private Bundle createQuestionArgsBundle(Question q){
         Bundle args = new Bundle();
         args.putString("questionTitle",q.getQuestionTitle());
         args.putString("questionID",q.getQuestionID());
@@ -133,9 +142,7 @@ public class MainActivity2 extends AppCompatActivity implements OnQuestionListCh
             args.putInt("ratingScaleLevel", ((RatingScaleQuestion) q).getRatingScaleLevel());
             args.putInt("iconResourceId", ((RatingScaleQuestion) q).getIconResourceId());
         }
-        intent.putExtra(QuestionResponseActivity.KEY_QUESTION_ARGS,args);
-
-        startActivity(intent);
+        return args;
     }
 
 

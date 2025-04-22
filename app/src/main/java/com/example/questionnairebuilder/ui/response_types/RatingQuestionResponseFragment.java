@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.RatingBar;
 import android.widget.Toast;
 
+import com.example.questionnairebuilder.QuestionResponseActivity;
 import com.example.questionnairebuilder.R;
 import com.example.questionnairebuilder.databinding.FragmentRatingQuestionResponseBinding;
 import com.example.questionnairebuilder.models.Question;
@@ -140,13 +141,14 @@ public class RatingQuestionResponseFragment extends Fragment {
 
     private void skipQuestion() {
         // TODO
+        ((QuestionResponseActivity) requireActivity()).skipQuestion();
     }
 
 
     private void save() {
        if(isValidResponse()) {
            responseRatingQuestion_LBL_error.setVisibility(GONE);
-           // TODO
+           // TODO: save to firebase + update question order
        }
        else
            responseRatingQuestion_LBL_error.setVisibility(VISIBLE);

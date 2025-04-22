@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.questionnairebuilder.QuestionResponseActivity;
 import com.example.questionnairebuilder.R;
 import com.example.questionnairebuilder.databinding.FragmentOpenQuestionResponseBinding;
 import com.example.questionnairebuilder.models.OpenEndedQuestion;
@@ -115,15 +116,16 @@ public class OpenQuestionResponseFragment extends Fragment {
 
     private void skipQuestion() {
         // TODO
+        ((QuestionResponseActivity) requireActivity()).skipQuestion();
     }
 
     private void save() {
-        if (!isValidResponse()) {
-            responseOpenQuestion_TIL_answer.setError(getString(R.string.error_required));
+        if (isValidResponse()) {
+            responseOpenQuestion_TIL_answer.setError(null);
+            // TODO: save to firebase + update question order
         }
         else{
-            responseOpenQuestion_TIL_answer.setError(null);
-            // TODO
+            responseOpenQuestion_TIL_answer.setError(getString(R.string.error_required));
         }
     }
 

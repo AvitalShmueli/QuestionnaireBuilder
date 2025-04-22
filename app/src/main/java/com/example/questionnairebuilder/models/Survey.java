@@ -1,5 +1,7 @@
 package com.example.questionnairebuilder.models;
 
+import com.example.questionnairebuilder.utilities.FirebaseManager;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -28,7 +30,8 @@ public class Survey {
     //private ErrorHandler errorHandler;
     private List<User> surveyViewers;
 
-    // Constructor
+    // Constructors
+
     public Survey() {
         this.questions = new ArrayList<>();
         this.surveyViewers = new ArrayList<>();
@@ -39,80 +42,90 @@ public class Survey {
         return ID;
     }
 
-    public void setID(String ID) {
+    public Survey setID(String ID) {
         this.ID = ID;
+        return this;
     }
 
     public String getSurveyTitle() {
         return surveyTitle;
     }
 
-    public void setSurveyTitle(String surveyTitle) {
+    public Survey setSurveyTitle(String surveyTitle) {
         this.surveyTitle = surveyTitle;
+        return this;
     }
 
     public String getDescription() {
         return description;
     }
 
-    public void setDescription(String description) {
+    public Survey setDescription(String description) {
         this.description = description;
+        return this;
     }
 
     public Date getDueDate() {
         return dueDate;
     }
 
-    public void setDueDate(Date dueDate) {
+    public Survey setDueDate(Date dueDate) {
         this.dueDate = dueDate;
+        return this;
     }
 
     public SurveyStatus getStatus() {
         return status;
     }
 
-    public void setStatus(SurveyStatus status) {
+    public Survey setStatus(SurveyStatus status) {
         this.status = status;
+        return this;
     }
 
     public User getAuthor() {
         return author;
     }
 
-    public void setAuthor(User author) {
+    public Survey setAuthor(User author) {
         this.author = author;
+        return this;
     }
 
     public Date getCreated() {
         return created;
     }
 
-    public void setCreated(Date created) {
+    public Survey setCreated(Date created) {
         this.created = created;
+        return this;
     }
 
     public Date getModified() {
         return modified;
     }
 
-    public void setModified(Date modified) {
+    public Survey setModified(Date modified) {
         this.modified = modified;
+        return this;
     }
 
     public Theme getTheme() {
         return theme;
     }
 
-    public void setTheme(Theme theme) {
+    public Survey setTheme(Theme theme) {
         this.theme = theme;
+        return this;
     }
 
     public List<Question> getQuestions() {
         return questions;
     }
 
-    public void setQuestions(List<Question> questions) {
+    public Survey setQuestions(List<Question> questions) {
         this.questions = questions;
+        return this;
     }
 
     /*public AnalyticsManager getAnalyticsManager() {
@@ -135,8 +148,9 @@ public class Survey {
         return surveyViewers;
     }
 
-    public void setSurveyViewers(List<User> surveyViewers) {
+    public Survey setSurveyViewers(List<User> surveyViewers) {
         this.surveyViewers = surveyViewers;
+        return this;
     }
 
     // Methods from UML
@@ -153,7 +167,7 @@ public class Survey {
     }*/
 
     public void save() {
-        // TODO: Implement save logic (e.g., save to DB or local storage)
+        FirebaseManager.getInstance().addSurvey(this);
     }
 
     /*public void deleteQuestion(int questionID) {

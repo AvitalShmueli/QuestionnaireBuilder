@@ -14,4 +14,5 @@
     <dimen name="corner_radius">8dp</dimen>
     <dimen name="padding_vertical">10dp</dimen>
     <dimen name="supporting_text_margins">16dp</dimen>
+    <dimen name="bufferMargin">8dp</dimen>
 </resources>

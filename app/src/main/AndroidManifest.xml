@@ -16,6 +16,9 @@
             android:name=".QuestionResponseActivity"
             android:exported="false" />
         <activity
+            android:name=".SurveyManagementActivity"
+            android:exported="false" />
+        <activity
             android:name=".QuestionsActivity"
             android:exported="false" />
         <activity

@@ -68,6 +68,7 @@ public class SignUpActivity extends AppCompatActivity {
     }
 
     private void registerUser() {
+        /*
         String username = binding.signUpTIETUsername.getText().toString().trim();
         String email = binding.signUpTIETEmail.getText().toString().trim();
         String password = binding.signUpTIETPassword.getText().toString().trim();
@@ -113,6 +114,10 @@ public class SignUpActivity extends AppCompatActivity {
                 Toast.makeText(this, "Sign up failed: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
             }
         });
+*/
+        // Temporarily skip Firebase logic:
+        startActivity(new Intent(this, MainActivity.class));
+        finish();
     }
 
     private void saveUserToDatabase(String uid, String username, String email, String imageUrl) {

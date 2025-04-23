@@ -16,6 +16,12 @@
             android:name=".QuestionResponseActivity"
             android:exported="false" />
         <activity
+            android:name=".SignUpActivity"
+            android:exported="false" />
+        <activity
+            android:name=".LoginActivity"
+            android:exported="false" />
+        <activity
             android:name=".SurveyManagementActivity"
             android:exported="false" />
         <activity

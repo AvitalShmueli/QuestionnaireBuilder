@@ -48,9 +48,12 @@ dependencies {
     implementation(libs.navigation.fragment)
     implementation(libs.navigation.ui)
     implementation(libs.legacy.support.v4)
+    implementation(libs.firebase.storage)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
+
+    implementation(libs.hdodenhof.circleimageview)
 
     // Import the Firebase BoM
     implementation(platform(libs.firebase.bom))
@@ -63,5 +66,6 @@ dependencies {
     // https://firebase.google.com/docs/android/setup#available-libraries
 
     implementation(libs.firebase.database)
+    implementation(libs.firebase.ui.auth)
 
 }

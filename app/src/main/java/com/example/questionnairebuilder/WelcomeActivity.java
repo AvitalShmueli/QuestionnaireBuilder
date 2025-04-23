@@ -36,12 +36,23 @@ public class WelcomeActivity extends AppCompatActivity {
         animateEntrance(welcome_BTN_login, 0);
         animateEntrance(welcome_BTN_signUp, 0);
 
-        welcome_IMG_language.setOnClickListener(view -> showLanguageDialog());
-        welcome_BTN_login.setOnClickListener(view -> moveToHome());
+        initViews();
     }
 
-    private void moveToHome() {
-        Intent intent = new Intent(WelcomeActivity.this, MainActivity.class);
+    private void initViews() {
+        welcome_IMG_language.setOnClickListener(view -> showLanguageDialog());
+        welcome_BTN_login.setOnClickListener(view -> moveToLogin());
+        welcome_BTN_signUp.setOnClickListener(view -> moveToSignUp());
+    }
+
+    private void moveToLogin() {
+        Intent intent = new Intent(WelcomeActivity.this, LoginActivity.class);
+        startActivity(intent);
+        finish();
+    }
+
+    private void moveToSignUp() {
+        Intent intent = new Intent(WelcomeActivity.this, SignUpActivity.class);
         startActivity(intent);
         finish();
     }

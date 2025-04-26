@@ -2,40 +2,44 @@ package com.example.questionnairebuilder.utilities;
 
 import android.net.Uri;
 
-import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
+import com.example.questionnairebuilder.interfaces.OneSurveyCallback;
+import com.example.questionnairebuilder.interfaces.SurveysCallback;
 import com.example.questionnairebuilder.models.Survey;
 import com.example.questionnairebuilder.models.User;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.ListenerRegistration;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class FirebaseManager {
     private static FirebaseManager instance;
-    private FirebaseDatabase database;
+    private FirebaseFirestore database;
     private FirebaseAuth auth;
-    private DatabaseReference surveysRef;
-    private DatabaseReference usersRef;
-    private DatabaseReference questionsRef;
+    private CollectionReference surveysRef;
+    private CollectionReference usersRef;
+    private CollectionReference questionsRef;
 
     private FirebaseManager() {
-        database = FirebaseDatabase.getInstance();
+        database = FirebaseFirestore.getInstance();
         auth = FirebaseAuth.getInstance();
 
-        surveysRef = database.getReference("Surveys");
-        usersRef = database.getReference("Users");
-        questionsRef = database.getReference("Questions");
+        surveysRef = database.collection("Surveys");
+        usersRef = database.collection("Users");
+        questionsRef = database.collection("Questions");
     }
 
     public static synchronized FirebaseManager getInstance() {
@@ -47,33 +51,73 @@ public class FirebaseManager {
     // =================== DATABASE ===================
 
     public void addSurvey(Survey survey) {
-        surveysRef.child(survey.getID()).setValue(survey);
+        surveysRef.document(survey.getID()).set(survey);
     }
 
-    public interface SurveyCallback {
-        void onSurveysLoaded(List<Survey> surveys);
-    }
-
-    public void getAllSurveys(SurveyCallback callback) {
-        surveysRef.addListenerForSingleValueEvent(new ValueEventListener() {
+    public ListenerRegistration listenToAllSurveys(SurveysCallback callback) {
+        return surveysRef.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                List<Survey> surveys = new ArrayList<>();
-                for (DataSnapshot child : snapshot.getChildren()) {
-                    Survey survey = child.getValue(Survey.class);
-                    if (survey != null) {
-                        surveys.add(survey);
+            public void onEvent(@Nullable QuerySnapshot snapshots, @Nullable FirebaseFirestoreException e) {
+                if (e != null) {
+                    callback.onError(e);
+                    return;
+                }
+
+                List<Survey> surveyList = new ArrayList<>();
+                if (snapshots != null) {
+                    for (DocumentSnapshot document : snapshots) {
+                        Survey survey = document.toObject(Survey.class);
+                        if (survey != null) {
+                            survey.setID(document.getId());
+                            surveyList.add(survey);
+                        }
                     }
                 }
-                callback.onSurveysLoaded(surveys);
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                // Handle error
+                callback.onSurveysLoaded(surveyList);
             }
         });
     }
+
+    public ListenerRegistration listenToMySurveys(String currentUserId, SurveysCallback callback) {
+        return surveysRef.whereEqualTo("author.uid", currentUserId)
+                .addSnapshotListener((value, error) -> {
+                    if (error != null) {
+                        callback.onError(error);
+                        return;
+                    }
+
+                    if (value != null) {
+                        List<Survey> surveyList = new ArrayList<>();
+                        for (DocumentSnapshot document : value.getDocuments()) {
+                            Survey survey = document.toObject(Survey.class);
+                            if (survey != null) {
+                                survey.setID(document.getId());
+                                surveyList.add(survey);
+                            }
+                        }
+                        callback.onSurveysLoaded(surveyList);
+                    }
+                });
+    }
+
+    public void getSurveyById(String surveyId, OneSurveyCallback callback) {
+        surveysRef.document(surveyId).get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        Survey survey = documentSnapshot.toObject(Survey.class);
+                        if (survey != null) {
+                            survey.setID(documentSnapshot.getId()); // set ID manually
+                            callback.onSurveyLoaded(survey);
+                        } else {
+                            callback.onError(new Exception("Survey is null"));
+                        }
+                    } else {
+                        callback.onError(new Exception("Survey not found"));
+                    }
+                })
+                .addOnFailureListener(e -> callback.onError(e));
+    }
+
 
     // =================== AUTH ===================
 
@@ -103,7 +147,7 @@ public class FirebaseManager {
     }
 
     public void saveUser(User user, OnUserSaveListener listener) {
-        usersRef.child(user.getUid()).setValue(user)
+        usersRef.document(user.getUid()).set(user)
                 .addOnCompleteListener(task -> listener.onSaved(task.isSuccessful()));
     }
 

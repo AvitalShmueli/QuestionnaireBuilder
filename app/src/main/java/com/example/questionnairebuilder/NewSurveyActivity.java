@@ -41,7 +41,6 @@ public class NewSurveyActivity extends AppCompatActivity {
     private TextInputEditText newSurvey_TXT_description;
     private String selectedTheme = null;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -67,7 +66,7 @@ public class NewSurveyActivity extends AppCompatActivity {
         newSurvey_BTN_continue.setOnClickListener(v -> {
             if (validateForm()) {
                 String dateStr = newSurvey_TIET_date.getText().toString().trim();
-                Date dueDate = null;
+                Date dueDate;
                 try {
                     SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
                     dueDate = sdf.parse(dateStr);
@@ -90,11 +89,12 @@ public class NewSurveyActivity extends AppCompatActivity {
                         .setModified(now)
                         .setTheme(getThemeEnumFromString(selectedTheme))
                         .setQuestions(new ArrayList<>())
-                        .setSurveyViewers(new ArrayList<>());;
+                        .setSurveyViewers(new ArrayList<>());
 
                 survey.save();
 
                 Intent intent = new Intent(NewSurveyActivity.this, QuestionsActivity.class);
+                intent.putExtra("surveyID",survey.getID());
                 startActivity(intent);
                 finish();
             }

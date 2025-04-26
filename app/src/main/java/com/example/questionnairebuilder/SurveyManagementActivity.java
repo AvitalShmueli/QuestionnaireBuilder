@@ -2,14 +2,14 @@ package com.example.questionnairebuilder;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.LinearLayout;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
+import com.example.questionnairebuilder.interfaces.OneSurveyCallback;
+import com.example.questionnairebuilder.models.Survey;
+import com.example.questionnairebuilder.utilities.FirebaseManager;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.materialswitch.MaterialSwitch;
 import com.google.android.material.textview.MaterialTextView;
@@ -19,6 +19,7 @@ public class SurveyManagementActivity extends AppCompatActivity {
     private LinearLayout management_LL_edit;
     private MaterialTextView management_LBL_status;
     private MaterialSwitch management_SW_status;
+    private Survey survey;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,10 +29,29 @@ public class SurveyManagementActivity extends AppCompatActivity {
         findViews();
         initViews();
 
+        getAllSurveyData();
+    }
+
+    private void getAllSurveyData(){
+        String surveyID = getIntent().getStringExtra("surveyID");
         String title = getIntent().getStringExtra("survey_title");
         if (title != null) {
             toolbar.setTitle(title);
         }
+
+        FirebaseManager.getInstance().getSurveyById(surveyID, new OneSurveyCallback() {
+            @Override
+            public void onSurveyLoaded(Survey loadedSurvey) {
+                survey = loadedSurvey;
+                // TODO: set labels based on the survey's data
+            }
+
+            @Override
+            public void onError(Exception e) {
+                Log.e("pttt","Failed to load survey: " + e.getMessage());
+            }
+        });
+
     }
 
     private void initViews() {
@@ -43,6 +63,7 @@ public class SurveyManagementActivity extends AppCompatActivity {
     private void setupEditClick() {
         management_LL_edit.setOnClickListener(v -> {
             Intent intent = new Intent(SurveyManagementActivity.this, QuestionsActivity.class);
+            intent.putExtra("surveyID",survey.getID());
             startActivity(intent);
         });
     }

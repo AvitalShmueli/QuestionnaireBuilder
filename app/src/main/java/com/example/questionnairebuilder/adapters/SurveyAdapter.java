@@ -29,6 +29,11 @@ public class SurveyAdapter extends RecyclerView.Adapter<SurveyAdapter.SurveyView
         this.listener = listener;
     }
 
+    public void updateSurveys(List<Survey> newSurveys) {
+        this.surveys = newSurveys;
+        notifyDataSetChanged();
+    }
+
     @NonNull
     @Override
     public SurveyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {

@@ -19,7 +19,7 @@
             android:textColor="@color/dark_blue"
             android:textSize="24sp"
             android:textStyle="normal"
-            android:text="Hello, User" />
+            android:text="@string/hello_user" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/home_BTN_createSurvey"

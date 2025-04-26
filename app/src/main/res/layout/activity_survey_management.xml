@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context=".SurveyManagementActivity">
 
     <com.google.android.material.appbar.MaterialToolbar
@@ -27,19 +28,19 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="?attr/actionBarSize"
-        android:padding="24dp">
+        android:fillViewport="false">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_margin="24dp"
             android:orientation="vertical">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="96dp"
                 android:layout_marginBottom="16dp"
+                android:baselineAligned="false"
                 android:gravity="center"
                 android:orientation="horizontal"
                 android:weightSum="2">
@@ -55,17 +56,17 @@
                         android:id="@+id/management_LBL_totalResponses"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="26"
                         android:textColor="@color/dark_blue"
                         android:textSize="36sp"
-                        android:textStyle="normal" />
+                        android:textStyle="normal"
+                        tools:text="26" />
 
                     <com.google.android.material.textview.MaterialTextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:gravity="center"
-                        android:text="Total\nResponses"
-                        android:textSize="8sp" />
+                        android:text="@string/total_responses"
+                        android:textSize="14sp" />
 
                 </LinearLayout>
 
@@ -80,17 +81,17 @@
                         android:id="@+id/management_LBL_completedResponses"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="5"
                         android:textColor="@color/dark_blue"
                         android:textSize="36sp"
-                        android:textStyle="normal" />
+                        android:textStyle="normal"
+                        tools:text="5" />
 
                     <com.google.android.material.textview.MaterialTextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:gravity="center"
-                        android:text="Completed\nResponses"
-                        android:textSize="8sp" />
+                        android:text="@string/completed_responses"
+                        android:textSize="14sp" />
 
                 </LinearLayout>
             </LinearLayout>
@@ -131,8 +132,8 @@
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="3dp"
-                    android:alpha="0.3"
                     android:layout_marginVertical="@dimen/bufferMargin"
+                    android:alpha="0.3"
                     android:background="@color/blue" />
 
                 <LinearLayout
@@ -164,8 +165,8 @@
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="3dp"
-                    android:alpha="0.3"
                     android:layout_marginVertical="@dimen/bufferMargin"
+                    android:alpha="0.3"
                     android:background="@color/blue" />
 
                 <LinearLayout
@@ -198,17 +199,17 @@
             <View
                 android:layout_width="match_parent"
                 android:layout_height="3dp"
-                android:alpha="0.3"
                 android:layout_marginVertical="@dimen/bufferMargin"
+                android:alpha="0.3"
                 android:background="@color/blue" />
 
             <com.google.android.material.textview.MaterialTextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
-                android:text="Settings"
+                android:text="@string/settings"
                 android:textColor="@color/blue"
-                android:textSize="8sp"
+                android:textSize="14sp"
                 android:textStyle="bold" />
 
             <LinearLayout
@@ -244,8 +245,8 @@
             <View
                 android:layout_width="match_parent"
                 android:layout_height="3dp"
-                android:alpha="0.3"
                 android:layout_marginVertical="@dimen/bufferMargin"
+                android:alpha="0.3"
                 android:background="@color/blue" />
 
             <LinearLayout
@@ -272,15 +273,15 @@
             <View
                 android:layout_width="match_parent"
                 android:layout_height="3dp"
-                android:alpha="0.3"
                 android:layout_marginVertical="@dimen/bufferMargin"
+                android:alpha="0.3"
                 android:background="@color/blue" />
 
             <com.google.android.material.textview.MaterialTextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:text="Details"
+                android:text="@string/details"
                 android:textColor="@color/blue"
                 android:textSize="14sp"
                 android:textStyle="bold" />
@@ -300,10 +301,11 @@
                     android:text="@string/created" />
 
                 <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/management_LBL_createdDate"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="8dp"
-                    android:text="31/12/2024" />
+                    tools:text="31/12/2024" />
 
             </LinearLayout>
 
@@ -328,10 +330,11 @@
                     android:text="@string/modified" />
 
                 <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/management_LBL_modifiedDate"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="8dp"
-                    android:text="06/01/2025" />
+                    tools:text="06/01/2025" />
 
             </LinearLayout>
 
@@ -356,10 +359,11 @@
                     android:text="@string/questions" />
 
                 <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/management_LBL_questionCount"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="8dp"
-                    android:text="8" />
+                    tools:text="8" />
 
             </LinearLayout>
 
@@ -384,15 +388,22 @@
                     android:text="@string/pages" />
 
                 <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/management_LBL_pageCount"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="8dp"
-                    android:text="2" />
+                    tools:text="2" />
 
             </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="3dp"
+                android:alpha="0.3"
+                android:background="@color/blue" />
 
         </LinearLayout>
 
     </ScrollView>
 
-</RelativeLayout>
+</LinearLayout>

@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.view.View;
 import android.widget.Toast;
 
 import androidx.activity.OnBackPressedCallback;
@@ -105,13 +106,15 @@ public class SignUpActivity extends AppCompatActivity {
                     FirebaseManager.getInstance().uploadUserProfileImage(uid, selectedImageUri, imageUrl -> {
                         saveUserToFirestore(uid, username, email, imageUrl);
                     });
-                } else {
-                    // No profile image selected
+                } else { // No profile image selected
                     saveUserToFirestore(uid, username, email, "");
                 }
             } else {
                 binding.signUpBTNRegister.setEnabled(true);
-                Toast.makeText(this, "Sign up failed: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
+
+                // Show error message on label
+                binding.signUpLBLError.setText(task.getException().getMessage());
+                binding.signUpLBLError.setVisibility(View.VISIBLE);
             }
         });
     }

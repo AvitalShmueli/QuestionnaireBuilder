@@ -52,6 +52,7 @@
                     android:orientation="vertical">
 
                     <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/management_LBL_totalResponses"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="26"
@@ -76,6 +77,7 @@
                     android:orientation="vertical">
 
                     <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/management_LBL_completedResponses"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="5"

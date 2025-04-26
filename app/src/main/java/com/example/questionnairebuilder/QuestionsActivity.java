@@ -1,5 +1,8 @@
 package com.example.questionnairebuilder;
 
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Gravity;
@@ -10,11 +13,14 @@ import android.widget.PopupMenu;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.questionnairebuilder.databinding.ActivityQuestionsBinding;
+import com.example.questionnairebuilder.models.Question;
 import com.example.questionnairebuilder.models.QuestionTypeEnum;
 import com.example.questionnairebuilder.models.QuestionTypeManager;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 public class QuestionsActivity extends AppCompatActivity {
@@ -37,14 +43,31 @@ public class QuestionsActivity extends AppCompatActivity {
         question_FAB_add = binding.questionFABAdd;
         question_FAB_add.setOnClickListener(v -> showQuestionTypeMenu(v));
 
+        String surveyID = getIntent().getStringExtra("surveyID");
+        List<Question> questionList = new ArrayList<>();
+        // TODO: get survey's questions from firestore
+
         questions_BTN_skip = binding.questionsBTNSkip;
-        questions_BTN_skip.setOnClickListener(v -> {
-            Intent intent = new Intent(this, MainActivity.class);
-            intent.putExtra("navigateTo", "navigation_my_surveys");
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            startActivity(intent);
-            finish(); // close QuestionsActivity
-        });
+        if(questionList.isEmpty()){
+            // new survey
+            questions_BTN_skip.setVisibility(VISIBLE);
+            questions_BTN_skip.setOnClickListener(v -> {
+                Intent intent = new Intent(this, MainActivity.class);
+                intent.putExtra("navigateTo", "navigation_my_surveys");
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(intent);
+                finish(); // close QuestionsActivity
+            });
+        }
+        else{
+            questions_BTN_skip.setVisibility(GONE);
+            showQuestions();
+        }
+
+    }
+
+    private void showQuestions() {
+
     }
 
     private void showQuestionTypeMenu(View v) {

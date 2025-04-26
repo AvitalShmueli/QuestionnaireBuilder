@@ -45,8 +45,11 @@ public class HomeFragment extends Fragment {
         View root = binding.getRoot();
 
         final TextView home_LBL_greeting = binding.homeLBLGreeting;
-        String s = getString(R.string.hello_user,viewModel.getUserName());
-        home_LBL_greeting.setText(s);
+        viewModel.getUsername().observe(getViewLifecycleOwner(), username -> {
+            if (username != null) {
+                home_LBL_greeting.setText(getString(R.string.hello_user, username));
+            }
+        });
 
         binding.homeBTNCreateSurvey.setOnClickListener(v -> {
             Intent intent = new Intent(getActivity(), NewSurveyActivity.class);

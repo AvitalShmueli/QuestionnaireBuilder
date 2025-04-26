@@ -36,6 +36,7 @@ import com.google.android.material.textfield.TextInputLayout;
 import com.google.android.material.textview.MaterialTextView;
 
 import java.util.ArrayList;
+import java.util.UUID;
 
 public class ChoiceQuestionFragment extends Fragment implements OnRowCountChangeListener, UnsavedChangesHandler {
 
@@ -54,14 +55,12 @@ public class ChoiceQuestionFragment extends Fragment implements OnRowCountChange
     private MaterialButton choiceQuestion_BTN_save;
     private MaterialButton choiceQuestion_BTN_cancel;
     private int choiceCount = 0;
-
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_TYPE = "ARG_TYPE";
-
     private String strType;
     private QuestionTypeEnum questionTypeEnum;
+    private String surveyID;
 
+    private static final String ARG_SURVEY_ID = "ARG_SURVEY_ID";
+    private static final String ARG_TYPE = "ARG_TYPE";
 
     public ChoiceQuestionFragment() {
         // Required empty public constructor
@@ -71,12 +70,14 @@ public class ChoiceQuestionFragment extends Fragment implements OnRowCountChange
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      *
+     * @param surveyID surveyID.
      * @param type choice type.
      * @return A new instance of fragment ChoiceQuestionFragment.
      */
-    public static ChoiceQuestionFragment newInstance(String type) {
+    public static ChoiceQuestionFragment newInstance(String surveyID, String type) {
         ChoiceQuestionFragment fragment = new ChoiceQuestionFragment();
         Bundle args = new Bundle();
+        args.putString(ARG_SURVEY_ID, surveyID);
         args.putString(ARG_TYPE, type);
         fragment.setArguments(args);
         return fragment;
@@ -87,6 +88,7 @@ public class ChoiceQuestionFragment extends Fragment implements OnRowCountChange
         super.onCreate(savedInstanceState);
         QuestionTypeManager.init(requireContext());
         if (getArguments() != null) {
+            surveyID = getArguments().getString(ARG_SURVEY_ID);
             strType = getArguments().getString(ARG_TYPE);
             if(strType != null)
                 questionTypeEnum = QuestionTypeManager.getKeyByValue(strType);
@@ -106,7 +108,6 @@ public class ChoiceQuestionFragment extends Fragment implements OnRowCountChange
                 });
     }
 
-
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -117,7 +118,6 @@ public class ChoiceQuestionFragment extends Fragment implements OnRowCountChange
 
         return root;
     }
-
 
     private void createBinding() {
         // the question
@@ -161,7 +161,6 @@ public class ChoiceQuestionFragment extends Fragment implements OnRowCountChange
         });
     }
 
-
     private void initDropDownValues() {
         itemsMaxSelectionsAllowed = new ArrayList<>();
         itemsMaxSelectionsAllowed.add(1);
@@ -172,7 +171,6 @@ public class ChoiceQuestionFragment extends Fragment implements OnRowCountChange
         choiceQuestion_DD_maxAllowed.setAdapter(adapterItems_MaxSelectionsAllowed);
         choiceQuestion_DD_maxAllowed.setOnItemClickListener((adapterView, view, position, id) -> selectedMaxSelectionsAllowed = adapterItems_MaxSelectionsAllowed.getItem(position));
     }
-
 
     @Override
     public void onRowCountChanged(int count) {
@@ -189,14 +187,12 @@ public class ChoiceQuestionFragment extends Fragment implements OnRowCountChange
         }
     }
 
-
     private void loadQuestionDetails(Question q){
         questionTypeEnum = q.getType();
         if(questionTypeEnum.isSingleSelection()){
             // TODO: complete
         }
     }
-
 
     private void save(){
         if (isValid()) {
@@ -224,9 +220,12 @@ public class ChoiceQuestionFragment extends Fragment implements OnRowCountChange
                     Log.d("pttt", "max selections: " + selectedMaxSelectionsAllowed);
                     break;
             }
-            q.setMandatory(mandatory);
+            q.setQuestionID(UUID.randomUUID().toString())
+                    .setSurveyID(surveyID)
+                    .setMandatory(mandatory);
             Log.d("pttt", "the choices: " + theChoices);
             q.save();
+            requireActivity().finish();
         }
         else{
             choiceQuestion_TIL_question.setError(choiceQuestion_TXT_question.getText().toString().trim().isEmpty()? getString(R.string.error_required) : null);
@@ -234,13 +233,11 @@ public class ChoiceQuestionFragment extends Fragment implements OnRowCountChange
         }
     }
 
-
     private boolean isValid(){
         return choiceQuestion_TXT_question.getText() != null &&
                 !choiceQuestion_TXT_question.getText().toString().trim().isEmpty() &&
                 !choicesAdapter.getDataList().isEmpty();
     }
-
 
     private void cancel(){
         if(hasUnsavedChanges())
@@ -249,12 +246,10 @@ public class ChoiceQuestionFragment extends Fragment implements OnRowCountChange
             requireActivity().finish();
     }
 
-
     public boolean hasUnsavedChanges() {
         if(choiceQuestion_TXT_question.getText() != null &&
                 !choiceQuestion_TXT_question.getText().toString().trim().isEmpty())
             return true;
         else return !choicesAdapter.getDataList().isEmpty() && questionTypeEnum != QuestionTypeEnum.YES_NO;
     }
-
 }

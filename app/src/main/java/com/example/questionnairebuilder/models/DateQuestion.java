@@ -4,6 +4,7 @@ public class DateQuestion extends Question{
     private DateSelectionModeEnum dateMode;
 
     public DateQuestion() {
+        super();
     }
 
     public DateQuestion(String question) {

@@ -27,6 +27,7 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
 import java.util.ArrayList;
+import java.util.UUID;
 
 
 public class RatingQuestionFragment extends Fragment implements UnsavedChangesHandler {
@@ -42,15 +43,35 @@ public class RatingQuestionFragment extends Fragment implements UnsavedChangesHa
     private ShapeableImageView ratingQuestion_IMG_selectedIcon;
     private Integer selectedRatingScaleLevel = 5;
     private Integer selectedRatingScaleIcon = null;
+    private String surveyID;
+
+    private static final String ARG_SURVEY_ID = "ARG_SURVEY_ID";
 
     public RatingQuestionFragment() {
         // Required empty public constructor
     }
 
+    /**
+     * Use this factory method to create a new instance of
+     * this fragment using the provided parameters.
+     *
+     * @param surveyID surveyID.
+     * @return A new instance of fragment DateQuestionFragment.
+     */
+    public static RatingQuestionFragment newInstance(String surveyID) {
+        RatingQuestionFragment fragment = new RatingQuestionFragment();
+        Bundle args = new Bundle();
+        args.putString(ARG_SURVEY_ID, surveyID);
+        fragment.setArguments(args);
+        return fragment;
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (getArguments() != null) {
+            surveyID = getArguments().getString(ARG_SURVEY_ID);
+        }
 
         requireActivity().getOnBackPressedDispatcher().addCallback(this,
                 new OnBackPressedCallback(true) {
@@ -66,7 +87,6 @@ public class RatingQuestionFragment extends Fragment implements UnsavedChangesHa
                 });
     }
 
-
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -78,7 +98,6 @@ public class RatingQuestionFragment extends Fragment implements UnsavedChangesHa
 
         return root;
     }
-
 
     private void createBinding() {
         ratingQuestion_BTN_save = binding.ratingQuestionBTNSave;
@@ -100,7 +119,6 @@ public class RatingQuestionFragment extends Fragment implements UnsavedChangesHa
         ratingQuestion_BTN_save.setOnClickListener(v -> save());
     }
 
-
     private void initDropDownValues() {
         ArrayList<Integer> itemsRatingScaleLevel = new ArrayList<>();
         for(int i = 1 ; i <= 5 ; i++)
@@ -112,7 +130,6 @@ public class RatingQuestionFragment extends Fragment implements UnsavedChangesHa
         ratingQuestion_DD_RatingScaleLevel.setAdapter(adapterItems_RatingScaleLevel);
         ratingQuestion_DD_RatingScaleLevel.setOnItemClickListener((adapterView, view, position, id) -> selectedRatingScaleLevel = adapterItems_RatingScaleLevel.getItem(position));
     }
-
 
     private void initIconsDropDownValues() {
         IconItem[] iconItems = {
@@ -136,11 +153,9 @@ public class RatingQuestionFragment extends Fragment implements UnsavedChangesHa
 
     }
 
-
     private void loadQuestionDetails(Question q){
         //TODO
     }
-
 
     private void save() {
         String questionTitle = null;
@@ -154,17 +169,18 @@ public class RatingQuestionFragment extends Fragment implements UnsavedChangesHa
             Question q = new RatingScaleQuestion(questionTitle)
                     .setRatingScaleLevel(selectedRatingScaleLevel)
                     .setIconResourceId(selectedRatingScaleIcon)
+                    .setQuestionID(UUID.randomUUID().toString())
+                    .setSurveyID(surveyID)
                     .setMandatory(mandatory);
             q.save();
+            requireActivity().finish();
         }
     }
-
 
     private boolean isValid(){
         return ratingQuestion_TXT_question.getText() != null &&
                 !ratingQuestion_TXT_question.getText().toString().trim().isEmpty();
     }
-
 
     private void cancel(){
         if(hasUnsavedChanges())
@@ -173,11 +189,9 @@ public class RatingQuestionFragment extends Fragment implements UnsavedChangesHa
             requireActivity().finish();
     }
 
-
     @Override
     public boolean hasUnsavedChanges() {
         return ratingQuestion_TXT_question.getText() != null &&
                 !ratingQuestion_TXT_question.getText().toString().trim().isEmpty();
     }
-
 }

@@ -21,6 +21,8 @@ import com.google.android.material.materialswitch.MaterialSwitch;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
+import java.util.UUID;
+
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link OpenQuestionFragment#newInstance} factory method to
@@ -34,46 +36,34 @@ public class OpenQuestionFragment extends Fragment implements UnsavedChangesHand
     private MaterialSwitch openQuestion_SW_mandatory;
     private MaterialButton openQuestion_BTN_save;
     private MaterialButton openQuestion_BTN_cancel;
+    private String surveyID;
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    private static final String ARG_SURVEY_ID = "ARG_SURVEY_ID";
 
     public OpenQuestionFragment() {
         // Required empty public constructor
     }
 
-
     /**
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
+     * @param surveyID surveyID.
      * @return A new instance of fragment OpenQuestionFragment.
      */
-    // TODO: Rename and change types and number of parameters
-    public static OpenQuestionFragment newInstance(String param1, String param2) {
+    public static OpenQuestionFragment newInstance(String surveyID) {
         OpenQuestionFragment fragment = new OpenQuestionFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
+        args.putString(ARG_SURVEY_ID, surveyID);
         fragment.setArguments(args);
         return fragment;
     }
-
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+            surveyID = getArguments().getString(ARG_SURVEY_ID);
         }
 
         requireActivity().getOnBackPressedDispatcher().addCallback(this,
@@ -90,7 +80,6 @@ public class OpenQuestionFragment extends Fragment implements UnsavedChangesHand
                 });
     }
 
-
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -103,7 +92,6 @@ public class OpenQuestionFragment extends Fragment implements UnsavedChangesHand
         return root;
     }
 
-
     private void createBinding() {
         openQuestion_BTN_save = binding.openQuestionBTNSave;
         openQuestion_BTN_cancel = binding.openQuestionBTNCancel;
@@ -115,11 +103,9 @@ public class OpenQuestionFragment extends Fragment implements UnsavedChangesHand
         openQuestion_BTN_save.setOnClickListener(v -> save());
     }
 
-
     private void loadQuestionDetails(Question q){
         //TODO
     }
-
 
     private void save(){
         {
@@ -131,18 +117,20 @@ public class OpenQuestionFragment extends Fragment implements UnsavedChangesHand
                 if(openQuestion_TXT_question.getText() != null)
                     questionTitle = openQuestion_TXT_question.getText().toString().trim();
                 boolean mandatory = openQuestion_SW_mandatory.isChecked();
-                Question q = new OpenEndedQuestion(questionTitle).setMandatory(mandatory);
+                Question q = new OpenEndedQuestion(questionTitle)
+                        .setQuestionID(UUID.randomUUID().toString())
+                        .setSurveyID(surveyID)
+                        .setMandatory(mandatory);
                 q.save();
+                requireActivity().finish();
             }
         }
     }
-
 
     private boolean isValid(){
         return openQuestion_TXT_question.getText() != null &&
                 !openQuestion_TXT_question.getText().toString().trim().isEmpty();
     }
-
 
     private void cancel(){
         if(hasUnsavedChanges())
@@ -150,7 +138,6 @@ public class OpenQuestionFragment extends Fragment implements UnsavedChangesHand
         else
             requireActivity().finish();
     }
-
 
     @Override
     public boolean hasUnsavedChanges() {

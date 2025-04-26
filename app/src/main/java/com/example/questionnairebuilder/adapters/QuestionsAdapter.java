@@ -1,10 +1,11 @@
 package com.example.questionnairebuilder.adapters;
 
-import android.content.Context;
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -13,25 +14,18 @@ import com.example.questionnairebuilder.R;
 import com.example.questionnairebuilder.interfaces.Callback_questionSelected;
 import com.example.questionnairebuilder.listeners.OnQuestionListChangedListener;
 import com.example.questionnairebuilder.models.Question;
+import com.google.android.material.textview.MaterialTextView;
 
 import java.util.List;
 
 public class QuestionsAdapter extends RecyclerView.Adapter<QuestionsAdapter.ViewHolder> {
-    private Context context;
-    private final List<Question> questionList;
+    private List<Question> questionList;
     private OnQuestionListChangedListener mListChangedListener;
 
     private Callback_questionSelected callback_questionSelected;
 
-    /*
-    public QuestionsAdapter( Context context, List<Question> questionList, OnQuestionListChangedListener listChangedListener) {
-        this.context = context;
-        this.questionList = questionList;
-        this.mListChangedListener = listChangedListener;
-    }*/
-
-    public QuestionsAdapter( Context context, List<Question> questionList) {
-        this.context = context;
+    public QuestionsAdapter(List<Question> questionList) {
+        //this.context = context;
         this.questionList = questionList;
     }
 
@@ -40,10 +34,15 @@ public class QuestionsAdapter extends RecyclerView.Adapter<QuestionsAdapter.View
         return this;
     }
 
+    public void updateQuestions(List<Question> newQuestions) {
+        this.questionList = newQuestions;
+        notifyDataSetChanged();
+    }
+
     @NonNull
     @Override
     public QuestionsAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(context).inflate(R.layout.rv_item_layout,parent,false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.rv_item_layout,parent,false);
         return new ViewHolder(view);
     }
 
@@ -53,6 +52,7 @@ public class QuestionsAdapter extends RecyclerView.Adapter<QuestionsAdapter.View
             Question question = questionList.get(position);
             String title = question.getQuestionTitle();
             int order = question.setOrder(position + 1).getOrder() ;
+            holder.rv_mandatory_star.setVisibility(question.isMandatory()? VISIBLE : GONE);
             holder.rv_title.setText(title + " | " + order);
 
             View.OnClickListener listener = new View.OnClickListener() {
@@ -62,8 +62,6 @@ public class QuestionsAdapter extends RecyclerView.Adapter<QuestionsAdapter.View
                         callback_questionSelected.select(question);
                 }
             };
-
-
 
             holder.rv_title.setOnClickListener(listener);
         }
@@ -75,12 +73,14 @@ public class QuestionsAdapter extends RecyclerView.Adapter<QuestionsAdapter.View
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder{
-        private TextView rv_title;
+        private MaterialTextView rv_title;
+        private MaterialTextView rv_mandatory_star;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
 
             rv_title = itemView.findViewById(R.id.rv_title);
+            rv_mandatory_star = itemView.findViewById(R.id.rv_mandatory_star);
         }
     }
 

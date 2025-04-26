@@ -1,5 +1,7 @@
 package com.example.questionnairebuilder.models;
 
+import com.example.questionnairebuilder.utilities.FirebaseManager;
+
 public abstract class Question {
     private String questionID;
     private String surveyID;
@@ -92,8 +94,7 @@ public abstract class Question {
         return this;
     }
 
-    public boolean save(){
-        // TODO: save to firebase
-        return true;
+    public void save(){
+        FirebaseManager.getInstance().addQuestion(this);
     }
 }

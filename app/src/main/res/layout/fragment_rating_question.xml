@@ -32,7 +32,7 @@
                 android:id="@+id/ratingQuestion_TXT_question"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="textMultiLine"
+                android:inputType="textMultiLine|textCapSentences"
                 android:gravity="top|start"
                 android:minLines="5"
                 android:maxLines="5"
@@ -126,10 +126,9 @@
                     android:id="@+id/ratingQuestion_IMG_selectedIcon"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
+                    android:layout_marginStart="12dp"
                     android:layout_centerVertical="true"
-                    android:paddingTop="4dp"
-                    android:tint="?attr/colorControlNormal"
+                    android:layout_marginVertical="16dp"
                     android:src="@drawable/ic_heart_filled"/>
             </RelativeLayout>
 

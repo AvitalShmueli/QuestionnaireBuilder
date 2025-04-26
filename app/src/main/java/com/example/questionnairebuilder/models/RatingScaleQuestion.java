@@ -5,6 +5,7 @@ public class RatingScaleQuestion extends Question{
     private int iconResourceId;
 
     public RatingScaleQuestion() {
+        super();
     }
 
     public RatingScaleQuestion(String question) {

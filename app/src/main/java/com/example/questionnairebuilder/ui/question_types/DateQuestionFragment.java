@@ -27,6 +27,7 @@ import com.google.android.material.textfield.TextInputLayout;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.UUID;
 
 public class DateQuestionFragment extends Fragment implements UnsavedChangesHandler {
 
@@ -38,16 +39,35 @@ public class DateQuestionFragment extends Fragment implements UnsavedChangesHand
     private MaterialButton dateQuestion_BTN_cancel;
     private AutoCompleteTextView dateQuestion_DD_DateSelectionMode;
     private DateSelectionModeEnum selectedMode;
+    private String surveyID;
 
+    private static final String ARG_SURVEY_ID = "ARG_SURVEY_ID";
 
     public DateQuestionFragment() {
         // Required empty public constructor
     }
 
+    /**
+     * Use this factory method to create a new instance of
+     * this fragment using the provided parameters.
+     *
+     * @param surveyID surveyID.
+     * @return A new instance of fragment DateQuestionFragment.
+     */
+    public static DateQuestionFragment newInstance(String surveyID) {
+        DateQuestionFragment fragment = new DateQuestionFragment();
+        Bundle args = new Bundle();
+        args.putString(ARG_SURVEY_ID, surveyID);
+        fragment.setArguments(args);
+        return fragment;
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (getArguments() != null) {
+            surveyID = getArguments().getString(ARG_SURVEY_ID);
+        }
 
         requireActivity().getOnBackPressedDispatcher().addCallback(this,
                 new OnBackPressedCallback(true) {
@@ -63,7 +83,6 @@ public class DateQuestionFragment extends Fragment implements UnsavedChangesHand
                 });
     }
 
-
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -75,7 +94,6 @@ public class DateQuestionFragment extends Fragment implements UnsavedChangesHand
 
         return root;
     }
-
 
     private void createBinding() {
         dateQuestion_BTN_save = binding.dateQuestionBTNSave;
@@ -92,7 +110,6 @@ public class DateQuestionFragment extends Fragment implements UnsavedChangesHand
         dateQuestion_BTN_save.setOnClickListener(v -> save());
 
     }
-
 
     private void initDropDownValues() {
         Map<DateSelectionModeEnum, String> itemsDateSelectionMode = new LinkedHashMap<>();
@@ -115,11 +132,9 @@ public class DateQuestionFragment extends Fragment implements UnsavedChangesHand
         dateQuestion_DD_DateSelectionMode.setOnItemClickListener((adapterView, view, position, id) -> selectedMode = reverseItems.get(adapterItems_DateSelectionMode.getItem(position)));
     }
 
-
     private void loadQuestionDetails(Question q){
         //TODO
     }
-
 
     private void save() {
         String questionTitle = null;
@@ -130,17 +145,20 @@ public class DateQuestionFragment extends Fragment implements UnsavedChangesHand
             if(dateQuestion_TXT_question.getText() != null)
                 questionTitle = dateQuestion_TXT_question.getText().toString().trim();
             boolean mandatory = dateQuestion_SW_mandatory.isChecked();
-            Question q = new DateQuestion(questionTitle).setDateMode(selectedMode).setMandatory(mandatory);
+            Question q = new DateQuestion(questionTitle)
+                    .setDateMode(selectedMode)
+                    .setQuestionID(UUID.randomUUID().toString())
+                    .setSurveyID(surveyID)
+                    .setMandatory(mandatory);
             q.save();
+            requireActivity().finish();
         }
     }
-
 
     private boolean isValid(){
         return dateQuestion_TXT_question.getText() != null &&
                 !dateQuestion_TXT_question.getText().toString().trim().isEmpty();
     }
-
 
     private void cancel(){
         if(hasUnsavedChanges())
@@ -148,7 +166,6 @@ public class DateQuestionFragment extends Fragment implements UnsavedChangesHand
         else
             requireActivity().finish();
     }
-
 
     @Override
     public boolean hasUnsavedChanges() {

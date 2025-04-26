@@ -49,6 +49,9 @@ public class HomeFragment extends Fragment {
             if (username != null) {
                 home_LBL_greeting.setText(getString(R.string.hello_user, username));
             }
+            else {
+                home_LBL_greeting.setText(getString(R.string.hello_user, "<username>"));
+            }
         });
 
         binding.homeBTNCreateSurvey.setOnClickListener(v -> {

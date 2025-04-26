@@ -26,6 +26,7 @@ public class EditQuestionActivity extends AppCompatActivity {
     private DateQuestionFragment dateQuestionFragment;
     private RatingQuestionFragment ratingQuestionFragment;
 
+    private String surveyID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,6 +38,7 @@ public class EditQuestionActivity extends AppCompatActivity {
         QuestionTypeManager.init(this);
 
         Intent previousIntent = getIntent();
+        surveyID = getIntent().getStringExtra("surveyID");
 
         String type = previousIntent.getStringExtra(KEY_TYPE);
         QuestionTypeEnum selectedType = QuestionTypeEnum.valueOf(type);
@@ -47,7 +49,7 @@ public class EditQuestionActivity extends AppCompatActivity {
         if(type != null) {
             switch (selectedType) {
                 case OPEN_ENDED_QUESTION:
-                    openQuestionFragment = new OpenQuestionFragment();
+                    openQuestionFragment = OpenQuestionFragment.newInstance(surveyID);
                     getSupportFragmentManager().beginTransaction()
                             .add(R.id.editQuestion_FRAME_question,openQuestionFragment)
                             .commit();
@@ -56,19 +58,19 @@ public class EditQuestionActivity extends AppCompatActivity {
                 case DROPDOWN:
                 case YES_NO:
                 case MULTIPLE_CHOICE:
-                    choiceQuestionFragment = ChoiceQuestionFragment.newInstance(type);
+                    choiceQuestionFragment = ChoiceQuestionFragment.newInstance(surveyID, type);
                     getSupportFragmentManager().beginTransaction()
                             .add(R.id.editQuestion_FRAME_question, choiceQuestionFragment)
                             .commit();
                     break;
                 case DATE:
-                    dateQuestionFragment = new DateQuestionFragment();
+                    dateQuestionFragment = DateQuestionFragment.newInstance(surveyID);
                     getSupportFragmentManager().beginTransaction()
                             .add(R.id.editQuestion_FRAME_question,dateQuestionFragment)
                             .commit();
                     break;
                 case RATING_SCALE:
-                    ratingQuestionFragment = new RatingQuestionFragment();
+                    ratingQuestionFragment = RatingQuestionFragment.newInstance(surveyID);
                     getSupportFragmentManager().beginTransaction()
                             .add(R.id.editQuestion_FRAME_question,ratingQuestionFragment)
                             .commit();

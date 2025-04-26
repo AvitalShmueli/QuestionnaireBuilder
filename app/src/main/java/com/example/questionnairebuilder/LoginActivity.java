@@ -4,12 +4,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
 import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
 import com.example.questionnairebuilder.databinding.ActivityLoginBinding;
 import com.example.questionnairebuilder.utilities.FirebaseManager;
@@ -89,11 +85,20 @@ public class LoginActivity extends AppCompatActivity {
     private void onLoginComplete(Task<AuthResult> task) {
         binding.loginBTNLogin.setEnabled(true);
         if (task.isSuccessful()) {
-            Toast.makeText(this, "Login successful", Toast.LENGTH_SHORT).show();
-            startActivity(new Intent(this, MainActivity.class));
-            finish();
-        }
-        else
+            String uid = task.getResult().getUser().getUid();
+
+            FirebaseManager.getInstance().getUserData(uid, user -> {
+                if (user != null) {
+                    Intent intent = new Intent(this, MainActivity.class);
+                    intent.putExtra("username", user.getUsername()); // Pass username
+                    startActivity(intent);
+                    finish();
+                } else {
+                    Toast.makeText(this, "Failed to load user data", Toast.LENGTH_LONG).show();
+                }
+            });
+        } else {
             Toast.makeText(this, "Login failed: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
+        }
     }
 }

@@ -35,8 +35,15 @@ public class MainActivity extends AppCompatActivity {
                 R.id.navigation_home, R.id.navigation_explore, R.id.navigation_my_surveys)
                 .build();
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_activity_home);
-        //NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(binding.navView, navController);
+
+        // Get username from intent
+        String username = getIntent().getStringExtra("username");
+        if (username != null) {
+            Bundle bundle = new Bundle();
+            bundle.putString("username", username);
+            navController.navigate(R.id.navigation_home, bundle); // Set the username as arguments for the start destination (HomeFragment)
+        }
 
         String destination = getIntent().getStringExtra("navigateTo");
         if ("navigation_my_surveys".equals(destination)) {

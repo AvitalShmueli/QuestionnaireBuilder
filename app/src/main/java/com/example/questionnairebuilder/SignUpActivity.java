@@ -37,7 +37,7 @@ public class SignUpActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
 
         toolBar = findViewById(R.id.topAppBar);
-        
+
         initViews();
 
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
@@ -68,7 +68,6 @@ public class SignUpActivity extends AppCompatActivity {
     }
 
     private void registerUser() {
-        /*
         String username = binding.signUpTIETUsername.getText().toString().trim();
         String email = binding.signUpTIETEmail.getText().toString().trim();
         String password = binding.signUpTIETPassword.getText().toString().trim();
@@ -96,31 +95,28 @@ public class SignUpActivity extends AppCompatActivity {
 
         binding.signUpBTNRegister.setEnabled(false);
 
+        // Register user with Firebase Auth
         FirebaseManager.getInstance().registerUser(email, password, task -> {
             if (task.isSuccessful()) {
                 String uid = task.getResult().getUser().getUid();
 
-                // If profile picture is selected, upload it
+                // Upload profile image if selected
                 if (selectedImageUri != null) {
                     FirebaseManager.getInstance().uploadUserProfileImage(uid, selectedImageUri, imageUrl -> {
-                        saveUserToDatabase(uid, username, email, imageUrl);
+                        saveUserToFirestore(uid, username, email, imageUrl);
                     });
                 } else {
-                    // No image selected, save user with empty image URL
-                    saveUserToDatabase(uid, username, email, "");
+                    // No profile image selected
+                    saveUserToFirestore(uid, username, email, "");
                 }
             } else {
                 binding.signUpBTNRegister.setEnabled(true);
                 Toast.makeText(this, "Sign up failed: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
             }
         });
-*/
-        // Temporarily skip Firebase logic:
-        startActivity(new Intent(this, MainActivity.class));
-        finish();
     }
 
-    private void saveUserToDatabase(String uid, String username, String email, String imageUrl) {
+    private void saveUserToFirestore(String uid, String username, String email, String imageUrl) {
         User user = new User()
                 .setUid(uid)
                 .setUsername(username)

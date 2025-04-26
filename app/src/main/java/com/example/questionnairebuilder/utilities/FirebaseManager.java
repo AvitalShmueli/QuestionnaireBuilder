@@ -137,18 +137,11 @@ public class FirebaseManager {
         auth.signOut();
     }
 
-    // =================== SIGN-UP ===================
-
     public void uploadUserProfileImage(String uid, Uri imageUri, OnImageUploadListener listener) {
         StorageReference storageRef = FirebaseStorage.getInstance().getReference("ProfileImages").child(uid + ".jpg");
         storageRef.putFile(imageUri)
                 .continueWithTask(task -> storageRef.getDownloadUrl())
                 .addOnSuccessListener(uri -> listener.onUploaded(uri.toString()));
-    }
-
-    public void saveUser(User user, OnUserSaveListener listener) {
-        usersRef.document(user.getUid()).set(user)
-                .addOnCompleteListener(task -> listener.onSaved(task.isSuccessful()));
     }
 
     public interface OnImageUploadListener {
@@ -157,6 +150,32 @@ public class FirebaseManager {
 
     public interface OnUserSaveListener {
         void onSaved(boolean success);
+    }
+
+    public void saveUser(User user, OnUserSaveListener listener) {
+        database.collection("Users")
+                .document(user.getUid())
+                .set(user)
+                .addOnCompleteListener(task -> listener.onSaved(task.isSuccessful()));
+    }
+
+    public void getUserData(String uid, OnUserFetchListener listener) {
+        database.collection("Users")
+                .document(uid)
+                .get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        User user = documentSnapshot.toObject(User.class);
+                        listener.onFetched(user);
+                    } else {
+                        listener.onFetched(null);
+                    }
+                })
+                .addOnFailureListener(e -> listener.onFetched(null));
+    }
+
+    public interface OnUserFetchListener {
+        void onFetched(User user);
     }
 
 }

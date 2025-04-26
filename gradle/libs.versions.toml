@@ -21,7 +21,7 @@ firebaseStorage = "21.0.1"
 [libraries]
 firebase-analytics = { module = "com.google.firebase:firebase-analytics" }
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
-firebase-database = { module = "com.google.firebase:firebase-database" }
+firebase-firestore = { module = "com.google.firebase:firebase-firestore" }
 firebase-ui-auth = { module = "com.firebaseui:firebase-ui-auth", version.ref = "firebaseUiAuth" }
 hdodenhof-circleimageview = { module = "de.hdodenhof:circleimageview", version.ref = "circleimageviewVersion" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }

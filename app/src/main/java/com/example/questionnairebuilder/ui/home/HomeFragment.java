@@ -41,8 +41,11 @@ public class HomeFragment extends Fragment {
             startActivity(intent);
         });
 
-        // final TextView textView = binding.textHome;
-        // homeViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
+        Bundle args = getArguments();
+        if (args != null) {
+            String username = args.getString("username", "User");
+            binding.homeLBLGreeting.setText("Hello, " + username);
+        }
 
         // Dummy data
         List<Survey> fakeSurveys = new ArrayList<>();

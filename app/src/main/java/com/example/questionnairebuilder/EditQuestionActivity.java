@@ -19,6 +19,8 @@ import com.google.android.material.appbar.MaterialToolbar;
 
 public class EditQuestionActivity extends AppCompatActivity {
     public static final String KEY_TYPE = "KEY_TYPE";
+    static final String KEY_QUESTION_HEADER = "KEY_QUESTION_HEADER";
+    public static final String KEY_QUESTION_ARGS = "KEY_QUESTION_ARGS";
     private ActivityEditQuestionBinding binding;
 
     private OpenQuestionFragment openQuestionFragment;
@@ -27,6 +29,9 @@ public class EditQuestionActivity extends AppCompatActivity {
     private RatingQuestionFragment ratingQuestionFragment;
 
     private String surveyID;
+    private String type;
+    private QuestionTypeEnum selectedType;
+    private int currentQuestionOrder = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,18 +40,50 @@ public class EditQuestionActivity extends AppCompatActivity {
         binding = ActivityEditQuestionBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        QuestionTypeManager.init(this);
+        if (savedInstanceState == null) {
+            QuestionTypeManager.init(this);
 
-        Intent previousIntent = getIntent();
-        surveyID = getIntent().getStringExtra("surveyID");
+            Intent previousIntent = getIntent();
 
-        String type = previousIntent.getStringExtra(KEY_TYPE);
-        QuestionTypeEnum selectedType = QuestionTypeEnum.valueOf(type);
-        type = QuestionTypeManager.getValueByKey(selectedType);
+            String title = previousIntent.getStringExtra(KEY_QUESTION_HEADER);
+            Bundle args = previousIntent.getBundleExtra(KEY_QUESTION_ARGS);
+            if (args != null) {
+                type = args.getString("questionType");
+                selectedType = QuestionTypeEnum.valueOf(type);
+                type = QuestionTypeManager.getValueByKey(selectedType);
 
-        initView(type);
+                currentQuestionOrder = args.getInt("order");
+                surveyID = args.getString("surveyID");
 
-        if(type != null) {
+                initView(title);
+            }
+            else{
+                surveyID = getIntent().getStringExtra("surveyID");
+
+                type = previousIntent.getStringExtra(KEY_TYPE);
+                selectedType = QuestionTypeEnum.valueOf(type);
+                type = QuestionTypeManager.getValueByKey(selectedType);
+
+                initView(type);
+            }
+            if (type != null) {
+                loadQuestionFragment(selectedType, args);
+            }
+        }
+
+
+        //QuestionTypeManager.init(this);
+
+        //Intent previousIntent = getIntent();
+        //surveyID = getIntent().getStringExtra("surveyID");
+
+        //type = previousIntent.getStringExtra(KEY_TYPE);
+        //selectedType = QuestionTypeEnum.valueOf(type);
+        //type = QuestionTypeManager.getValueByKey(selectedType);
+
+        //initView(type);
+
+        /*if(type != null) {
             switch (selectedType) {
                 case OPEN_ENDED_QUESTION:
                     openQuestionFragment = OpenQuestionFragment.newInstance(surveyID);
@@ -77,7 +114,7 @@ public class EditQuestionActivity extends AppCompatActivity {
                     break;
 
             }
-        }
+        }*/
 
     }
 
@@ -93,6 +130,42 @@ public class EditQuestionActivity extends AppCompatActivity {
         myToolbar.setNavigationOnClickListener(v -> onBack());
 
     }
+
+    private void loadQuestionFragment(QuestionTypeEnum selectedType, Bundle args){
+        switch (selectedType) {
+            case OPEN_ENDED_QUESTION:
+                openQuestionFragment = OpenQuestionFragment.newInstance(surveyID);
+                getSupportFragmentManager().beginTransaction()
+                        .add(R.id.editQuestion_FRAME_question,openQuestionFragment)
+                        .commit();
+                break;
+            case SINGLE_CHOICE:
+            case DROPDOWN:
+            case YES_NO:
+            case MULTIPLE_CHOICE:
+                if(args == null)
+                    choiceQuestionFragment = ChoiceQuestionFragment.newInstance(surveyID, type);
+                else choiceQuestionFragment = ChoiceQuestionFragment.newInstance(args);
+                getSupportFragmentManager().beginTransaction()
+                        .add(R.id.editQuestion_FRAME_question, choiceQuestionFragment)
+                        .commit();
+                break;
+            case DATE:
+                dateQuestionFragment = DateQuestionFragment.newInstance(surveyID);
+                getSupportFragmentManager().beginTransaction()
+                        .add(R.id.editQuestion_FRAME_question,dateQuestionFragment)
+                        .commit();
+                break;
+            case RATING_SCALE:
+                ratingQuestionFragment = RatingQuestionFragment.newInstance(surveyID);
+                getSupportFragmentManager().beginTransaction()
+                        .add(R.id.editQuestion_FRAME_question,ratingQuestionFragment)
+                        .commit();
+                break;
+
+        }
+    }
+
 
     private void onBack(){
         Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.editQuestion_FRAME_question);

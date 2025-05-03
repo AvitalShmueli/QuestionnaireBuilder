@@ -35,11 +35,11 @@ public class ChoicesAdapter extends RecyclerView.Adapter<ChoicesAdapter.ViewHold
         this.isFixedMode = false;
     }
 
-    public ChoicesAdapter(OnRowCountChangeListener listener, @NonNull List<String> predefinedChoices) {
-        this.dataList = new ArrayList<>(predefinedChoices);
+    public ChoicesAdapter(OnRowCountChangeListener listener, @NonNull List<String> choices, boolean isFixedMode) {
+        this.dataList = new ArrayList<>(choices);
         //this.dataList.add(""); // Initial empty row
         this.rowCountListener = listener;
-        this.isFixedMode = !predefinedChoices.isEmpty();
+        this.isFixedMode = isFixedMode;
         if (!isFixedMode) {
             dataList.add(""); // Add initial empty row if no predefined choices
         }

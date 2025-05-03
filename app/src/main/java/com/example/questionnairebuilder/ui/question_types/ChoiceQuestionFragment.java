@@ -4,7 +4,6 @@ import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,8 +23,8 @@ import com.example.questionnairebuilder.interfaces.UnsavedChangesHandler;
 import com.example.questionnairebuilder.adapters.ChoicesAdapter;
 import com.example.questionnairebuilder.databinding.FragmentChoiceQuestionBinding;
 import com.example.questionnairebuilder.listeners.OnRowCountChangeListener;
+import com.example.questionnairebuilder.models.ChoiceQuestion;
 import com.example.questionnairebuilder.models.MultipleChoiceQuestion;
-import com.example.questionnairebuilder.models.Question;
 import com.example.questionnairebuilder.models.QuestionTypeEnum;
 import com.example.questionnairebuilder.models.QuestionTypeManager;
 import com.example.questionnairebuilder.models.SingleChoiceQuestion;
@@ -58,6 +57,7 @@ public class ChoiceQuestionFragment extends Fragment implements OnRowCountChange
     private String strType;
     private QuestionTypeEnum questionTypeEnum;
     private String surveyID;
+    private ChoiceQuestion question;
 
     private static final String ARG_SURVEY_ID = "ARG_SURVEY_ID";
     private static final String ARG_TYPE = "ARG_TYPE";
@@ -83,15 +83,49 @@ public class ChoiceQuestionFragment extends Fragment implements OnRowCountChange
         return fragment;
     }
 
+    /**
+     * Use this factory method to create a new instance of
+     * this fragment using the provided parameters.
+     *
+     * @param questionArgs bundle of question's details.
+     * @return A new instance of fragment ChoiceQuestionFragment.
+     */
+    public static ChoiceQuestionFragment newInstance(Bundle questionArgs) {
+        ChoiceQuestionFragment fragment = new ChoiceQuestionFragment();
+        fragment.setArguments(questionArgs);
+        return fragment;
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Bundle args = getArguments();
         QuestionTypeManager.init(requireContext());
-        if (getArguments() != null) {
-            surveyID = getArguments().getString(ARG_SURVEY_ID);
-            strType = getArguments().getString(ARG_TYPE);
-            if(strType != null)
-                questionTypeEnum = QuestionTypeManager.getKeyByValue(strType);
+        if (args != null) {
+            if (args.getString("questionID") == null) { // new question
+                surveyID = getArguments().getString(ARG_SURVEY_ID);
+                strType = getArguments().getString(ARG_TYPE);
+                if(strType != null)
+                    questionTypeEnum = QuestionTypeManager.getKeyByValue(strType);
+            }
+            else {
+                surveyID = args.getString("surveyID");
+                questionTypeEnum = QuestionTypeEnum.valueOf(args.getString("questionType"));
+                strType = args.getString("questionType");
+                if (questionTypeEnum.isSingleSelection()) {
+                    question = new SingleChoiceQuestion(args.getString("questionTitle"), questionTypeEnum)
+                            .setChoices(args.getStringArrayList("choices"));
+                } else {
+                    question = new MultipleChoiceQuestion(args.getString("questionTitle"))
+                            .setAllowedSelectionNum(args.getInt("allowedSelectionNum"))
+                            .setChoices(args.getStringArrayList("choices"));
+                }
+                question.setOther(args.getBoolean("other"))
+                        .setMandatory(args.getBoolean("mandatory"))
+                        .setQuestionID(args.getString("questionID"))
+                        .setSurveyID(surveyID)
+                        .setOrder(args.getInt("order"));
+            }
         }
 
         requireActivity().getOnBackPressedDispatcher().addCallback(this,
@@ -115,42 +149,33 @@ public class ChoiceQuestionFragment extends Fragment implements OnRowCountChange
         View root = binding.getRoot();
 
         createBinding();
-
+        initView();
+        loadQuestionDetails(question);
         return root;
     }
 
     private void createBinding() {
-        // the question
         choiceQuestion_TIL_question = binding.choiceQuestionTILQuestion;
         choiceQuestion_TXT_question = binding.choiceQuestionTXTQuestion;
         choiceQuestion_SW_mandatory = binding.choiceQuestionSWMandatory;
-        choiceQuestion_SW_mandatory.setOnClickListener(v -> choiceQuestion_RV_choices.clearFocus());
         choiceQuestion_SW_other = binding.choiceQuestionSWOther;
+        choiceQuestion_DD_maxAllowed = binding.choiceQuestionDDMaxAllowed;
+        choiceQuestion_LL_maxAllowed = binding.choiceQuestionLLMaxAllowed;
+        choiceQuestion_RV_choices = binding.choiceQuestionRVChoices;
+        choiceQuestion_LBL_ErrorRV = binding.choiceQuestionLBLErrorRV;
+        choiceQuestion_BTN_save = binding.choiceQuestionBTNSave;
+        choiceQuestion_BTN_cancel = binding.choiceQuestionBTNCancel;
+    }
+
+    private void initView(){
+        choiceQuestion_SW_mandatory.setOnClickListener(v -> choiceQuestion_RV_choices.clearFocus());
         choiceQuestion_SW_other.setOnClickListener(v -> choiceQuestion_RV_choices.clearFocus());
 
         // max selection allowed dropdown
-        choiceQuestion_DD_maxAllowed = binding.choiceQuestionDDMaxAllowed;
-        choiceQuestion_LL_maxAllowed = binding.choiceQuestionLLMaxAllowed;
         choiceQuestion_LL_maxAllowed.setVisibility(strType.equals(getString(R.string.multiple_choice)) ? VISIBLE : GONE);
         initDropDownValues();
 
-        // choices repeating table
-        choiceQuestion_RV_choices = binding.choiceQuestionRVChoices;
-        choiceQuestion_LBL_ErrorRV = binding.choiceQuestionLBLErrorRV;
-        choiceQuestion_RV_choices.setLayoutManager(new LinearLayoutManager(requireActivity()));
-
-        ArrayList<String> choices = new ArrayList<>();
-        if(questionTypeEnum == QuestionTypeEnum.YES_NO){
-            choices.add(requireContext().getString(R.string.yes));
-            choices.add(requireContext().getString(R.string.no));
-        }
-
-        choicesAdapter = new ChoicesAdapter(this,choices);
-        choiceQuestion_RV_choices.setAdapter(choicesAdapter);
-
         // save & cancel buttons
-        choiceQuestion_BTN_save = binding.choiceQuestionBTNSave;
-        choiceQuestion_BTN_cancel = binding.choiceQuestionBTNCancel;
         choiceQuestion_BTN_cancel.setOnClickListener(v -> {
             choiceQuestion_RV_choices.clearFocus();
             cancel();
@@ -172,6 +197,22 @@ public class ChoiceQuestionFragment extends Fragment implements OnRowCountChange
         choiceQuestion_DD_maxAllowed.setOnItemClickListener((adapterView, view, position, id) -> selectedMaxSelectionsAllowed = adapterItems_MaxSelectionsAllowed.getItem(position));
     }
 
+    private void initChoices(ArrayList<String> choices) {
+        // choices repeating table
+        choiceQuestion_RV_choices.setLayoutManager(new LinearLayoutManager(requireActivity()));
+        boolean isYesNo = questionTypeEnum == QuestionTypeEnum.YES_NO;
+        if(choices == null){
+            choices = new ArrayList<>();
+            if(isYesNo){
+                choices.add(requireContext().getString(R.string.yes));
+                choices.add(requireContext().getString(R.string.no));
+            }
+        }
+
+        choicesAdapter = new ChoicesAdapter(this,choices,isYesNo);
+        choiceQuestion_RV_choices.setAdapter(choicesAdapter);
+    }
+
     @Override
     public void onRowCountChanged(int count) {
         choiceCount = count;
@@ -187,10 +228,20 @@ public class ChoiceQuestionFragment extends Fragment implements OnRowCountChange
         }
     }
 
-    private void loadQuestionDetails(Question q){
+    private void loadQuestionDetails(ChoiceQuestion q){
+        if(q == null) {
+            initChoices(null);
+            return;
+        }
         questionTypeEnum = q.getType();
-        if(questionTypeEnum.isSingleSelection()){
-            // TODO: complete
+        choiceQuestion_TXT_question.setText(q.getQuestionTitle());
+        initChoices(q.getChoices());
+        choiceQuestion_SW_mandatory.setChecked(q.isMandatory());
+        choiceQuestion_SW_other.setChecked(q.isOther());
+
+        if(!questionTypeEnum.isSingleSelection()){
+            String maxSelections = String.valueOf(((MultipleChoiceQuestion)q).getAllowedSelectionNum());
+            choiceQuestion_DD_maxAllowed.setText(maxSelections);
         }
     }
 
@@ -199,32 +250,40 @@ public class ChoiceQuestionFragment extends Fragment implements OnRowCountChange
             choiceQuestion_TIL_question.setError(null);
             choiceQuestion_LBL_ErrorRV.setVisibility(GONE);
 
-            Question q;
             String questionTitle = choiceQuestion_TXT_question.getText().toString().trim();
             boolean mandatory = choiceQuestion_SW_mandatory.isChecked();
             ArrayList<String> theChoices = choicesAdapter.getDataList();
             boolean other = choiceQuestion_SW_other.isChecked();
-            switch (questionTypeEnum) {
-                case SINGLE_CHOICE:
-                    q = new SingleChoiceQuestion(questionTitle, QuestionTypeEnum.SINGLE_CHOICE, theChoices, other);
-                    break;
-                case DROPDOWN:
-                    q = new SingleChoiceQuestion(questionTitle, QuestionTypeEnum.DROPDOWN, theChoices, other);
-                    break;
-                case YES_NO:
-                    q = new SingleChoiceQuestion(questionTitle, QuestionTypeEnum.YES_NO, theChoices, other);
-                    break;
-                default:
-                    q = new MultipleChoiceQuestion(questionTitle, theChoices, other)
-                            .setAllowedSelectionNum(selectedMaxSelectionsAllowed);
-                    Log.d("pttt", "max selections: " + selectedMaxSelectionsAllowed);
-                    break;
+
+            if(question == null){
+                switch (questionTypeEnum) {
+                    case SINGLE_CHOICE:
+                        question = new SingleChoiceQuestion(questionTitle, QuestionTypeEnum.SINGLE_CHOICE, theChoices, other);
+                        break;
+                    case DROPDOWN:
+                        question = new SingleChoiceQuestion(questionTitle, QuestionTypeEnum.DROPDOWN, theChoices, other);
+                        break;
+                    case YES_NO:
+                        question = new SingleChoiceQuestion(questionTitle, QuestionTypeEnum.YES_NO, theChoices, other);
+                        break;
+                    default:
+                        question = new MultipleChoiceQuestion(questionTitle, theChoices, other)
+                                .setAllowedSelectionNum(selectedMaxSelectionsAllowed);
+                        break;
+                }
+                question.setQuestionID(UUID.randomUUID().toString())
+                        .setSurveyID(surveyID)
+                        .setMandatory(mandatory);
             }
-            q.setQuestionID(UUID.randomUUID().toString())
-                    .setSurveyID(surveyID)
-                    .setMandatory(mandatory);
-            Log.d("pttt", "the choices: " + theChoices);
-            q.save();
+            else{
+                if(!questionTypeEnum.isSingleSelection())
+                    ((MultipleChoiceQuestion)question).setAllowedSelectionNum(selectedMaxSelectionsAllowed);
+                question.setChoices(theChoices)
+                        .setOther(other)
+                        .setQuestionTitle(questionTitle)
+                        .setMandatory(mandatory);
+            }
+            question.save();
             requireActivity().finish();
         }
         else{

@@ -90,7 +90,7 @@ public class QuestionsActivity extends AppCompatActivity {
             @Override
             public void select(Question question) {
                 // TODO: add logic of edit mode
-                changeActivityResponse(question);
+                changeActivityEditQuestion(question);
             }
         });
         recyclerView.setAdapter(questionAdapter);
@@ -171,10 +171,13 @@ public class QuestionsActivity extends AppCompatActivity {
         args.putBoolean("mandatory",q.isMandatory());
         args.putInt("order",q.getOrder());
         args.putString("image",q.getImage());
-        if(q instanceof OpenEndedQuestion)
+        if(q instanceof OpenEndedQuestion) {
             args.putBoolean("multipleLineAnswer",((OpenEndedQuestion)q).isMultipleLineAnswer());
-        if(q instanceof ChoiceQuestion)
-            args.putStringArrayList("choices",((ChoiceQuestion)q).getChoices());
+        }
+        if(q instanceof ChoiceQuestion) {
+            args.putStringArrayList("choices", ((ChoiceQuestion) q).getChoices());
+            args.putBoolean("other",((ChoiceQuestion)q).isOther());
+        }
         if(q instanceof MultipleChoiceQuestion)
             args.putInt("allowedSelectionNum",((MultipleChoiceQuestion)q).getAllowedSelectionNum());
         if(q instanceof DateQuestion)

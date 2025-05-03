@@ -13,6 +13,7 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.questionnairebuilder.utilities.FirebaseManager;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.imageview.ShapeableImageView;
 
@@ -134,5 +135,16 @@ public class WelcomeActivity extends AppCompatActivity {
 
         Context context = newBase.createConfigurationContext(config);
         super.attachBaseContext(context);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        if(FirebaseManager.getInstance().getCurrentUser() != null) {
+            Intent intent = new Intent(this, MainActivity.class);
+            startActivity(intent);
+            finish();
+        }
     }
 }

@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.view.View;
 import android.widget.Toast;
 
 import androidx.activity.OnBackPressedCallback;
@@ -105,13 +106,15 @@ public class SignUpActivity extends AppCompatActivity {
                     FirebaseManager.getInstance().uploadUserProfileImage(uid, selectedImageUri, imageUrl -> {
                         saveUserToFirestore(uid, username, email, imageUrl);
                     });
-                } else {
-                    // No profile image selected
+                } else { // No profile image selected
                     saveUserToFirestore(uid, username, email, "");
                 }
             } else {
                 binding.signUpBTNRegister.setEnabled(true);
-                Toast.makeText(this, "Sign up failed: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
+
+                // Show error message on label
+                binding.signUpLBLError.setText(task.getException().getMessage());
+                binding.signUpLBLError.setVisibility(View.VISIBLE);
             }
         });
     }
@@ -134,5 +137,26 @@ public class SignUpActivity extends AppCompatActivity {
             }
         });
     }
+
+    @Override
+    public boolean dispatchTouchEvent(android.view.MotionEvent ev) {
+        if (ev.getAction() == android.view.MotionEvent.ACTION_DOWN) {
+            android.view.View v = getCurrentFocus();
+            if (v instanceof android.widget.EditText) {
+                android.graphics.Rect outRect = new android.graphics.Rect();
+                v.getGlobalVisibleRect(outRect);
+                if (!outRect.contains((int) ev.getRawX(), (int) ev.getRawY())) {
+                    v.clearFocus();
+                    android.view.inputmethod.InputMethodManager imm =
+                            (android.view.inputmethod.InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+                    if (imm != null) {
+                        imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+                    }
+                }
+            }
+        }
+        return super.dispatchTouchEvent(ev);
+    }
+
 
 }

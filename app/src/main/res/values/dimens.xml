@@ -17,4 +17,6 @@
     <dimen name="supporting_text_margins">16dp</dimen>
     <dimen name="bufferMargin">8dp</dimen>
     <dimen name="icon_size">32dp</dimen>
+    <dimen name="responses_size">36sp</dimen>
+    <dimen name="responses_text_size">14sp</dimen>
 </resources>

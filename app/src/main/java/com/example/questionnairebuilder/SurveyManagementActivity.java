@@ -3,9 +3,12 @@ package com.example.questionnairebuilder;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.AppCompatSpinner;
 
 import com.example.questionnairebuilder.interfaces.OneSurveyCallback;
 import com.example.questionnairebuilder.models.Survey;
@@ -14,11 +17,23 @@ import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.materialswitch.MaterialSwitch;
 import com.google.android.material.textview.MaterialTextView;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
 public class SurveyManagementActivity extends AppCompatActivity {
     private MaterialToolbar toolbar;
     private LinearLayout management_LL_edit;
-    private MaterialTextView management_LBL_status;
-    private MaterialSwitch management_SW_status;
+    private MaterialTextView management_LBL_isOpen;
+    private MaterialSwitch management_SW_isOpen;
+    private MaterialTextView management_LBL_totalResponses;
+    private MaterialTextView management_LBL_completedResponses;
+    private MaterialTextView management_LBL_createdDate;
+    private MaterialTextView management_LBL_modifiedDate;
+    private MaterialTextView management_LBL_dueDate;
+    private MaterialTextView management_LBL_questionCount;
+    private MaterialTextView management_LBL_pageCount;
+    private AppCompatSpinner management_SP_status;
     private Survey survey;
 
     @Override
@@ -43,7 +58,40 @@ public class SurveyManagementActivity extends AppCompatActivity {
             @Override
             public void onSurveyLoaded(Survey loadedSurvey) {
                 survey = loadedSurvey;
-                // TODO: set labels based on the survey's data
+
+                // Total Responses
+                int totalResponses = survey.getSurveyViewers() != null ? survey.getSurveyViewers().size() : 0;
+                management_LBL_totalResponses.setText(String.valueOf(totalResponses));
+
+                // Completed Responses
+                management_LBL_completedResponses.setText(String.valueOf(totalResponses));
+
+                // Created Date
+                if (survey.getCreated() != null) {
+                    management_LBL_createdDate.setText(formatDate(survey.getCreated()));
+                }
+
+                // Modified Date
+                if (survey.getModified() != null) {
+                    management_LBL_modifiedDate.setText(formatDate(survey.getModified()));
+                }
+
+                // Due Date
+                if (survey.getDueDate() != null) {
+                    management_LBL_dueDate.setText(formatDate(survey.getDueDate()));
+                }
+
+                // Question Count
+                int questionCount = survey.getQuestions() != null ? survey.getQuestions().size() : 0;
+                management_LBL_questionCount.setText(String.valueOf(questionCount));
+
+                // Page Count
+                management_LBL_pageCount.setText("1");
+
+                // Status Switch & Label
+                boolean isPublished = survey.getStatus() == Survey.SurveyStatus.Published;
+                management_SW_isOpen.setChecked(isPublished);
+                updateStatusLabel(isPublished); // Already implemented
             }
 
             @Override
@@ -51,13 +99,31 @@ public class SurveyManagementActivity extends AppCompatActivity {
                 Log.e("pttt","Failed to load survey: " + e.getMessage());
             }
         });
+    }
 
+    @NonNull
+    private String formatDate(Date date) {
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+        return sdf.format(date);
     }
 
     private void initViews() {
         setSupportActionBar(toolbar);
-        initStatusSwitch();
+        toolbar.setNavigationOnClickListener(v -> getOnBackPressedDispatcher().onBackPressed());
+        initIsOpenSwitch();
         setupEditClick();
+        initSpinner();
+    }
+
+    private void initSpinner() {
+        String[] statuses = {getString(R.string.draft), getString(R.string.published), getString(R.string.close)};
+        ArrayAdapter<String> statusAdapter = new ArrayAdapter<>(
+                this,
+                R.layout.spinner_item,
+                statuses
+        );
+        statusAdapter.setDropDownViewResource(R.layout.spinner_item);
+        management_SP_status.setAdapter(statusAdapter);
     }
 
     private void setupEditClick() {
@@ -69,28 +135,38 @@ public class SurveyManagementActivity extends AppCompatActivity {
         });
     }
 
-    private void initStatusSwitch() {
-        updateStatusLabel(management_SW_status.isChecked()); // Initialize current state
-        management_SW_status.setOnCheckedChangeListener((buttonView, isChecked) -> { // Listen for future changes
+    private void initIsOpenSwitch() {
+
+        management_SW_isOpen.setChecked(false); // Initialize current state default to Closed (unchecked)
+        updateStatusLabel(false);
+        management_SW_isOpen.setOnCheckedChangeListener((buttonView, isChecked) -> { // Listen for future changes
             updateStatusLabel(isChecked);
         });
     }
 
     private void updateStatusLabel(boolean isChecked) {
         if (isChecked) {
-            management_LBL_status.setText(R.string.open);
-            management_LBL_status.setTextColor(getColor(R.color.theme_circle_green));
+            management_LBL_isOpen.setText(R.string.open);
+            management_LBL_isOpen.setTextColor(getColor(R.color.theme_circle_green));
         }
         else {
-            management_LBL_status.setText(R.string.closed);
-            management_LBL_status.setTextColor(getColor(R.color.theme_circle_red));
+            management_LBL_isOpen.setText(R.string.closed);
+            management_LBL_isOpen.setTextColor(getColor(R.color.theme_circle_red));
         }
     }
 
     private void findViews() {
         toolbar = findViewById(R.id.topAppBar);
         management_LL_edit = findViewById(R.id.management_LL_edit);
-        management_LBL_status = findViewById(R.id.management_LBL_status);
-        management_SW_status = findViewById(R.id.management_SW_status);
+        management_LBL_isOpen = findViewById(R.id.management_LBL_isOpen);
+        management_SW_isOpen = findViewById(R.id.management_SW_isOpen);
+        management_LBL_totalResponses = findViewById(R.id.management_LBL_totalResponses);
+        management_LBL_completedResponses = findViewById(R.id.management_LBL_completedResponses);
+        management_LBL_createdDate = findViewById(R.id.management_LBL_createdDate);
+        management_LBL_modifiedDate = findViewById(R.id.management_LBL_modifiedDate);
+        management_LBL_dueDate = findViewById(R.id.management_LBL_dueDate);
+        management_LBL_questionCount = findViewById(R.id.management_LBL_questionCount);
+        management_LBL_pageCount = findViewById(R.id.management_LBL_pageCount);
+        management_SP_status = findViewById(R.id.management_SP_status);
     }
 }

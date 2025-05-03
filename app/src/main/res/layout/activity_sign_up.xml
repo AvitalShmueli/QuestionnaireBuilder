@@ -102,7 +102,17 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
-                android:text="Sign Up" />
+                android:text="@string/sign_up" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/signUp_LBL_error"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@android:color/holo_red_dark"
+                android:visibility="gone"
+                android:textStyle="bold"
+                android:layout_marginTop="8dp"
+                tools:text="Error message here" />
 
         </LinearLayout>
 

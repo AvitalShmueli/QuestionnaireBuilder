@@ -58,29 +58,11 @@ public class ChoiceQuestionFragment extends Fragment implements OnRowCountChange
     private QuestionTypeEnum questionTypeEnum;
     private String surveyID;
     private ChoiceQuestion question;
+    private int currentQuestionOrder;
 
-    private static final String ARG_SURVEY_ID = "ARG_SURVEY_ID";
-    private static final String ARG_TYPE = "ARG_TYPE";
 
     public ChoiceQuestionFragment() {
         // Required empty public constructor
-    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param surveyID surveyID.
-     * @param type choice type.
-     * @return A new instance of fragment ChoiceQuestionFragment.
-     */
-    public static ChoiceQuestionFragment newInstance(String surveyID, String type) {
-        ChoiceQuestionFragment fragment = new ChoiceQuestionFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_SURVEY_ID, surveyID);
-        args.putString(ARG_TYPE, type);
-        fragment.setArguments(args);
-        return fragment;
     }
 
     /**
@@ -102,16 +84,12 @@ public class ChoiceQuestionFragment extends Fragment implements OnRowCountChange
         Bundle args = getArguments();
         QuestionTypeManager.init(requireContext());
         if (args != null) {
-            if (args.getString("questionID") == null) { // new question
-                surveyID = getArguments().getString(ARG_SURVEY_ID);
-                strType = getArguments().getString(ARG_TYPE);
-                if(strType != null)
-                    questionTypeEnum = QuestionTypeManager.getKeyByValue(strType);
-            }
-            else {
-                surveyID = args.getString("surveyID");
-                questionTypeEnum = QuestionTypeEnum.valueOf(args.getString("questionType"));
-                strType = QuestionTypeManager.getValueByKey(questionTypeEnum);
+            surveyID = args.getString("surveyID");
+            currentQuestionOrder = args.getInt("order");
+            questionTypeEnum = QuestionTypeEnum.valueOf(args.getString("questionType"));
+            strType = QuestionTypeManager.getValueByKey(questionTypeEnum);
+
+            if (args.getString("questionID") != null) { // edit question
                 if (questionTypeEnum.isSingleSelection()) {
                     question = new SingleChoiceQuestion(args.getString("questionTitle"), questionTypeEnum)
                             .setChoices(args.getStringArrayList("choices"));
@@ -172,6 +150,7 @@ public class ChoiceQuestionFragment extends Fragment implements OnRowCountChange
         choiceQuestion_SW_mandatory.setOnClickListener(v -> choiceQuestion_RV_choices.clearFocus());
         choiceQuestion_SW_other.setOnClickListener(v -> choiceQuestion_RV_choices.clearFocus());
         initDropDownValues();
+
         // save & cancel buttons
         choiceQuestion_BTN_cancel.setOnClickListener(v -> {
             choiceQuestion_RV_choices.clearFocus();
@@ -274,7 +253,8 @@ public class ChoiceQuestionFragment extends Fragment implements OnRowCountChange
                 }
                 question.setQuestionID(UUID.randomUUID().toString())
                         .setSurveyID(surveyID)
-                        .setMandatory(mandatory);
+                        .setMandatory(mandatory)
+                        .setOrder(currentQuestionOrder);
             }
             else{
                 if(!questionTypeEnum.isSingleSelection())

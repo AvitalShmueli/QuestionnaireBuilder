@@ -44,26 +44,10 @@ public class RatingQuestionFragment extends Fragment implements UnsavedChangesHa
     private Integer selectedRatingScaleIcon = null;
     private String surveyID;
     private RatingScaleQuestion question;
-
-    private static final String ARG_SURVEY_ID = "ARG_SURVEY_ID";
+    private int currentQuestionOrder;
 
     public RatingQuestionFragment() {
         // Required empty public constructor
-    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param surveyID surveyID.
-     * @return A new instance of fragment DateQuestionFragment.
-     */
-    public static RatingQuestionFragment newInstance(String surveyID) {
-        RatingQuestionFragment fragment = new RatingQuestionFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_SURVEY_ID, surveyID);
-        fragment.setArguments(args);
-        return fragment;
     }
 
     /**
@@ -84,10 +68,9 @@ public class RatingQuestionFragment extends Fragment implements UnsavedChangesHa
         super.onCreate(savedInstanceState);
         Bundle args = getArguments();
         if (args != null) {
-            if (args.getString("questionID") == null) { // new question
-                surveyID = args.getString(ARG_SURVEY_ID);
-            } else {
-                surveyID = args.getString("surveyID");
+            surveyID = args.getString("surveyID");
+            currentQuestionOrder = args.getInt("order");
+            if (args.getString("questionID") != null) { // edit question
                 question = (RatingScaleQuestion) new RatingScaleQuestion(args.getString("questionTitle"))
                         .setIconResourceId(args.getInt("iconResourceId"))
                         .setRatingScaleLevel(args.getInt("ratingScaleLevel"))
@@ -208,7 +191,8 @@ public class RatingQuestionFragment extends Fragment implements UnsavedChangesHa
                         .setIconResourceId(selectedRatingScaleIcon)
                         .setQuestionID(UUID.randomUUID().toString())
                         .setSurveyID(surveyID)
-                        .setMandatory(mandatory);
+                        .setMandatory(mandatory)
+                        .setOrder(currentQuestionOrder);
             }
             else {
                 question.setRatingScaleLevel(selectedRatingScaleLevel)

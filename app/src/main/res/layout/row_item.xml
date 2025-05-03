@@ -9,7 +9,7 @@
         android:id="@+id/row_TXT_item"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:inputType="text"
+        android:inputType="text|textCapSentences"
         android:layout_weight="1"
         android:backgroundTint="?attr/colorPrimary"
         android:textSize="@dimen/input_text_size"

@@ -18,7 +18,6 @@ import com.example.questionnairebuilder.ui.question_types.RatingQuestionFragment
 import com.google.android.material.appbar.MaterialToolbar;
 
 public class EditQuestionActivity extends AppCompatActivity {
-    public static final String KEY_TYPE = "KEY_TYPE";
     static final String KEY_QUESTION_HEADER = "KEY_QUESTION_HEADER";
     public static final String KEY_QUESTION_ARGS = "KEY_QUESTION_ARGS";
     private ActivityEditQuestionBinding binding;
@@ -31,7 +30,6 @@ public class EditQuestionActivity extends AppCompatActivity {
     private String surveyID;
     private String type;
     private QuestionTypeEnum selectedType;
-    private int currentQuestionOrder = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,71 +49,13 @@ public class EditQuestionActivity extends AppCompatActivity {
                 type = args.getString("questionType");
                 selectedType = QuestionTypeEnum.valueOf(type);
                 type = QuestionTypeManager.getValueByKey(selectedType);
-
-                currentQuestionOrder = args.getInt("order");
                 surveyID = args.getString("surveyID");
-
-                initView(title);
             }
-            else{
-                surveyID = getIntent().getStringExtra("surveyID");
-
-                type = previousIntent.getStringExtra(KEY_TYPE);
-                selectedType = QuestionTypeEnum.valueOf(type);
-                type = QuestionTypeManager.getValueByKey(selectedType);
-
-                initView(type);
-            }
+            initView(title == null? type : title);
             if (type != null) {
                 loadQuestionFragment(selectedType, args);
             }
         }
-
-
-        //QuestionTypeManager.init(this);
-
-        //Intent previousIntent = getIntent();
-        //surveyID = getIntent().getStringExtra("surveyID");
-
-        //type = previousIntent.getStringExtra(KEY_TYPE);
-        //selectedType = QuestionTypeEnum.valueOf(type);
-        //type = QuestionTypeManager.getValueByKey(selectedType);
-
-        //initView(type);
-
-        /*if(type != null) {
-            switch (selectedType) {
-                case OPEN_ENDED_QUESTION:
-                    openQuestionFragment = OpenQuestionFragment.newInstance(surveyID);
-                    getSupportFragmentManager().beginTransaction()
-                            .add(R.id.editQuestion_FRAME_question,openQuestionFragment)
-                            .commit();
-                    break;
-                case SINGLE_CHOICE:
-                case DROPDOWN:
-                case YES_NO:
-                case MULTIPLE_CHOICE:
-                    choiceQuestionFragment = ChoiceQuestionFragment.newInstance(surveyID, type);
-                    getSupportFragmentManager().beginTransaction()
-                            .add(R.id.editQuestion_FRAME_question, choiceQuestionFragment)
-                            .commit();
-                    break;
-                case DATE:
-                    dateQuestionFragment = DateQuestionFragment.newInstance(surveyID);
-                    getSupportFragmentManager().beginTransaction()
-                            .add(R.id.editQuestion_FRAME_question,dateQuestionFragment)
-                            .commit();
-                    break;
-                case RATING_SCALE:
-                    ratingQuestionFragment = RatingQuestionFragment.newInstance(surveyID);
-                    getSupportFragmentManager().beginTransaction()
-                            .add(R.id.editQuestion_FRAME_question,ratingQuestionFragment)
-                            .commit();
-                    break;
-
-            }
-        }*/
-
     }
 
     private void initView(String title){
@@ -134,9 +74,7 @@ public class EditQuestionActivity extends AppCompatActivity {
     private void loadQuestionFragment(QuestionTypeEnum selectedType, Bundle args){
         switch (selectedType) {
             case OPEN_ENDED_QUESTION:
-                if(args == null)
-                    openQuestionFragment = OpenQuestionFragment.newInstance(surveyID);
-                else openQuestionFragment = OpenQuestionFragment.newInstance(args);
+                openQuestionFragment = OpenQuestionFragment.newInstance(args);
                 getSupportFragmentManager().beginTransaction()
                         .add(R.id.editQuestion_FRAME_question,openQuestionFragment)
                         .commit();
@@ -145,25 +83,19 @@ public class EditQuestionActivity extends AppCompatActivity {
             case DROPDOWN:
             case YES_NO:
             case MULTIPLE_CHOICE:
-                if(args == null)
-                    choiceQuestionFragment = ChoiceQuestionFragment.newInstance(surveyID, type);
-                else choiceQuestionFragment = ChoiceQuestionFragment.newInstance(args);
+                choiceQuestionFragment = ChoiceQuestionFragment.newInstance(args);
                 getSupportFragmentManager().beginTransaction()
                         .add(R.id.editQuestion_FRAME_question, choiceQuestionFragment)
                         .commit();
                 break;
             case DATE:
-                if(args == null)
-                    dateQuestionFragment = DateQuestionFragment.newInstance(surveyID);
-                else dateQuestionFragment = DateQuestionFragment.newInstance(args);
+                dateQuestionFragment = DateQuestionFragment.newInstance(args);
                 getSupportFragmentManager().beginTransaction()
                         .add(R.id.editQuestion_FRAME_question,dateQuestionFragment)
                         .commit();
                 break;
             case RATING_SCALE:
-                if(args == null)
-                    ratingQuestionFragment = RatingQuestionFragment.newInstance(surveyID);
-                else ratingQuestionFragment = RatingQuestionFragment.newInstance(args);
+                ratingQuestionFragment = RatingQuestionFragment.newInstance(args);
                 getSupportFragmentManager().beginTransaction()
                         .add(R.id.editQuestion_FRAME_question,ratingQuestionFragment)
                         .commit();
@@ -198,12 +130,5 @@ public class EditQuestionActivity extends AppCompatActivity {
                 .setNegativeButton(R.string.no, (dialog, which) -> dialog.dismiss())
                 .setCancelable(true)
                 .show();
-    }
-
-
-    private void changeActivity(String type) {
-        Intent editQuestionActivity = new Intent(this, EditQuestionActivity.class);
-        editQuestionActivity.putExtra(EditQuestionActivity.KEY_TYPE,type);
-        startActivity(editQuestionActivity);
     }
 }

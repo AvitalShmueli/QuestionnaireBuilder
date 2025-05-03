@@ -13,7 +13,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.questionnairebuilder.R;
 import com.example.questionnairebuilder.interfaces.Callback_questionSelected;
-import com.example.questionnairebuilder.listeners.OnQuestionListChangedListener;
 import com.example.questionnairebuilder.models.Question;
 import com.google.android.material.textview.MaterialTextView;
 
@@ -21,12 +20,10 @@ import java.util.List;
 
 public class QuestionsAdapter extends RecyclerView.Adapter<QuestionsAdapter.ViewHolder> {
     private List<Question> questionList;
-    private OnQuestionListChangedListener mListChangedListener;
 
     private Callback_questionSelected callback_questionSelected;
 
     public QuestionsAdapter(List<Question> questionList) {
-        //this.context = context;
         this.questionList = questionList;
     }
 
@@ -52,7 +49,8 @@ public class QuestionsAdapter extends RecyclerView.Adapter<QuestionsAdapter.View
         if (!questionList.isEmpty()) {
             Question question = questionList.get(position);
             String title = question.getQuestionTitle();
-            int order = question.setOrder(position + 1).getOrder() ;
+            //int order = question.setOrder(position + 1).getOrder();
+            int order = question.getOrder();
             holder.rv_mandatory_star.setVisibility(question.isMandatory()? VISIBLE : GONE);
             holder.rv_title.setText(title + " | " + order);
 

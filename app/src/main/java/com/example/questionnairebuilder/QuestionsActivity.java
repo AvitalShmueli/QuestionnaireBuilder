@@ -54,6 +54,8 @@ public class QuestionsActivity extends AppCompatActivity {
     private List<Question> questionList = new ArrayList<>();
     private ListenerRegistration questionsListener;
 
+    private boolean editModeEnabled;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -66,19 +68,22 @@ public class QuestionsActivity extends AppCompatActivity {
 
         surveyID = getIntent().getStringExtra("surveyID");
         surveyTitle = getIntent().getStringExtra("survey_title");
+        editModeEnabled = false;
 
+        createBinding();
         setupViews();
-
     }
 
-    private void setupViews() {
+    private void createBinding(){
         toolbar = binding.topAppBar;
         question_LL_add_first_question = binding.questionLLAddFirstQuestion;
         question_FAB_add = binding.questionFABAdd;
         question_FAB_add_bottom = binding.questionFABAddBottom;
         questions_BTN_skip = binding.questionsBTNSkip;
         recyclerView = binding.recyclerView;
+    }
 
+    private void setupViews() {
         if (surveyTitle != null) {
             toolbar.setTitle(surveyTitle);
         }
@@ -90,7 +95,9 @@ public class QuestionsActivity extends AppCompatActivity {
             @Override
             public void select(Question question) {
                 // TODO: add logic of edit mode
-                changeActivityEditQuestion(question);
+                if(editModeEnabled)
+                    changeActivityEditQuestion(question);
+                else changeActivityResponse(question);
             }
         });
         recyclerView.setAdapter(questionAdapter);
@@ -121,7 +128,7 @@ public class QuestionsActivity extends AppCompatActivity {
                 String selectedItem;
                 if(item.getTitle() != null) {
                     selectedItem = item.getTitle().toString();
-                    changeActivity(QuestionTypeManager.getKeyByValue(selectedItem));
+                    changeActivityNewQuestion(QuestionTypeManager.getKeyByValue(selectedItem));
                     return true;
                 }
                 return false;
@@ -131,10 +138,13 @@ public class QuestionsActivity extends AppCompatActivity {
         popupMenu.show();
     }
 
-    private void changeActivity(QuestionTypeEnum type) {
+    private void changeActivityNewQuestion(QuestionTypeEnum type) {
         Intent intent = new Intent(this, EditQuestionActivity.class);
-        intent.putExtra(EditQuestionActivity.KEY_TYPE, type.toString());
-        intent.putExtra("surveyID", surveyID);
+        Bundle args = new Bundle();
+        args.putString("questionType", type.toString());
+        args.putString("surveyID", surveyID);
+        args.putInt("order", questionAdapter.getItemCount() + 1);
+        intent.putExtra(EditQuestionActivity.KEY_QUESTION_ARGS,args);
         startActivity(intent);
     }
 

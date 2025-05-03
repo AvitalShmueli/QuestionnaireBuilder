@@ -40,26 +40,10 @@ public class DateQuestionFragment extends Fragment implements UnsavedChangesHand
     private DateSelectionModeEnum selectedMode;
     private String surveyID;
     private DateQuestion question;
-
-    private static final String ARG_SURVEY_ID = "ARG_SURVEY_ID";
+    private int currentQuestionOrder;
 
     public DateQuestionFragment() {
         // Required empty public constructor
-    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param surveyID surveyID.
-     * @return A new instance of fragment DateQuestionFragment.
-     */
-    public static DateQuestionFragment newInstance(String surveyID) {
-        DateQuestionFragment fragment = new DateQuestionFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_SURVEY_ID, surveyID);
-        fragment.setArguments(args);
-        return fragment;
     }
 
     /**
@@ -80,11 +64,9 @@ public class DateQuestionFragment extends Fragment implements UnsavedChangesHand
         super.onCreate(savedInstanceState);
         Bundle args = getArguments();
         if (args != null) {
-            if (args.getString("questionID") == null) { // new question
-                surveyID = args.getString(ARG_SURVEY_ID);
-            }
-            else {
-                surveyID = args.getString("surveyID");
+            surveyID = args.getString("surveyID");
+            currentQuestionOrder = args.getInt("order");
+            if (args.getString("questionID") != null) { // edit question
                 question = (DateQuestion) new DateQuestion(args.getString("questionTitle"))
                         .setDateMode(DateSelectionModeEnum.valueOf(args.getString("dateSelectionMode")))
                         .setMandatory(args.getBoolean("mandatory"))
@@ -184,7 +166,8 @@ public class DateQuestionFragment extends Fragment implements UnsavedChangesHand
                         .setDateMode(selectedMode)
                         .setQuestionID(UUID.randomUUID().toString())
                         .setSurveyID(surveyID)
-                        .setMandatory(mandatory);
+                        .setMandatory(mandatory)
+                        .setOrder(currentQuestionOrder);
             }
             else{
                 question.setDateMode(selectedMode)

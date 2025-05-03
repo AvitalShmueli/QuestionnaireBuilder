@@ -38,26 +38,10 @@ public class OpenQuestionFragment extends Fragment implements UnsavedChangesHand
     private MaterialButton openQuestion_BTN_cancel;
     private String surveyID;
     private OpenEndedQuestion question;
-
-    private static final String ARG_SURVEY_ID = "ARG_SURVEY_ID";
+    private int currentQuestionOrder;
 
     public OpenQuestionFragment() {
         // Required empty public constructor
-    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param surveyID surveyID.
-     * @return A new instance of fragment OpenQuestionFragment.
-     */
-    public static OpenQuestionFragment newInstance(String surveyID) {
-        OpenQuestionFragment fragment = new OpenQuestionFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_SURVEY_ID, surveyID);
-        fragment.setArguments(args);
-        return fragment;
     }
 
     /**
@@ -78,11 +62,9 @@ public class OpenQuestionFragment extends Fragment implements UnsavedChangesHand
         super.onCreate(savedInstanceState);
         Bundle args = getArguments();
         if (args != null) {
-            if (args.getString("questionID") == null) { // new question
-                surveyID = getArguments().getString(ARG_SURVEY_ID);
-            }
-            else{
-                surveyID = args.getString("surveyID");
+            surveyID = args.getString("surveyID");
+            currentQuestionOrder = args.getInt("order");
+            if (args.getString("questionID") != null) { // edit question
                 question = (OpenEndedQuestion) new OpenEndedQuestion(args.getString("questionTitle"))
                         .setMandatory(args.getBoolean("mandatory"))
                         .setQuestionID(args.getString("questionID"))
@@ -155,7 +137,8 @@ public class OpenQuestionFragment extends Fragment implements UnsavedChangesHand
                     question = (OpenEndedQuestion) new OpenEndedQuestion(questionTitle)
                             .setQuestionID(UUID.randomUUID().toString())
                             .setSurveyID(surveyID)
-                            .setMandatory(mandatory);
+                            .setMandatory(mandatory)
+                            .setOrder(currentQuestionOrder);
                 }
                 else{
                     question.setQuestionTitle(questionTitle)

@@ -1,34 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     tools:context=".SurveyManagementActivity">
 
-    <com.google.android.material.appbar.MaterialToolbar
-        android:id="@+id/topAppBar"
+    <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:background="?attr/android:statusBarColor"
-        android:backgroundTint="@color/light_blue"
-        android:elevation="@dimen/toolbar_elevation"
-        android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
-        android:titleTextColor="@android:color/black"
-        app:menu="@menu/top_app_bar_menu"
-        app:navigationIcon="@drawable/arrow_back_24px"
-        app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-        app:title="Survey Title #1"
-        app:titleCentered="true"
-        app:titleTextAppearance="@style/toolbarTextStyle"
-        app:titleTextColor="@color/blackish" />
+        android:layout_height="wrap_content"
+        android:theme="@style/ThemeOverlay.AppCompat.ActionBar">
 
-    <ScrollView
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/topAppBar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/android:statusBarColor"
+            android:backgroundTint="@color/light_blue"
+            android:elevation="@dimen/toolbar_elevation"
+            android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
+            android:titleTextColor="@android:color/black"
+            app:menu="@menu/top_app_bar_menu"
+            app:navigationIcon="@drawable/arrow_back_24px"
+            app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+            app:title="Survey Title #1"
+            app:titleCentered="true"
+            app:titleTextAppearance="@style/toolbarTextStyle"
+            app:titleTextColor="@color/blackish" />
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:fillViewport="false">
+        android:fillViewport="true"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -57,7 +64,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textColor="@color/dark_blue"
-                        android:textSize="36sp"
+                        android:textSize="@dimen/responses_size"
                         android:textStyle="normal"
                         tools:text="26" />
 
@@ -66,7 +73,7 @@
                         android:layout_height="wrap_content"
                         android:gravity="center"
                         android:text="@string/total_responses"
-                        android:textSize="14sp" />
+                        android:textSize="@dimen/responses_text_size" />
 
                 </LinearLayout>
 
@@ -82,7 +89,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textColor="@color/dark_blue"
-                        android:textSize="36sp"
+                        android:textSize="@dimen/responses_size"
                         android:textStyle="normal"
                         tools:text="5" />
 
@@ -91,7 +98,7 @@
                         android:layout_height="wrap_content"
                         android:gravity="center"
                         android:text="@string/completed_responses"
-                        android:textSize="14sp" />
+                        android:textSize="@dimen/responses_text_size" />
 
                 </LinearLayout>
             </LinearLayout>
@@ -124,7 +131,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="16dp"
-                        android:text="Edit"
+                        android:text="@string/edit"
                         android:textSize="16sp" />
 
                 </LinearLayout>
@@ -157,7 +164,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="16dp"
-                        android:text="Share"
+                        android:text="@string/share"
                         android:textSize="16sp" />
 
                 </LinearLayout>
@@ -190,7 +197,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="16dp"
-                        android:text="Analyze"
+                        android:text="@string/analyze"
                         android:textSize="16sp" />
                 </LinearLayout>
 
@@ -215,6 +222,37 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="8dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/survey_status" />
+
+                <androidx.appcompat.widget.AppCompatSpinner
+                    android:id="@+id/management_SP_status"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/spinner_background"
+                    android:paddingEnd="24dp"
+                    android:spinnerMode="dropdown" />
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="3dp"
+                android:layout_marginVertical="@dimen/bufferMargin"
+                android:alpha="0.3"
+                android:background="@color/blue" />
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
                 android:showDividers="middle">
@@ -223,10 +261,10 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="@string/survey_status" />
+                    android:text="@string/open_for_responses" />
 
                 <com.google.android.material.textview.MaterialTextView
-                    android:id="@+id/management_LBL_status"
+                    android:id="@+id/management_LBL_isOpen"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="8dp"
@@ -235,7 +273,7 @@
                     android:textStyle="bold" />
 
                 <com.google.android.material.materialswitch.MaterialSwitch
-                    android:id="@+id/management_SW_status"
+                    android:id="@+id/management_SW_isOpen"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:checked="true" />
@@ -356,6 +394,35 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
+                    android:text="@string/due_date" />
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/management_LBL_dueDate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    tools:text="30/06/2025" />
+
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="3dp"
+                android:alpha="0.3"
+                android:background="@color/blue" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:showDividers="middle">
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
                     android:text="@string/questions" />
 
                 <com.google.android.material.textview.MaterialTextView
@@ -404,6 +471,6 @@
 
         </LinearLayout>
 
-    </ScrollView>
+    </androidx.core.widget.NestedScrollView>
 
-</LinearLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

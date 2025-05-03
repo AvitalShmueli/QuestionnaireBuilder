@@ -125,8 +125,8 @@
                 <com.google.android.material.imageview.ShapeableImageView
                     android:id="@+id/ratingQuestion_IMG_selectedIcon"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="12dp"
+                    android:layout_height="@dimen/icon_size"
+                    android:layout_marginStart="@dimen/input_horizontal_margin"
                     android:layout_centerVertical="true"
                     android:layout_marginVertical="16dp"
                     android:src="@drawable/ic_heart_filled"/>

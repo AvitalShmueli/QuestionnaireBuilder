@@ -18,7 +18,6 @@ import com.example.questionnairebuilder.adapters.IconsAdapter;
 import com.example.questionnairebuilder.databinding.FragmentRatingQuestionBinding;
 import com.example.questionnairebuilder.interfaces.UnsavedChangesHandler;
 import com.example.questionnairebuilder.models.IconItem;
-import com.example.questionnairebuilder.models.Question;
 import com.example.questionnairebuilder.models.RatingScaleQuestion;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.imageview.ShapeableImageView;
@@ -44,6 +43,7 @@ public class RatingQuestionFragment extends Fragment implements UnsavedChangesHa
     private Integer selectedRatingScaleLevel = 5;
     private Integer selectedRatingScaleIcon = null;
     private String surveyID;
+    private RatingScaleQuestion question;
 
     private static final String ARG_SURVEY_ID = "ARG_SURVEY_ID";
 
@@ -66,11 +66,36 @@ public class RatingQuestionFragment extends Fragment implements UnsavedChangesHa
         return fragment;
     }
 
+    /**
+     * Use this factory method to create a new instance of
+     * this fragment using the provided parameters.
+     *
+     * @param questionArgs bundle of question's details.
+     * @return A new instance of fragment DateQuestionFragment.
+     */
+    public static RatingQuestionFragment newInstance(Bundle questionArgs) {
+        RatingQuestionFragment fragment = new RatingQuestionFragment();
+        fragment.setArguments(questionArgs);
+        return fragment;
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            surveyID = getArguments().getString(ARG_SURVEY_ID);
+        Bundle args = getArguments();
+        if (args != null) {
+            if (args.getString("questionID") == null) { // new question
+                surveyID = args.getString(ARG_SURVEY_ID);
+            } else {
+                surveyID = args.getString("surveyID");
+                question = (RatingScaleQuestion) new RatingScaleQuestion(args.getString("questionTitle"))
+                        .setIconResourceId(args.getInt("iconResourceId"))
+                        .setRatingScaleLevel(args.getInt("ratingScaleLevel"))
+                        .setMandatory(args.getBoolean("mandatory"))
+                        .setQuestionID(args.getString("questionID"))
+                        .setSurveyID(surveyID)
+                        .setOrder(args.getInt("order"));
+            }
         }
 
         requireActivity().getOnBackPressedDispatcher().addCallback(this,
@@ -95,6 +120,8 @@ public class RatingQuestionFragment extends Fragment implements UnsavedChangesHa
         View root = binding.getRoot();
 
         createBinding();
+        initView();
+        loadQuestionDetails(question);
 
         return root;
     }
@@ -105,16 +132,14 @@ public class RatingQuestionFragment extends Fragment implements UnsavedChangesHa
         ratingQuestion_TIL_question = binding.ratingQuestionTILQuestion;
         ratingQuestion_TXT_question = binding.ratingQuestionTXTQuestion;
         ratingQuestion_SW_mandatory = binding.ratingQuestionSWMandatory;
-
-        // Rating Scale Level dropdown
         ratingQuestion_DD_RatingScaleLevel = binding.ratingQuestionDDRatingScaleLevel;
-        initDropDownValues();
-
-        // Rating Scale Level dropdown
         ratingQuestion_DD_RatingScaleIcon = binding.ratingQuestionDDRatingScaleIcon;
         ratingQuestion_IMG_selectedIcon = binding.ratingQuestionIMGSelectedIcon;
-        initIconsDropDownValues();
+    }
 
+    private void initView(){
+        initDropDownValues();// Rating Scale Level dropdown
+        initIconsDropDownValues(); // Rating Scale Level dropdown
         ratingQuestion_BTN_cancel.setOnClickListener(v -> cancel());
         ratingQuestion_BTN_save.setOnClickListener(v -> save());
     }
@@ -143,8 +168,9 @@ public class RatingQuestionFragment extends Fragment implements UnsavedChangesHa
 
         if(selectedRatingScaleIcon == null) {
             selectedRatingScaleIcon = R.drawable.ic_star_filled;
-            ratingQuestion_IMG_selectedIcon.setImageResource(R.drawable.ic_star_filled);
         }
+        ratingQuestion_IMG_selectedIcon.setImageResource(selectedRatingScaleIcon);
+
         ratingQuestion_DD_RatingScaleIcon.setOnItemClickListener((parent, view, position, id) -> {
             IconItem selected = (IconItem) parent.getItemAtPosition(position);
             selectedRatingScaleIcon = selected.iconResId;
@@ -153,8 +179,18 @@ public class RatingQuestionFragment extends Fragment implements UnsavedChangesHa
 
     }
 
-    private void loadQuestionDetails(Question q){
-        //TODO
+    private void loadQuestionDetails(RatingScaleQuestion q){
+        if(q == null) {
+            return;
+        }
+
+        ratingQuestion_TXT_question.setText(q.getQuestionTitle());
+        ratingQuestion_SW_mandatory.setChecked(q.isMandatory());
+        selectedRatingScaleLevel = q.getRatingScaleLevel();
+        selectedRatingScaleIcon = q.getIconResourceId();
+
+        initDropDownValues();// Rating Scale Level dropdown
+        initIconsDropDownValues(); // Rating Scale Level dropdown
     }
 
     private void save() {
@@ -166,13 +202,21 @@ public class RatingQuestionFragment extends Fragment implements UnsavedChangesHa
             if(ratingQuestion_TXT_question.getText() != null)
                 questionTitle = ratingQuestion_TXT_question.getText().toString().trim();
             boolean mandatory = ratingQuestion_SW_mandatory.isChecked();
-            Question q = new RatingScaleQuestion(questionTitle)
-                    .setRatingScaleLevel(selectedRatingScaleLevel)
-                    .setIconResourceId(selectedRatingScaleIcon)
-                    .setQuestionID(UUID.randomUUID().toString())
-                    .setSurveyID(surveyID)
-                    .setMandatory(mandatory);
-            q.save();
+            if(question == null) {
+                question = (RatingScaleQuestion) new RatingScaleQuestion(questionTitle)
+                        .setRatingScaleLevel(selectedRatingScaleLevel)
+                        .setIconResourceId(selectedRatingScaleIcon)
+                        .setQuestionID(UUID.randomUUID().toString())
+                        .setSurveyID(surveyID)
+                        .setMandatory(mandatory);
+            }
+            else {
+                question.setRatingScaleLevel(selectedRatingScaleLevel)
+                        .setIconResourceId(selectedRatingScaleIcon)
+                        .setQuestionTitle(questionTitle)
+                        .setMandatory(mandatory);
+            }
+            question.save();
             requireActivity().finish();
         }
     }

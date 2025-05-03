@@ -85,8 +85,8 @@ public class DateQuestionFragment extends Fragment implements UnsavedChangesHand
             }
             else {
                 surveyID = args.getString("surveyID");
-                question = new DateQuestion(args.getString("questionTitle"));
-                question.setDateMode(DateSelectionModeEnum.valueOf(args.getString("dateSelectionMode")))
+                question = (DateQuestion) new DateQuestion(args.getString("questionTitle"))
+                        .setDateMode(DateSelectionModeEnum.valueOf(args.getString("dateSelectionMode")))
                         .setMandatory(args.getBoolean("mandatory"))
                         .setQuestionID(args.getString("questionID"))
                         .setSurveyID(surveyID)
@@ -132,6 +132,7 @@ public class DateQuestionFragment extends Fragment implements UnsavedChangesHand
     }
 
     private void initView(){
+        initDropDownValues();
         dateQuestion_BTN_cancel.setOnClickListener(v -> cancel());
         dateQuestion_BTN_save.setOnClickListener(v -> save());
     }

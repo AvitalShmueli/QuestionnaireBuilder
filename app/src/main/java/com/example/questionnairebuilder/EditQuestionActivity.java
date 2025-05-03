@@ -161,7 +161,9 @@ public class EditQuestionActivity extends AppCompatActivity {
                         .commit();
                 break;
             case RATING_SCALE:
-                ratingQuestionFragment = RatingQuestionFragment.newInstance(surveyID);
+                if(args == null)
+                    ratingQuestionFragment = RatingQuestionFragment.newInstance(surveyID);
+                else ratingQuestionFragment = RatingQuestionFragment.newInstance(args);
                 getSupportFragmentManager().beginTransaction()
                         .add(R.id.editQuestion_FRAME_question,ratingQuestionFragment)
                         .commit();

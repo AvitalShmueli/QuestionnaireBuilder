@@ -171,7 +171,7 @@ public class ChoiceQuestionFragment extends Fragment implements OnRowCountChange
     private void initView(){
         choiceQuestion_SW_mandatory.setOnClickListener(v -> choiceQuestion_RV_choices.clearFocus());
         choiceQuestion_SW_other.setOnClickListener(v -> choiceQuestion_RV_choices.clearFocus());
-
+        initDropDownValues();
         // save & cancel buttons
         choiceQuestion_BTN_cancel.setOnClickListener(v -> {
             choiceQuestion_RV_choices.clearFocus();
@@ -232,6 +232,7 @@ public class ChoiceQuestionFragment extends Fragment implements OnRowCountChange
     private void loadQuestionDetails(ChoiceQuestion q){
         if(q == null) {
             initChoices(null);
+            initDropDownValues();
             return;
         }
         questionTypeEnum = q.getType();

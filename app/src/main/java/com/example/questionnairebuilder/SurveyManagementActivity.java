@@ -64,6 +64,7 @@ public class SurveyManagementActivity extends AppCompatActivity {
         management_LL_edit.setOnClickListener(v -> {
             Intent intent = new Intent(SurveyManagementActivity.this, QuestionsActivity.class);
             intent.putExtra("surveyID",survey.getID());
+            intent.putExtra("survey_title",survey.getSurveyTitle());
             startActivity(intent);
         });
     }

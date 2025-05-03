@@ -40,6 +40,7 @@ public class HomeViewModel extends ViewModel {
                     if (user != null) {
                         mUsername.setValue(user.getUsername());
                     }
+                    else mUsername.setValue(null);
                 }
             });
         }

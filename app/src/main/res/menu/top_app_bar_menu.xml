@@ -4,6 +4,6 @@
     <item
         android:id="@+id/action_profile"
         android:icon="@drawable/account_circle_24px"
-        android:title="Profile"
+        android:title="@string/profile"
         app:showAsAction="always" />
 </menu>

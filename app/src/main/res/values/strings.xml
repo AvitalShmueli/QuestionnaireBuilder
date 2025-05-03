@@ -73,5 +73,7 @@
     <string name="username">Username</string>
     <string name="log_out">Log Out</string>
     <string name="hello_user">Hello, %1$s!</string>
+    <string name="add_question">Add Question</string>
+    <string name="profile">Profile</string>
 
 </resources>

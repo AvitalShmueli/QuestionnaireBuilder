@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.questionnairebuilder.R;
@@ -63,7 +64,7 @@ public class QuestionsAdapter extends RecyclerView.Adapter<QuestionsAdapter.View
                 }
             };
 
-            holder.rv_title.setOnClickListener(listener);
+            holder.item_CARD_data.setOnClickListener(listener);
         }
     }
 
@@ -73,12 +74,13 @@ public class QuestionsAdapter extends RecyclerView.Adapter<QuestionsAdapter.View
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder{
+        private CardView item_CARD_data;
         private MaterialTextView rv_title;
         private MaterialTextView rv_mandatory_star;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-
+            item_CARD_data = itemView.findViewById(R.id.item_CARD_data);
             rv_title = itemView.findViewById(R.id.rv_title);
             rv_mandatory_star = itemView.findViewById(R.id.rv_mandatory_star);
         }

@@ -6,6 +6,7 @@ public class MultipleChoiceQuestion extends ChoiceQuestion{
     private int allowedSelectionNum;
 
     public MultipleChoiceQuestion() {
+        super();
     }
 
     public MultipleChoiceQuestion(String question) {

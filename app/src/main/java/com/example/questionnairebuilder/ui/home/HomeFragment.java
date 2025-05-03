@@ -22,6 +22,7 @@ import com.example.questionnairebuilder.databinding.FragmentHomeBinding;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Locale;
+import java.util.Objects;
 
 public class HomeFragment extends Fragment {
     private HomeViewModel viewModel;
@@ -45,8 +46,9 @@ public class HomeFragment extends Fragment {
         View root = binding.getRoot();
 
         final TextView home_LBL_greeting = binding.homeLBLGreeting;
-        String s = getString(R.string.hello_user,viewModel.getUserName());
-        home_LBL_greeting.setText(s);
+        viewModel.getUsername().observe(getViewLifecycleOwner(), username -> {
+            home_LBL_greeting.setText(getString(R.string.hello_user, Objects.requireNonNullElse(username, "<username>")));
+        });
 
         binding.homeBTNCreateSurvey.setOnClickListener(v -> {
             Intent intent = new Intent(getActivity(), NewSurveyActivity.class);

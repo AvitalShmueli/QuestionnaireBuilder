@@ -5,6 +5,7 @@ import java.util.ArrayList;
 public class SingleChoiceQuestion extends ChoiceQuestion{
 
     public SingleChoiceQuestion() {
+        super();
     }
 
     public SingleChoiceQuestion(String question, QuestionTypeEnum type) {
@@ -14,5 +15,4 @@ public class SingleChoiceQuestion extends ChoiceQuestion{
     public SingleChoiceQuestion(String question, QuestionTypeEnum type, ArrayList<String> choices, boolean other) {
         super(question, type, choices, other);
     }
-
 }

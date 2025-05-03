@@ -11,10 +11,12 @@
     <dimen name="back_button_size">52dp</dimen>
     <dimen name="account_image_padding">8dp</dimen>
     <dimen name="toolbar_elevation">4dp</dimen>
+    <dimen name="card_elevation">4dp</dimen>
     <dimen name="corner_radius">8dp</dimen>
     <dimen name="padding_vertical">10dp</dimen>
     <dimen name="supporting_text_margins">16dp</dimen>
     <dimen name="bufferMargin">8dp</dimen>
+    <dimen name="icon_size">32dp</dimen>
     <dimen name="responses_size">36sp</dimen>
     <dimen name="responses_text_size">14sp</dimen>
 </resources>

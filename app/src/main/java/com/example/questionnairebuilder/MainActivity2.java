@@ -77,7 +77,7 @@ public class MainActivity2 extends AppCompatActivity implements OnQuestionListCh
 
         findViews();
         questionList = questionListDemo();
-        QuestionsAdapter questionsAdapter = new QuestionsAdapter(this,questionList);
+        QuestionsAdapter questionsAdapter = new QuestionsAdapter(questionList);
         questionsAdapter.setCallbackQuestionSelected(new Callback_questionSelected() {
             @Override
             public void select(Question question) {
@@ -107,7 +107,6 @@ public class MainActivity2 extends AppCompatActivity implements OnQuestionListCh
 
     }
 
-
     private void changeActivity(Question q) {
         Intent intent = new Intent(this, QuestionResponseActivity.class);
 
@@ -120,7 +119,6 @@ public class MainActivity2 extends AppCompatActivity implements OnQuestionListCh
         startActivity(intent);
     }
 
-
     private Bundle createQuestionArgsBundle(Question q){
         Bundle args = new Bundle();
         args.putString("questionTitle",q.getQuestionTitle());
@@ -132,8 +130,10 @@ public class MainActivity2 extends AppCompatActivity implements OnQuestionListCh
         args.putString("image",q.getImage());
         if(q instanceof OpenEndedQuestion)
             args.putBoolean("multipleLineAnswer",((OpenEndedQuestion)q).isMultipleLineAnswer());
-        if(q instanceof ChoiceQuestion)
-            args.putStringArrayList("choices",((ChoiceQuestion)q).getChoices());
+        if(q instanceof ChoiceQuestion) {
+            args.putStringArrayList("choices", ((ChoiceQuestion) q).getChoices());
+            args.putBoolean("other",((ChoiceQuestion)q).isOther());
+        }
         if(q instanceof MultipleChoiceQuestion)
             args.putInt("allowedSelectionNum",((MultipleChoiceQuestion)q).getAllowedSelectionNum());
         if(q instanceof DateQuestion)
@@ -144,7 +144,6 @@ public class MainActivity2 extends AppCompatActivity implements OnQuestionListCh
         }
         return args;
     }
-
 
     ItemTouchHelper.SimpleCallback simpleCallback = new ItemTouchHelper
             .SimpleCallback(ItemTouchHelper.UP | ItemTouchHelper.DOWN | ItemTouchHelper.START | ItemTouchHelper.END, 0) {

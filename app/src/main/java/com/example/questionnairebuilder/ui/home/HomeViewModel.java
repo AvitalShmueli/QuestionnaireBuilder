@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel;
 
 import com.example.questionnairebuilder.interfaces.SurveysCallback;
 import com.example.questionnairebuilder.models.Survey;
+import com.example.questionnairebuilder.models.User;
 import com.example.questionnairebuilder.utilities.FirebaseManager;
 import com.google.firebase.firestore.ListenerRegistration;
 
@@ -16,17 +17,34 @@ import java.util.UUID;
 
 public class HomeViewModel extends ViewModel {
 
-    private final String userName;
+    private final MutableLiveData<String> mUsername = new MutableLiveData<>();
     private final MutableLiveData<List<Survey>> surveysLiveData = new MutableLiveData<>(new ArrayList<>());
     private final MutableLiveData<List<Survey>> fakeSurveysLiveData = new MutableLiveData<>();
     private ListenerRegistration listenerRegistration;
 
     public HomeViewModel() {
-        userName = "username";
+        mUsername.setValue("");
+        getCurrentUserUsername();
     }
 
-    public String getUserName() {
-        return userName;
+    public LiveData<String> getUsername() {
+        return mUsername;
+    }
+
+    private void getCurrentUserUsername(){
+        FirebaseManager firebaseManager = FirebaseManager.getInstance();
+        if (firebaseManager.getCurrentUser() != null) {
+            String currentUserId = firebaseManager.getCurrentUser().getUid();
+            firebaseManager.getUserData(currentUserId, new FirebaseManager.OnUserFetchListener() {
+                @Override
+                public void onFetched(User user) {
+                    if (user != null) {
+                        mUsername.setValue(user.getUsername());
+                    }
+                    else mUsername.setValue("");
+                }
+            });
+        }
     }
 
     public LiveData<List<Survey>> getSurveys() {

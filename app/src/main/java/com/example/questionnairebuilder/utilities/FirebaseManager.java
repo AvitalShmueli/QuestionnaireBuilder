@@ -1,11 +1,21 @@
 package com.example.questionnairebuilder.utilities;
 
 import android.net.Uri;
+import android.util.Log;
 
 import androidx.annotation.Nullable;
 
+import com.example.questionnairebuilder.interfaces.OneQuestionCallback;
 import com.example.questionnairebuilder.interfaces.OneSurveyCallback;
+import com.example.questionnairebuilder.interfaces.QuestionsCallback;
 import com.example.questionnairebuilder.interfaces.SurveysCallback;
+import com.example.questionnairebuilder.models.DateQuestion;
+import com.example.questionnairebuilder.models.MultipleChoiceQuestion;
+import com.example.questionnairebuilder.models.OpenEndedQuestion;
+import com.example.questionnairebuilder.models.Question;
+import com.example.questionnairebuilder.models.QuestionTypeEnum;
+import com.example.questionnairebuilder.models.RatingScaleQuestion;
+import com.example.questionnairebuilder.models.SingleChoiceQuestion;
 import com.example.questionnairebuilder.models.Survey;
 import com.example.questionnairebuilder.models.User;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -113,6 +123,103 @@ public class FirebaseManager {
                         }
                     } else {
                         callback.onError(new Exception("Survey not found"));
+                    }
+                })
+                .addOnFailureListener(e -> callback.onError(e));
+    }
+
+    public void addQuestion(Question question) {
+        questionsRef.document(question.getQuestionID()).set(question);
+    }
+
+    public ListenerRegistration listenToSurveyQuestions(String surveyID, QuestionsCallback callback) {
+        return questionsRef.whereEqualTo("surveyID", surveyID)
+                .orderBy("order")
+                .addSnapshotListener((value, error) -> {
+                    if (error != null) {
+                        callback.onError(error);
+                        return;
+                    }
+
+                    if (value != null) {
+                        List<Question> questionList = new ArrayList<>();
+                        for (DocumentSnapshot document : value.getDocuments()) {
+                            Log.d("FirestoreDoc", "Document: " + document.getData());
+                            Object mandatoryRaw = document.get("mandatory");
+                            if (mandatoryRaw != null) {
+                                Log.d("FirestoreMandatory", "mandatoryRaw: " + mandatoryRaw + " (type = " + mandatoryRaw.getClass().getSimpleName() + ")");
+                            }
+                            String typeString = document.getString("type");
+                            QuestionTypeEnum type = QuestionTypeEnum.valueOf(typeString);
+                            Question question = null;
+                            switch (type) {
+                                case OPEN_ENDED_QUESTION:
+                                    question = document.toObject(OpenEndedQuestion.class);
+                                    break;
+                                case SINGLE_CHOICE:
+                                case YES_NO:
+                                case DROPDOWN:
+                                    question = document.toObject(SingleChoiceQuestion.class);
+                                    break;
+                                case MULTIPLE_CHOICE:
+                                    question = document.toObject(MultipleChoiceQuestion.class);
+                                    break;
+                                case DATE:
+                                    question = document.toObject(DateQuestion.class);
+                                    break;
+                                case RATING_SCALE:
+                                    question = document.toObject(RatingScaleQuestion.class);
+                                    break;
+                            }
+                            if (question != null) {
+                                question.setQuestionID(document.getId());
+                                Boolean mandatory = document.getBoolean("mandatory");
+                                if (mandatory != null) {
+                                    question.setMandatory(mandatory);
+                                }
+                                questionList.add(question);
+                            }
+                        }
+                        callback.onQuestionsLoaded(questionList);
+                    }
+
+                });
+    }
+
+    public void getQuestionById(String questionId, OneQuestionCallback callback) {
+        questionsRef.document(questionId).get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        String typeString = documentSnapshot.getString("type");
+                        QuestionTypeEnum type = QuestionTypeEnum.valueOf(typeString);
+                        Question question = null;
+                        switch (type) {
+                            case OPEN_ENDED_QUESTION:
+                                question = documentSnapshot.toObject(OpenEndedQuestion.class);
+                                break;
+                            case SINGLE_CHOICE:
+                            case YES_NO:
+                            case DROPDOWN:
+                                question = documentSnapshot.toObject(SingleChoiceQuestion.class);
+                                break;
+                            case MULTIPLE_CHOICE:
+                                question = documentSnapshot.toObject(MultipleChoiceQuestion.class);
+                                break;
+                            case DATE:
+                                question = documentSnapshot.toObject(DateQuestion.class);
+                                break;
+                            case RATING_SCALE:
+                                question = documentSnapshot.toObject(RatingScaleQuestion.class);
+                                break;
+                        }
+                        if (question != null) {
+                            question.setQuestionID(documentSnapshot.getId()); // set ID manually
+                            callback.onQuestionLoaded(question);
+                        } else {
+                            callback.onError(new Exception("Question is null"));
+                        }
+                    } else {
+                        callback.onError(new Exception("Question not found"));
                     }
                 })
                 .addOnFailureListener(e -> callback.onError(e));

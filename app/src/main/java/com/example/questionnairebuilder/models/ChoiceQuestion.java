@@ -7,6 +7,7 @@ public abstract class ChoiceQuestion extends Question{
     private boolean other;
 
     public ChoiceQuestion() {
+        super();
     }
 
     public ChoiceQuestion(String question, QuestionTypeEnum type) {

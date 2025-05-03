@@ -111,13 +111,14 @@ public class ChoiceQuestionFragment extends Fragment implements OnRowCountChange
             else {
                 surveyID = args.getString("surveyID");
                 questionTypeEnum = QuestionTypeEnum.valueOf(args.getString("questionType"));
-                strType = args.getString("questionType");
+                strType = QuestionTypeManager.getValueByKey(questionTypeEnum);
                 if (questionTypeEnum.isSingleSelection()) {
                     question = new SingleChoiceQuestion(args.getString("questionTitle"), questionTypeEnum)
                             .setChoices(args.getStringArrayList("choices"));
                 } else {
+                    selectedMaxSelectionsAllowed = args.getInt("allowedSelectionNum");
                     question = new MultipleChoiceQuestion(args.getString("questionTitle"))
-                            .setAllowedSelectionNum(args.getInt("allowedSelectionNum"))
+                            .setAllowedSelectionNum(selectedMaxSelectionsAllowed)
                             .setChoices(args.getStringArrayList("choices"));
                 }
                 question.setOther(args.getBoolean("other"))
@@ -171,10 +172,6 @@ public class ChoiceQuestionFragment extends Fragment implements OnRowCountChange
         choiceQuestion_SW_mandatory.setOnClickListener(v -> choiceQuestion_RV_choices.clearFocus());
         choiceQuestion_SW_other.setOnClickListener(v -> choiceQuestion_RV_choices.clearFocus());
 
-        // max selection allowed dropdown
-        choiceQuestion_LL_maxAllowed.setVisibility(strType.equals(getString(R.string.multiple_choice)) ? VISIBLE : GONE);
-        initDropDownValues();
-
         // save & cancel buttons
         choiceQuestion_BTN_cancel.setOnClickListener(v -> {
             choiceQuestion_RV_choices.clearFocus();
@@ -187,14 +184,18 @@ public class ChoiceQuestionFragment extends Fragment implements OnRowCountChange
     }
 
     private void initDropDownValues() {
+        choiceQuestion_LL_maxAllowed.setVisibility(strType.equals(getString(R.string.multiple_choice)) ? VISIBLE : GONE);
         itemsMaxSelectionsAllowed = new ArrayList<>();
-        itemsMaxSelectionsAllowed.add(1);
-
+        choiceCount = choicesAdapter != null ? choicesAdapter.getDataList().size() : 1;
+        for (int i = 1; i <= choiceCount; i++) {
+            itemsMaxSelectionsAllowed.add(i);
+        }
         String maxSelections = selectedMaxSelectionsAllowed.toString();
         choiceQuestion_DD_maxAllowed.setText(maxSelections);
         ArrayAdapter<Integer> adapterItems_MaxSelectionsAllowed = new ArrayAdapter<>(requireActivity(), R.layout.dropdown_item, itemsMaxSelectionsAllowed);
         choiceQuestion_DD_maxAllowed.setAdapter(adapterItems_MaxSelectionsAllowed);
         choiceQuestion_DD_maxAllowed.setOnItemClickListener((adapterView, view, position, id) -> selectedMaxSelectionsAllowed = adapterItems_MaxSelectionsAllowed.getItem(position));
+
     }
 
     private void initChoices(ArrayList<String> choices) {
@@ -239,9 +240,8 @@ public class ChoiceQuestionFragment extends Fragment implements OnRowCountChange
         choiceQuestion_SW_mandatory.setChecked(q.isMandatory());
         choiceQuestion_SW_other.setChecked(q.isOther());
 
-        if(!questionTypeEnum.isSingleSelection()){
-            String maxSelections = String.valueOf(((MultipleChoiceQuestion)q).getAllowedSelectionNum());
-            choiceQuestion_DD_maxAllowed.setText(maxSelections);
+        if(!questionTypeEnum.isSingleSelection()) {
+            initDropDownValues(); // max selection allowed dropdown
         }
     }
 

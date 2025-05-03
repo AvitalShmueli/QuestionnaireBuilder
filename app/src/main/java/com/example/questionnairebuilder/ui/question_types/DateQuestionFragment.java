@@ -18,7 +18,6 @@ import com.example.questionnairebuilder.databinding.FragmentDateQuestionBinding;
 import com.example.questionnairebuilder.interfaces.UnsavedChangesHandler;
 import com.example.questionnairebuilder.models.DateQuestion;
 import com.example.questionnairebuilder.models.DateSelectionModeEnum;
-import com.example.questionnairebuilder.models.Question;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.materialswitch.MaterialSwitch;
 import com.google.android.material.textfield.TextInputEditText;
@@ -40,6 +39,7 @@ public class DateQuestionFragment extends Fragment implements UnsavedChangesHand
     private AutoCompleteTextView dateQuestion_DD_DateSelectionMode;
     private DateSelectionModeEnum selectedMode;
     private String surveyID;
+    private DateQuestion question;
 
     private static final String ARG_SURVEY_ID = "ARG_SURVEY_ID";
 
@@ -62,11 +62,36 @@ public class DateQuestionFragment extends Fragment implements UnsavedChangesHand
         return fragment;
     }
 
+    /**
+     * Use this factory method to create a new instance of
+     * this fragment using the provided parameters.
+     *
+     * @param questionArgs bundle of question's details.
+     * @return A new instance of fragment DateQuestionFragment.
+     */
+    public static DateQuestionFragment newInstance(Bundle questionArgs) {
+        DateQuestionFragment fragment = new DateQuestionFragment();
+        fragment.setArguments(questionArgs);
+        return fragment;
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            surveyID = getArguments().getString(ARG_SURVEY_ID);
+        Bundle args = getArguments();
+        if (args != null) {
+            if (args.getString("questionID") == null) { // new question
+                surveyID = args.getString(ARG_SURVEY_ID);
+            }
+            else {
+                surveyID = args.getString("surveyID");
+                question = new DateQuestion(args.getString("questionTitle"));
+                question.setDateMode(DateSelectionModeEnum.valueOf(args.getString("dateSelectionMode")))
+                        .setMandatory(args.getBoolean("mandatory"))
+                        .setQuestionID(args.getString("questionID"))
+                        .setSurveyID(surveyID)
+                        .setOrder(args.getInt("order"));
+            }
         }
 
         requireActivity().getOnBackPressedDispatcher().addCallback(this,
@@ -91,6 +116,8 @@ public class DateQuestionFragment extends Fragment implements UnsavedChangesHand
         View root = binding.getRoot();
 
         createBinding();
+        initView();
+        loadQuestionDetails(question);
 
         return root;
     }
@@ -101,14 +128,12 @@ public class DateQuestionFragment extends Fragment implements UnsavedChangesHand
         dateQuestion_TIL_question = binding.dateQuestionTILQuestion;
         dateQuestion_TXT_question = binding.dateQuestionTXTQuestion;
         dateQuestion_SW_mandatory = binding.dateQuestionSWMandatory;
-
-        // Date Selection Mode dropdown
         dateQuestion_DD_DateSelectionMode = binding.dateQuestionDDDateSelectionMode;
-        initDropDownValues();
+    }
 
+    private void initView(){
         dateQuestion_BTN_cancel.setOnClickListener(v -> cancel());
         dateQuestion_BTN_save.setOnClickListener(v -> save());
-
     }
 
     private void initDropDownValues() {
@@ -132,8 +157,16 @@ public class DateQuestionFragment extends Fragment implements UnsavedChangesHand
         dateQuestion_DD_DateSelectionMode.setOnItemClickListener((adapterView, view, position, id) -> selectedMode = reverseItems.get(adapterItems_DateSelectionMode.getItem(position)));
     }
 
-    private void loadQuestionDetails(Question q){
-        //TODO
+    private void loadQuestionDetails(DateQuestion q){
+        if(q == null) {
+            return;
+        }
+
+        dateQuestion_TXT_question.setText(q.getQuestionTitle());
+        dateQuestion_SW_mandatory.setChecked(q.isMandatory());
+        selectedMode = q.getDateMode();
+
+        initDropDownValues(); //Date Selection Mode dropdown
     }
 
     private void save() {
@@ -145,12 +178,19 @@ public class DateQuestionFragment extends Fragment implements UnsavedChangesHand
             if(dateQuestion_TXT_question.getText() != null)
                 questionTitle = dateQuestion_TXT_question.getText().toString().trim();
             boolean mandatory = dateQuestion_SW_mandatory.isChecked();
-            Question q = new DateQuestion(questionTitle)
-                    .setDateMode(selectedMode)
-                    .setQuestionID(UUID.randomUUID().toString())
-                    .setSurveyID(surveyID)
-                    .setMandatory(mandatory);
-            q.save();
+            if(question == null) {
+                question = (DateQuestion) new DateQuestion(questionTitle)
+                        .setDateMode(selectedMode)
+                        .setQuestionID(UUID.randomUUID().toString())
+                        .setSurveyID(surveyID)
+                        .setMandatory(mandatory);
+            }
+            else{
+                question.setDateMode(selectedMode)
+                        .setQuestionTitle(questionTitle)
+                        .setMandatory(mandatory);
+            }
+            question.save();
             requireActivity().finish();
         }
     }

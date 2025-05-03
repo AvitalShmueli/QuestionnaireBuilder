@@ -151,7 +151,9 @@ public class EditQuestionActivity extends AppCompatActivity {
                         .commit();
                 break;
             case DATE:
-                dateQuestionFragment = DateQuestionFragment.newInstance(surveyID);
+                if(args == null)
+                    dateQuestionFragment = DateQuestionFragment.newInstance(surveyID);
+                else dateQuestionFragment = DateQuestionFragment.newInstance(args);
                 getSupportFragmentManager().beginTransaction()
                         .add(R.id.editQuestion_FRAME_question,dateQuestionFragment)
                         .commit();

@@ -23,6 +23,7 @@ public class HomeViewModel extends ViewModel {
     private ListenerRegistration listenerRegistration;
 
     public HomeViewModel() {
+        mUsername.setValue("");
         getCurrentUserUsername();
     }
 
@@ -40,7 +41,7 @@ public class HomeViewModel extends ViewModel {
                     if (user != null) {
                         mUsername.setValue(user.getUsername());
                     }
-                    else mUsername.setValue(null);
+                    else mUsername.setValue("");
                 }
             });
         }

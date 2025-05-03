@@ -37,6 +37,7 @@ public class OpenQuestionFragment extends Fragment implements UnsavedChangesHand
     private MaterialButton openQuestion_BTN_save;
     private MaterialButton openQuestion_BTN_cancel;
     private String surveyID;
+    private OpenEndedQuestion question;
 
     private static final String ARG_SURVEY_ID = "ARG_SURVEY_ID";
 
@@ -59,11 +60,35 @@ public class OpenQuestionFragment extends Fragment implements UnsavedChangesHand
         return fragment;
     }
 
+    /**
+     * Use this factory method to create a new instance of
+     * this fragment using the provided parameters.
+     *
+     * @param questionArgs bundle of question's details.
+     * @return A new instance of fragment OpenQuestionFragment.
+     */
+    public static OpenQuestionFragment newInstance(Bundle questionArgs) {
+        OpenQuestionFragment fragment = new OpenQuestionFragment();
+        fragment.setArguments(questionArgs);
+        return fragment;
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            surveyID = getArguments().getString(ARG_SURVEY_ID);
+        Bundle args = getArguments();
+        if (args != null) {
+            if (args.getString("questionID") == null) { // new question
+                surveyID = getArguments().getString(ARG_SURVEY_ID);
+            }
+            else{
+                surveyID = args.getString("surveyID");
+                question = (OpenEndedQuestion) new OpenEndedQuestion(args.getString("questionTitle"))
+                        .setMandatory(args.getBoolean("mandatory"))
+                        .setQuestionID(args.getString("questionID"))
+                        .setSurveyID(surveyID)
+                        .setOrder(args.getInt("order"));
+            }
         }
 
         requireActivity().getOnBackPressedDispatcher().addCallback(this,
@@ -88,6 +113,8 @@ public class OpenQuestionFragment extends Fragment implements UnsavedChangesHand
         View root = binding.getRoot();
 
         createBinding();
+        initView();
+        loadQuestionDetails(question);
 
         return root;
     }
@@ -98,13 +125,20 @@ public class OpenQuestionFragment extends Fragment implements UnsavedChangesHand
         openQuestion_TIL_question = binding.openQuestionTILQuestion;
         openQuestion_TXT_question = binding.openQuestionTXTQuestion;
         openQuestion_SW_mandatory = binding.openQuestionSWMandatory;
+    }
 
+    private void initView(){
         openQuestion_BTN_cancel.setOnClickListener(v -> cancel());
         openQuestion_BTN_save.setOnClickListener(v -> save());
     }
 
     private void loadQuestionDetails(Question q){
-        //TODO
+        if(q == null) {
+            return;
+        }
+
+        openQuestion_TXT_question.setText(q.getQuestionTitle());
+        openQuestion_SW_mandatory.setChecked(q.isMandatory());
     }
 
     private void save(){
@@ -117,11 +151,17 @@ public class OpenQuestionFragment extends Fragment implements UnsavedChangesHand
                 if(openQuestion_TXT_question.getText() != null)
                     questionTitle = openQuestion_TXT_question.getText().toString().trim();
                 boolean mandatory = openQuestion_SW_mandatory.isChecked();
-                Question q = new OpenEndedQuestion(questionTitle)
-                        .setQuestionID(UUID.randomUUID().toString())
-                        .setSurveyID(surveyID)
-                        .setMandatory(mandatory);
-                q.save();
+                if(question == null) {
+                    question = (OpenEndedQuestion) new OpenEndedQuestion(questionTitle)
+                            .setQuestionID(UUID.randomUUID().toString())
+                            .setSurveyID(surveyID)
+                            .setMandatory(mandatory);
+                }
+                else{
+                    question.setQuestionTitle(questionTitle)
+                            .setMandatory(mandatory);
+                }
+                question.save();
                 requireActivity().finish();
             }
         }

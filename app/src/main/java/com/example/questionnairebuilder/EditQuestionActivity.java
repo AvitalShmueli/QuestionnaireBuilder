@@ -134,7 +134,9 @@ public class EditQuestionActivity extends AppCompatActivity {
     private void loadQuestionFragment(QuestionTypeEnum selectedType, Bundle args){
         switch (selectedType) {
             case OPEN_ENDED_QUESTION:
-                openQuestionFragment = OpenQuestionFragment.newInstance(surveyID);
+                if(args == null)
+                    openQuestionFragment = OpenQuestionFragment.newInstance(surveyID);
+                else openQuestionFragment = OpenQuestionFragment.newInstance(args);
                 getSupportFragmentManager().beginTransaction()
                         .add(R.id.editQuestion_FRAME_question,openQuestionFragment)
                         .commit();

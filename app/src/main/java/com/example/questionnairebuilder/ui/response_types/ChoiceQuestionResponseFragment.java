@@ -14,6 +14,8 @@ import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
@@ -29,6 +31,7 @@ import com.example.questionnairebuilder.models.Question;
 import com.example.questionnairebuilder.models.QuestionTypeEnum;
 import com.example.questionnairebuilder.models.SingleChoiceQuestion;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.textfield.TextInputLayout;
 import com.google.android.material.textview.MaterialTextView;
 
 import java.util.ArrayList;
@@ -48,6 +51,8 @@ public class ChoiceQuestionResponseFragment extends Fragment {
     private RadioGroup responseChoiceQuestion_RadioGroup;
     private LinearLayout responseChoiceQuestion_LL_checkBoxContainer;
     private MaterialTextView responseChoiceQuestion_LBL_error;
+    private TextInputLayout choiceQuestion_DD_layout_dropdown;
+    private AutoCompleteTextView responseChoiceQuestion_DD_dropdown;
     private Question question;
     private int currentSelectionCount = 0;
     private final List<String> selectedChoices = new ArrayList<>();
@@ -111,6 +116,8 @@ public class ChoiceQuestionResponseFragment extends Fragment {
         responseChoiceQuestion_RadioGroup = binding.responseChoiceQuestionRadioGroup;
         responseChoiceQuestion_LL_checkBoxContainer = binding.responseChoiceQuestionLLCheckBoxContainer;
         responseChoiceQuestion_LBL_error = binding.responseChoiceQuestionLBLError;
+        choiceQuestion_DD_layout_dropdown = binding.choiceQuestionDDLayoutDropdown;
+        responseChoiceQuestion_DD_dropdown = binding.responseChoiceQuestionDDDropdown;
 
         if(question != null) {
             responseChoiceQuestion_LBL_question.setText(question.getQuestionTitle());
@@ -129,19 +136,20 @@ public class ChoiceQuestionResponseFragment extends Fragment {
         }
     }
 
-
     private void initChoices(){
         ArrayList<String> options = ((ChoiceQuestion)question).getChoices();
         responseChoiceQuestion_RadioGroup.removeAllViews();
         responseChoiceQuestion_LL_checkBoxContainer.removeAllViews();
-        if(question.getType().isSingleSelection()) {
+        if(question.getType() == QuestionTypeEnum.DROPDOWN){
+            initDropdownValues(options);
+        }
+        else if(question.getType().isSingleSelection()) {
             initRadioButtons(options);
         }
         else {
             initCheckboxes(options, ((MultipleChoiceQuestion)question).getAllowedSelectionNum());
         }
     }
-
 
     private void initRadioButtons(List<String> options){
         for (String option : options) {
@@ -163,6 +171,7 @@ public class ChoiceQuestionResponseFragment extends Fragment {
         }
         responseChoiceQuestion_RadioGroup.setVisibility(VISIBLE);
         responseChoiceQuestion_LL_checkBoxContainer.setVisibility(GONE);
+        choiceQuestion_DD_layout_dropdown.setVisibility(GONE);
 
         responseChoiceQuestion_RadioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
@@ -177,7 +186,6 @@ public class ChoiceQuestionResponseFragment extends Fragment {
             }
         });
     }
-
 
     private void initCheckboxes(List<String> options, int maxSelections){
         selectedChoices.clear();
@@ -220,25 +228,40 @@ public class ChoiceQuestionResponseFragment extends Fragment {
         }
         responseChoiceQuestion_RadioGroup.setVisibility(GONE);
         responseChoiceQuestion_LL_checkBoxContainer.setVisibility(VISIBLE);
+        choiceQuestion_DD_layout_dropdown.setVisibility(GONE);
     }
 
+    private void initDropdownValues(List<String> options) {
+        ArrayAdapter<String> adapterItems_dropdownOptions = new ArrayAdapter<>(requireActivity(), R.layout.dropdown_item, options);
+        responseChoiceQuestion_DD_dropdown.setAdapter(adapterItems_dropdownOptions);
+        responseChoiceQuestion_DD_dropdown.setOnItemClickListener((adapterView, view, position, id) -> {
+            String selectedItem = adapterItems_dropdownOptions.getItem(position);
+            if (selectedItem != null) {
+                selectedChoices.clear();
+                selectedChoices.add(selectedItem);
+                Log.d("RadioGroup", "Selected: " + selectedItem);
+            }
+        });
+        responseChoiceQuestion_RadioGroup.setVisibility(GONE);
+        responseChoiceQuestion_LL_checkBoxContainer.setVisibility(GONE);
+        choiceQuestion_DD_layout_dropdown.setVisibility(VISIBLE);
+
+    }
 
     private int dpToPx(int dp) {
         return (int) TypedValue.applyDimension(
                 TypedValue.COMPLEX_UNIT_DIP, dp, getResources().getDisplayMetrics());
     }
 
-
     private void skipQuestion() {
         // TODO
         ((QuestionResponseActivity) requireActivity()).skipQuestion();
     }
 
-
     private void save() {
         if (isValidResponse()) {
             responseChoiceQuestion_LBL_error.setVisibility(GONE);
-            // TODO: save to firebase + update question order
+            // TODO: save to firebase + update question order + skip to next question
         }
         else{
             responseChoiceQuestion_LBL_error.setVisibility(VISIBLE);
@@ -248,5 +271,4 @@ public class ChoiceQuestionResponseFragment extends Fragment {
     private boolean isValidResponse() {
         return !question.isMandatory() || !selectedChoices.isEmpty();
     }
-
 }

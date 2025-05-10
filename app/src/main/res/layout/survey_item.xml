@@ -4,16 +4,17 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="8dp">
+    android:layout_margin="4dp">
 
     <androidx.cardview.widget.CardView
         android:id="@+id/item_CARD_data"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_margin="@dimen/card_elevation"
         android:backgroundTint="@color/light_blue"
-        android:elevation="8dp"
-        android:layout_marginHorizontal="8dp"
+        android:elevation="@dimen/card_elevation"
         app:cardCornerRadius="20dp"
+        app:cardElevation="@dimen/card_elevation"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -42,6 +43,7 @@
                 android:id="@+id/item_LBL_surveyStatus"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
                 android:gravity="end"
                 android:textColor="@color/dark_blue"
                 android:textSize="14sp"
@@ -55,7 +57,7 @@
                 android:id="@+id/item_LBL_surveyDate"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                tools:text="Date: 31/01/2025"
+                tools:text="Due Date: 31/01/2025"
                 android:textSize="14sp"
                 android:layout_marginVertical="4dp"
                 android:textColor="@color/blackish"

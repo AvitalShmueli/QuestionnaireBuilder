@@ -3,22 +3,27 @@ package com.example.questionnairebuilder;
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.questionnairebuilder.adapters.QuestionsAdapter;
 import com.example.questionnairebuilder.databinding.ActivityQuestionsBinding;
 import com.example.questionnairebuilder.interfaces.Callback_questionSelected;
+import com.example.questionnairebuilder.interfaces.ItemMoveCallback;
 import com.example.questionnairebuilder.interfaces.QuestionsCallback;
 import com.example.questionnairebuilder.models.ChoiceQuestion;
 import com.example.questionnairebuilder.models.DateQuestion;
@@ -37,6 +42,7 @@ import com.google.firebase.firestore.ListenerRegistration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class QuestionsActivity extends AppCompatActivity {
     private ActivityQuestionsBinding binding;
@@ -53,8 +59,9 @@ public class QuestionsActivity extends AppCompatActivity {
     private QuestionsAdapter questionAdapter;
     private List<Question> questionList = new ArrayList<>();
     private ListenerRegistration questionsListener;
+    private MenuItem editMenuItem;
+    private boolean canEdit = true;
 
-    private boolean editModeEnabled;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,7 +75,6 @@ public class QuestionsActivity extends AppCompatActivity {
 
         surveyID = getIntent().getStringExtra("surveyID");
         surveyTitle = getIntent().getStringExtra("survey_title");
-        editModeEnabled = false;
 
         createBinding();
         setupViews();
@@ -83,10 +89,45 @@ public class QuestionsActivity extends AppCompatActivity {
         recyclerView = binding.recyclerView;
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.toolbar_menu, menu);
+        editMenuItem = menu.findItem(R.id.action_done);
+        questionAdapter.setReorderEnabled(canEdit);
+        editMenuItem.setVisible(canEdit);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.action_done) {
+            Set<Question> changedQuestions = questionAdapter.getQuestionsToUpdate();
+            saveToDatabase(changedQuestions);
+            changedQuestions.clear(); // Reset for future edits
+            finish();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    public void saveToDatabase(Set<Question> questionsToUpdate) {
+        for(Question q : questionsToUpdate){
+            q.save();
+        }
+    }
+
     private void setupViews() {
+        setSupportActionBar(toolbar);
         if (surveyTitle != null) {
             toolbar.setTitle(surveyTitle);
         }
+        toolbar.setNavigationOnClickListener(v -> onBack());
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                onBack();
+            }
+        });
 
         // Setup RecyclerView
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -95,7 +136,7 @@ public class QuestionsActivity extends AppCompatActivity {
             @Override
             public void select(Question question) {
                 // TODO: add logic of edit mode
-                if(editModeEnabled)
+                if(canEdit)
                     changeActivityEditQuestion(question);
                 else changeActivityResponse(question);
             }
@@ -114,6 +155,20 @@ public class QuestionsActivity extends AppCompatActivity {
             startActivity(intent);
             finish();
         });
+
+
+        ItemTouchHelper touchHelper = new ItemTouchHelper(new ItemMoveCallback(questionAdapter));
+        touchHelper.attachToRecyclerView(recyclerView);
+
+        questionAdapter.setOnStartDragListener(viewHolder -> {
+            touchHelper.startDrag(viewHolder);
+        });
+    }
+
+    private void onBack() {
+        if(questionAdapter.getQuestionsToUpdate().isEmpty())
+            finish();
+        else showCancelConfirmationDialog();
     }
 
     private void showQuestionTypeMenu(View v) {
@@ -217,15 +272,15 @@ public class QuestionsActivity extends AppCompatActivity {
             public void onQuestionsLoaded(List<Question> questions) {
                 questionList = questions;
                 questionAdapter.updateQuestions(questionList);
-
+                int editVisibility = canEdit ? VISIBLE : GONE;
                 if (questionList.isEmpty()) {
-                    questions_BTN_skip.setVisibility(VISIBLE);
-                    question_LL_add_first_question.setVisibility(VISIBLE);
+                    questions_BTN_skip.setVisibility(editVisibility);
+                    question_LL_add_first_question.setVisibility(editVisibility);
                     question_FAB_add_bottom.setVisibility(GONE);
                 } else {
                     questions_BTN_skip.setVisibility(GONE);
                     question_LL_add_first_question.setVisibility(GONE);
-                    question_FAB_add_bottom.setVisibility(VISIBLE);
+                    question_FAB_add_bottom.setVisibility(editVisibility);
                 }
             }
 
@@ -241,6 +296,19 @@ public class QuestionsActivity extends AppCompatActivity {
             questionsListener.remove();
             questionsListener = null;
         }
+    }
+
+    public void showCancelConfirmationDialog() {
+        new AlertDialog.Builder(this)
+                .setTitle(R.string.discard_changes_title)
+                .setMessage(R.string.discard_changes_msg)
+                .setPositiveButton(R.string.yes, (dialog, which) -> {
+                    dialog.dismiss();
+                    finish();
+                })
+                .setNegativeButton(R.string.no, (dialog, which) -> dialog.dismiss())
+                .setCancelable(true)
+                .show();
     }
 
 }

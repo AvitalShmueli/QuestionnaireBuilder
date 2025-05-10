@@ -59,7 +59,7 @@ public class HomeFragment extends Fragment {
         recyclerView = binding.homeLSTSurveys;
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        surveyAdapter = new SurveyAdapter(new ArrayList<>(), survey -> {
+        surveyAdapter = new SurveyAdapter(requireContext(), new ArrayList<>(), survey -> {
             // OnSurveyClickListener
             Intent intent = new Intent(getActivity(), SurveyManagementActivity.class);
             intent.putExtra("survey_title", survey.getSurveyTitle());

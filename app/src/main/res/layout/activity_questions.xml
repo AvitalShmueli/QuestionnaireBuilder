@@ -13,7 +13,7 @@
 
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/topAppBar"
-            app:menu="@menu/top_app_bar_menu"
+            app:menu="@menu/toolbar_menu"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/android:statusBarColor"

@@ -43,14 +43,16 @@
             android:text="@string/active_surveys"
             android:textColor="@color/dark_blue"
             android:textSize="16sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:paddingHorizontal="8dp"/>
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/home_LST_surveys"
-                android:layout_below="@id/home_LBL_activeTitle"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:clipToPadding="false"
-                tools:listitem="@layout/survey_item" />
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/home_LST_surveys"
+            android:layout_below="@id/home_LBL_activeTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:clipToPadding="false"
+            android:padding="8dp"
+            tools:listitem="@layout/survey_item" />
     </RelativeLayout>
 </FrameLayout>

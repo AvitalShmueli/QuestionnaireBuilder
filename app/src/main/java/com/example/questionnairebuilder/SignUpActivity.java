@@ -15,7 +15,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.questionnairebuilder.databinding.ActivitySignUpBinding;
 import com.example.questionnairebuilder.models.User;
-import com.example.questionnairebuilder.utilities.FirebaseManager;
+import com.example.questionnairebuilder.utilities.AuthenticationManager;
+import com.example.questionnairebuilder.utilities.FirestoreManager;
 import com.google.android.material.appbar.MaterialToolbar;
 
 public class SignUpActivity extends AppCompatActivity {
@@ -97,13 +98,13 @@ public class SignUpActivity extends AppCompatActivity {
         binding.signUpBTNRegister.setEnabled(false);
 
         // Register user with Firebase Auth
-        FirebaseManager.getInstance().registerUser(email, password, task -> {
+        AuthenticationManager.getInstance().registerUser(email, password, task -> {
             if (task.isSuccessful()) {
                 String uid = task.getResult().getUser().getUid();
 
                 // Upload profile image if selected
                 if (selectedImageUri != null) {
-                    FirebaseManager.getInstance().uploadUserProfileImage(uid, selectedImageUri, imageUrl -> {
+                    FirestoreManager.getInstance().uploadUserProfileImage(uid, selectedImageUri, imageUrl -> {
                         saveUserToFirestore(uid, username, email, imageUrl);
                     });
                 } else { // No profile image selected
@@ -126,7 +127,7 @@ public class SignUpActivity extends AppCompatActivity {
                 .setEmail(email)
                 .setProfileImageUrl(imageUrl);
 
-        FirebaseManager.getInstance().saveUser(user, success -> {
+        FirestoreManager.getInstance().saveUser(user, success -> {
             binding.signUpBTNRegister.setEnabled(true);
             if (success) {
                 Toast.makeText(this, "Registration successful!", Toast.LENGTH_SHORT).show();

@@ -1,6 +1,6 @@
 package com.example.questionnairebuilder.models;
 
-import com.example.questionnairebuilder.utilities.FirebaseManager;
+import com.example.questionnairebuilder.utilities.FirestoreManager;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -167,7 +167,7 @@ public class Survey {
     }*/
 
     public void save() {
-        FirebaseManager.getInstance().addSurvey(this);
+        FirestoreManager.getInstance().addSurvey(this);
     }
 
     /*public void deleteQuestion(int questionID) {

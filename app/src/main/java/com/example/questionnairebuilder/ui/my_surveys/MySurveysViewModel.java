@@ -6,7 +6,7 @@ import androidx.lifecycle.ViewModel;
 
 import com.example.questionnairebuilder.interfaces.SurveysCallback;
 import com.example.questionnairebuilder.models.Survey;
-import com.example.questionnairebuilder.utilities.FirebaseManager;
+import com.example.questionnairebuilder.utilities.FirestoreManager;
 import com.google.firebase.firestore.ListenerRegistration;
 
 import java.util.ArrayList;
@@ -54,7 +54,7 @@ public class MySurveysViewModel extends ViewModel {
     }
 
     public void startListening() {
-        listenerRegistration = FirebaseManager.getInstance().listenToMySurveys(mCurrentUserId.getValue(),new SurveysCallback() {
+        listenerRegistration = FirestoreManager.getInstance().listenToMySurveys(mCurrentUserId.getValue(),new SurveysCallback() {
             @Override
             public void onSurveysLoaded(List<Survey> surveys) {
                 surveysLiveData.setValue(surveys);

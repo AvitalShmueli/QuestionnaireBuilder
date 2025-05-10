@@ -15,7 +15,7 @@ import android.view.ViewGroup;
 
 import com.example.questionnairebuilder.WelcomeActivity;
 import com.example.questionnairebuilder.databinding.FragmentSettingsBinding;
-import com.example.questionnairebuilder.utilities.FirebaseManager;
+import com.example.questionnairebuilder.utilities.AuthenticationManager;
 
 public class SettingsFragment extends Fragment {
 
@@ -37,7 +37,7 @@ public class SettingsFragment extends Fragment {
         View root = binding.getRoot();
 
         binding.settingsBTNLogout.setOnClickListener(v -> {
-            FirebaseManager.getInstance().logout();
+            AuthenticationManager.getInstance().logout();
             Intent intent = new Intent(requireContext(), WelcomeActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);

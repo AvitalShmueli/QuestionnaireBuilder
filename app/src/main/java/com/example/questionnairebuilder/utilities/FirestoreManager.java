@@ -9,6 +9,9 @@ import com.example.questionnairebuilder.interfaces.OneQuestionCallback;
 import com.example.questionnairebuilder.interfaces.OneSurveyCallback;
 import com.example.questionnairebuilder.interfaces.QuestionsCallback;
 import com.example.questionnairebuilder.interfaces.SurveysCallback;
+import com.example.questionnairebuilder.listeners.OnImageUploadListener;
+import com.example.questionnairebuilder.listeners.OnUserFetchListener;
+import com.example.questionnairebuilder.listeners.OnUserSaveListener;
 import com.example.questionnairebuilder.models.DateQuestion;
 import com.example.questionnairebuilder.models.MultipleChoiceQuestion;
 import com.example.questionnairebuilder.models.OpenEndedQuestion;
@@ -18,13 +21,6 @@ import com.example.questionnairebuilder.models.RatingScaleQuestion;
 import com.example.questionnairebuilder.models.SingleChoiceQuestion;
 import com.example.questionnairebuilder.models.Survey;
 import com.example.questionnairebuilder.models.User;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.common.util.concurrent.FutureCallback;
-import com.google.common.util.concurrent.Futures;
-import com.google.common.util.concurrent.ListenableFuture;
-import com.google.firebase.auth.AuthResult;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
@@ -34,47 +30,30 @@ import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.google.firebase.vertexai.FirebaseVertexAI;
-import com.google.firebase.vertexai.GenerativeModel;
-import com.google.firebase.vertexai.java.GenerativeModelFutures;
-import com.google.firebase.vertexai.type.Content;
-import com.google.firebase.vertexai.type.GenerateContentResponse;
-import com.google.firebase.vertexai.type.Part;
+
 import java.util.List;
-import java.util.concurrent.Executors;
 
 import java.util.ArrayList;
 
-public class FirebaseManager {
-    private static FirebaseManager instance;
+public class FirestoreManager {
+    private static FirestoreManager instance;
     private FirebaseFirestore database;
-    private FirebaseAuth auth;
     private CollectionReference surveysRef;
-    private CollectionReference usersRef;
     private CollectionReference questionsRef;
-    private GenerativeModel geminiModel;
-    GenerativeModelFutures model;
+    private CollectionReference usersRef;
 
-    private FirebaseManager() {
+    private FirestoreManager() {
         database = FirebaseFirestore.getInstance();
-        auth = FirebaseAuth.getInstance();
-
         surveysRef = database.collection("Surveys");
-        usersRef = database.collection("Users");
         questionsRef = database.collection("Questions");
-
-        geminiModel = FirebaseVertexAI.getInstance()
-                .generativeModel("gemini-2.0-flash");
-        model = GenerativeModelFutures.from(geminiModel);
+        usersRef = database.collection("Users");
     }
 
-    public static synchronized FirebaseManager getInstance() {
+    public static synchronized FirestoreManager getInstance() {
         if (instance == null)
-            instance = new FirebaseManager();
+            instance = new FirestoreManager();
         return instance;
     }
-
-    // =================== DATABASE ===================
 
     public void addSurvey(Survey survey) {
         surveysRef.document(survey.getID()).set(survey);
@@ -241,25 +220,6 @@ public class FirebaseManager {
                 .addOnFailureListener(e -> callback.onError(e));
     }
 
-
-    // =================== AUTH ===================
-
-    public void registerUser(String email, String password, OnCompleteListener<AuthResult> listener) {
-        auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(listener);
-    }
-
-    public void loginUser(String email, String password, OnCompleteListener<AuthResult> listener) {
-        auth.signInWithEmailAndPassword(email, password).addOnCompleteListener(listener);
-    }
-
-    public FirebaseUser getCurrentUser() {
-        return auth.getCurrentUser();
-    }
-
-    public void logout() {
-        auth.signOut();
-    }
-
     public void uploadUserProfileImage(String uid, Uri imageUri, OnImageUploadListener listener) {
         StorageReference storageRef = FirebaseStorage.getInstance().getReference("ProfileImages").child(uid + ".jpg");
         storageRef.putFile(imageUri)
@@ -267,24 +227,14 @@ public class FirebaseManager {
                 .addOnSuccessListener(uri -> listener.onUploaded(uri.toString()));
     }
 
-    public interface OnImageUploadListener {
-        void onUploaded(String imageUrl);
-    }
-
-    public interface OnUserSaveListener {
-        void onSaved(boolean success);
-    }
-
     public void saveUser(User user, OnUserSaveListener listener) {
-        database.collection("Users")
-                .document(user.getUid())
+        usersRef.document(user.getUid())
                 .set(user)
                 .addOnCompleteListener(task -> listener.onSaved(task.isSuccessful()));
     }
 
     public void getUserData(String uid, OnUserFetchListener listener) {
-        database.collection("Users")
-                .document(uid)
+        usersRef.document(uid)
                 .get()
                 .addOnSuccessListener(documentSnapshot -> {
                     if (documentSnapshot.exists()) {
@@ -295,39 +245,5 @@ public class FirebaseManager {
                     }
                 })
                 .addOnFailureListener(e -> listener.onFetched(null));
-    }
-
-    public void analyzeOpenAnswer(String userResponse, OnAnalysisCompleteListener listener) {
-        String prompt = "Analyze the following survey response and summarize the user's sentiment and suggestions:\n\n" + userResponse;
-
-        Content content = new Content.Builder()
-                .addText(prompt)
-                .build();
-
-        ListenableFuture<GenerateContentResponse> future = model.generateContent(content);
-
-        Futures.addCallback(future, new FutureCallback<GenerateContentResponse>() {
-            @Override
-            public void onSuccess(GenerateContentResponse response) {
-                String result = response.getText();
-                listener.onAnalysisComplete(result);
-            }
-
-            @Override
-            public void onFailure(Throwable t) {
-                listener.onError(new Exception(t));
-            }
-        }, Executors.newSingleThreadExecutor());
-    }
-
-
-
-    public interface OnUserFetchListener {
-        void onFetched(User user);
-    }
-
-    public interface OnAnalysisCompleteListener {
-        void onAnalysisComplete(String result);
-        void onError(Exception e);
     }
 }

@@ -19,6 +19,9 @@ import com.example.questionnairebuilder.models.SingleChoiceQuestion;
 import com.example.questionnairebuilder.models.Survey;
 import com.example.questionnairebuilder.models.User;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.common.util.concurrent.FutureCallback;
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -31,9 +34,16 @@ import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.google.firebase.vertexai.FirebaseVertexAI;
+import com.google.firebase.vertexai.GenerativeModel;
+import com.google.firebase.vertexai.java.GenerativeModelFutures;
+import com.google.firebase.vertexai.type.Content;
+import com.google.firebase.vertexai.type.GenerateContentResponse;
+import com.google.firebase.vertexai.type.Part;
+import java.util.List;
+import java.util.concurrent.Executors;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class FirebaseManager {
     private static FirebaseManager instance;
@@ -42,6 +52,8 @@ public class FirebaseManager {
     private CollectionReference surveysRef;
     private CollectionReference usersRef;
     private CollectionReference questionsRef;
+    private GenerativeModel geminiModel;
+    GenerativeModelFutures model;
 
     private FirebaseManager() {
         database = FirebaseFirestore.getInstance();
@@ -50,6 +62,10 @@ public class FirebaseManager {
         surveysRef = database.collection("Surveys");
         usersRef = database.collection("Users");
         questionsRef = database.collection("Questions");
+
+        geminiModel = FirebaseVertexAI.getInstance()
+                .generativeModel("gemini-2.0-flash");
+        model = GenerativeModelFutures.from(geminiModel);
     }
 
     public static synchronized FirebaseManager getInstance() {
@@ -281,8 +297,37 @@ public class FirebaseManager {
                 .addOnFailureListener(e -> listener.onFetched(null));
     }
 
+    public void analyzeOpenAnswer(String userResponse, OnAnalysisCompleteListener listener) {
+        String prompt = "Analyze the following survey response and summarize the user's sentiment and suggestions:\n\n" + userResponse;
+
+        Content content = new Content.Builder()
+                .addText(prompt)
+                .build();
+
+        ListenableFuture<GenerateContentResponse> future = model.generateContent(content);
+
+        Futures.addCallback(future, new FutureCallback<GenerateContentResponse>() {
+            @Override
+            public void onSuccess(GenerateContentResponse response) {
+                String result = response.getText();
+                listener.onAnalysisComplete(result);
+            }
+
+            @Override
+            public void onFailure(Throwable t) {
+                listener.onError(new Exception(t));
+            }
+        }, Executors.newSingleThreadExecutor());
+    }
+
+
+
     public interface OnUserFetchListener {
         void onFetched(User user);
     }
 
+    public interface OnAnalysisCompleteListener {
+        void onAnalysisComplete(String result);
+        void onError(Exception e);
+    }
 }

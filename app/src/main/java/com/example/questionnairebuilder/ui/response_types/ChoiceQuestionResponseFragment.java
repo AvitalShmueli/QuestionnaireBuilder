@@ -25,17 +25,22 @@ import android.widget.Toast;
 import com.example.questionnairebuilder.QuestionResponseActivity;
 import com.example.questionnairebuilder.R;
 import com.example.questionnairebuilder.databinding.FragmentChoiceQuestionResponseBinding;
+import com.example.questionnairebuilder.interfaces.OnResponseCallback;
 import com.example.questionnairebuilder.models.ChoiceQuestion;
 import com.example.questionnairebuilder.models.MultipleChoiceQuestion;
 import com.example.questionnairebuilder.models.Question;
 import com.example.questionnairebuilder.models.QuestionTypeEnum;
+import com.example.questionnairebuilder.models.Response;
 import com.example.questionnairebuilder.models.SingleChoiceQuestion;
+import com.example.questionnairebuilder.utilities.AuthenticationManager;
+import com.example.questionnairebuilder.utilities.FirestoreManager;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.android.material.textview.MaterialTextView;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -54,6 +59,7 @@ public class ChoiceQuestionResponseFragment extends Fragment {
     private TextInputLayout choiceQuestion_DD_layout_dropdown;
     private AutoCompleteTextView responseChoiceQuestion_DD_dropdown;
     private Question question;
+    private Response response;
     private int currentSelectionCount = 0;
     private final List<String> selectedChoices = new ArrayList<>();
 
@@ -102,7 +108,6 @@ public class ChoiceQuestionResponseFragment extends Fragment {
         binding = FragmentChoiceQuestionResponseBinding.inflate(inflater, container, false);
 
         View root = binding.getRoot();
-
         createBinding();
 
         return root;
@@ -128,7 +133,9 @@ public class ChoiceQuestionResponseFragment extends Fragment {
                 responseChoiceQuestion_LBL_mandatory.setVisibility(GONE);
                 responseChoiceQuestion_BTN_skip.setVisibility(VISIBLE);
             }
-            initChoices();
+
+            selectedChoices.clear();
+            loadResponse(question);
 
             // listeners
             responseChoiceQuestion_BTN_save.setOnClickListener(v -> save());
@@ -188,7 +195,7 @@ public class ChoiceQuestionResponseFragment extends Fragment {
     }
 
     private void initCheckboxes(List<String> options, int maxSelections){
-        selectedChoices.clear();
+
         currentSelectionCount = 0;
         for (String option : options) {
             CheckBox checkBox = new CheckBox(getContext());
@@ -233,6 +240,8 @@ public class ChoiceQuestionResponseFragment extends Fragment {
 
     private void initDropdownValues(List<String> options) {
         ArrayAdapter<String> adapterItems_dropdownOptions = new ArrayAdapter<>(requireActivity(), R.layout.dropdown_item, options);
+        if(!selectedChoices.isEmpty())
+            responseChoiceQuestion_DD_dropdown.setText(selectedChoices.get(0));
         responseChoiceQuestion_DD_dropdown.setAdapter(adapterItems_dropdownOptions);
         responseChoiceQuestion_DD_dropdown.setOnItemClickListener((adapterView, view, position, id) -> {
             String selectedItem = adapterItems_dropdownOptions.getItem(position);
@@ -253,15 +262,47 @@ public class ChoiceQuestionResponseFragment extends Fragment {
                 TypedValue.COMPLEX_UNIT_DIP, dp, getResources().getDisplayMetrics());
     }
 
+    private void loadResponse(Question question) {
+        String userID = AuthenticationManager.getInstance().getCurrentUser().getUid();
+        FirestoreManager.getInstance().getResponse(question.getSurveyID(), question.getQuestionID(), userID, new OnResponseCallback() {
+            @Override
+            public void onResponseLoad(Response theResponse) {
+                if(theResponse != null) {
+                    response = theResponse;
+                    selectedChoices.clear();
+                    selectedChoices.addAll(response.getResponseValues());
+                    currentSelectionCount = selectedChoices.size();
+                }
+                initChoices();
+            }
+
+            @Override
+            public void onResponseLoadFailure() {
+                response = null;
+                initChoices();
+            }
+        });
+    }
+
     private void skipQuestion() {
-        // TODO
         ((QuestionResponseActivity) requireActivity()).skipQuestion();
     }
 
     private void save() {
         if (isValidResponse()) {
             responseChoiceQuestion_LBL_error.setVisibility(GONE);
-            // TODO: save to firebase + update question order + skip to next question
+            if(response == null) {
+                response = new Response()
+                        .setResponseID(UUID.randomUUID().toString())
+                        .setSurveyID(question.getSurveyID())
+                        .setQuestionID(question.getQuestionID())
+                        .setResponseValues(selectedChoices);
+            }
+            else {
+                response.getResponseValues().clear();
+                response.setResponseValues(selectedChoices);
+            }
+            ((QuestionResponseActivity)requireActivity()).saveResponse(response);
         }
         else{
             responseChoiceQuestion_LBL_error.setVisibility(VISIBLE);

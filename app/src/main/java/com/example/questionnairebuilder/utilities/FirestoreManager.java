@@ -3,8 +3,10 @@ package com.example.questionnairebuilder.utilities;
 import android.net.Uri;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.example.questionnairebuilder.interfaces.OnResponseCallback;
 import com.example.questionnairebuilder.interfaces.OneQuestionCallback;
 import com.example.questionnairebuilder.interfaces.OneSurveyCallback;
 import com.example.questionnairebuilder.interfaces.QuestionsCallback;
@@ -18,15 +20,19 @@ import com.example.questionnairebuilder.models.OpenEndedQuestion;
 import com.example.questionnairebuilder.models.Question;
 import com.example.questionnairebuilder.models.QuestionTypeEnum;
 import com.example.questionnairebuilder.models.RatingScaleQuestion;
+import com.example.questionnairebuilder.models.Response;
 import com.example.questionnairebuilder.models.SingleChoiceQuestion;
 import com.example.questionnairebuilder.models.Survey;
 import com.example.questionnairebuilder.models.User;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.ListenerRegistration;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -41,12 +47,14 @@ public class FirestoreManager {
     private CollectionReference surveysRef;
     private CollectionReference questionsRef;
     private CollectionReference usersRef;
+    private CollectionReference responsesRef;
 
     private FirestoreManager() {
         database = FirebaseFirestore.getInstance();
         surveysRef = database.collection("Surveys");
         questionsRef = database.collection("Questions");
         usersRef = database.collection("Users");
+        responsesRef = database.collection("Responses");
     }
 
     public static synchronized FirestoreManager getInstance() {
@@ -246,4 +254,35 @@ public class FirestoreManager {
                 })
                 .addOnFailureListener(e -> listener.onFetched(null));
     }
+
+    public void addResponse(Response response) {
+        responsesRef.document(response.getResponseID()).set(response);
+    }
+
+    public void getResponse(String surveyID, String questionID, String userID, OnResponseCallback callback){
+        responsesRef.whereEqualTo("surveyID",surveyID)
+                .whereEqualTo("questionID",questionID)
+                .whereEqualTo("userID",userID)
+                .limit(1)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            if(task.getResult().isEmpty()){
+                                callback.onResponseLoad(null);
+                            }
+                            else {
+                                for (QueryDocumentSnapshot document : task.getResult()) {
+                                    Response response = document.toObject(Response.class);
+                                    callback.onResponseLoad(response);
+                                }
+                            }
+                        } else {
+                            callback.onResponseLoadFailure();
+                        }
+                    }
+                });
+    }
+
 }

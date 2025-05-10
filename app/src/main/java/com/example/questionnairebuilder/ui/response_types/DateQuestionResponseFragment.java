@@ -17,9 +17,13 @@ import android.view.ViewGroup;
 
 import com.example.questionnairebuilder.QuestionResponseActivity;
 import com.example.questionnairebuilder.databinding.FragmentDateQuestionResponseBinding;
+import com.example.questionnairebuilder.interfaces.OnResponseCallback;
 import com.example.questionnairebuilder.models.DateQuestion;
 import com.example.questionnairebuilder.models.DateSelectionModeEnum;
 import com.example.questionnairebuilder.models.Question;
+import com.example.questionnairebuilder.models.Response;
+import com.example.questionnairebuilder.utilities.AuthenticationManager;
+import com.example.questionnairebuilder.utilities.FirestoreManager;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.textfield.TextInputEditText;
@@ -28,8 +32,10 @@ import com.google.android.material.textview.MaterialTextView;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Locale;
+import java.util.UUID;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -47,12 +53,11 @@ public class DateQuestionResponseFragment extends Fragment {
     private MaterialButton responseDateQuestion_BTN_save;
     private MaterialButton responseDateQuestion_BTN_skip;
     private Question question;
-
+    private Response response;
 
     public DateQuestionResponseFragment() {
         // Required empty public constructor
     }
-
 
     /**
      * Use this factory method to create a new instance of
@@ -66,7 +71,6 @@ public class DateQuestionResponseFragment extends Fragment {
         fragment.setArguments(questionArgs);
         return fragment;
     }
-
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -82,7 +86,6 @@ public class DateQuestionResponseFragment extends Fragment {
         }
     }
 
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -90,10 +93,10 @@ public class DateQuestionResponseFragment extends Fragment {
         View root = binding.getRoot();
 
         createBinding();
+        loadResponse(question);
 
         return root;
     }
-
 
     private void createBinding() {
         responseDateQuestion_LBL_question = binding.responseDateQuestionLBLQuestion;
@@ -124,6 +127,32 @@ public class DateQuestionResponseFragment extends Fragment {
         }
     }
 
+    private void loadResponse(Question question) {
+        String userID = AuthenticationManager.getInstance().getCurrentUser().getUid();
+        FirestoreManager.getInstance().getResponse(question.getSurveyID(), question.getQuestionID(), userID, new OnResponseCallback() {
+            @Override
+            public void onResponseLoad(Response theResponse) {
+                if(theResponse != null) {
+                    response = theResponse;
+                    if (!response.getResponseValues().isEmpty()) {
+                        if(((DateQuestion)question).getDateMode() == DateSelectionModeEnum.DATE_RANGE && response.getResponseValues().size() == 2){
+                            responseDateQuestion_TXT_date.setText(response.getResponseValues().get(0));
+                            responseDateQuestion_TXT_date2.setText(response.getResponseValues().get(1));
+                        }
+                        else{
+                            responseDateQuestion_TXT_date.setText(response.getResponseValues().get(0));
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onResponseLoadFailure() {
+                response = null;
+            }
+        });
+    }
+
     private void setupDateFieldBehavior() {
         setupDateField(responseDateQuestion_TIL_date, responseDateQuestion_TXT_date);
 
@@ -137,7 +166,6 @@ public class DateQuestionResponseFragment extends Fragment {
             responseDateQuestion_TIL_date2.setVisibility(GONE);
         }
     }
-
 
     private void setupDateField(TextInputLayout inputLayout, TextInputEditText editText) {
         inputLayout.setEndIconOnClickListener(v -> showMaterialDatePicker(editText));
@@ -181,7 +209,6 @@ public class DateQuestionResponseFragment extends Fragment {
         );
     }
 
-
     private boolean isValidDate(String date) {
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
         sdf.setLenient(false); // Ensures 32/13/2025 is rejected
@@ -193,7 +220,6 @@ public class DateQuestionResponseFragment extends Fragment {
             return false;
         }
     }
-
 
     private void showMaterialDatePicker(TextInputEditText editText) {
         MaterialDatePicker<Long> datePicker = MaterialDatePicker.Builder
@@ -220,19 +246,30 @@ public class DateQuestionResponseFragment extends Fragment {
         datePicker.show(requireActivity().getSupportFragmentManager(), "DATE_PICKER");
     }
 
-
     private void skipQuestion() {
-        // TODO
         ((QuestionResponseActivity) requireActivity()).skipQuestion();
     }
 
-
     private void save() {
         if (isValidResponse()) {
-            // TODO: save to firebase + update question order
+            ArrayList<String> selectedDates = new ArrayList<>();
+            selectedDates.add(responseDateQuestion_TXT_date.getText().toString());
+            if(((DateQuestion)question).getDateMode() == DateSelectionModeEnum.DATE_RANGE)
+                selectedDates.add(responseDateQuestion_TXT_date2.getText().toString());
+
+            if(response == null) {
+                response = new Response()
+                        .setResponseID(UUID.randomUUID().toString())
+                        .setSurveyID(question.getSurveyID())
+                        .setQuestionID(question.getQuestionID())
+                        .setResponseValues(selectedDates);
+            }
+            else {
+                response.setResponseValues(selectedDates);
+            }
+            ((QuestionResponseActivity)requireActivity()).saveResponse(response);
         }
     }
-
 
     private boolean isValidResponse() {
         boolean valid = validateDateField(responseDateQuestion_TXT_date, responseDateQuestion_TIL_date);
@@ -246,7 +283,6 @@ public class DateQuestionResponseFragment extends Fragment {
 
         return valid;
     }
-
 
     private boolean validateDateField(TextInputEditText editText, TextInputLayout inputLayout) {
         String date = "";
@@ -267,5 +303,4 @@ public class DateQuestionResponseFragment extends Fragment {
             return true;
         }
     }
-
 }

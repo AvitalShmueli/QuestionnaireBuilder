@@ -45,6 +45,8 @@ import java.util.Map;
 import java.util.Set;
 
 public class QuestionsActivity extends AppCompatActivity {
+    public static final String KEY_EDIT_MODE = "KEY_EDIT_MODE";
+
     private ActivityQuestionsBinding binding;
     private MaterialToolbar toolbar;
     private LinearLayout question_LL_add_first_question;
@@ -60,7 +62,7 @@ public class QuestionsActivity extends AppCompatActivity {
     private List<Question> questionList = new ArrayList<>();
     private ListenerRegistration questionsListener;
     private MenuItem editMenuItem;
-    private boolean canEdit = true;
+    private boolean canEdit;
 
 
     @Override
@@ -69,6 +71,9 @@ public class QuestionsActivity extends AppCompatActivity {
         binding = ActivityQuestionsBinding.inflate(getLayoutInflater());
         View root = binding.getRoot();
         setContentView(root);
+
+        Intent previousIntent = getIntent();
+        canEdit = previousIntent.getBooleanExtra(KEY_EDIT_MODE,false);
 
         QuestionTypeManager.init(this);
         menu = QuestionTypeManager.getMenu();

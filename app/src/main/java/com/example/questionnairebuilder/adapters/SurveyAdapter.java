@@ -1,5 +1,6 @@
 package com.example.questionnairebuilder.adapters;
 
+import android.content.Context;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -17,6 +18,7 @@ import java.util.List;
 import java.util.Locale;
 
 public class SurveyAdapter extends RecyclerView.Adapter<SurveyAdapter.SurveyViewHolder> {
+    private final Context context;
     private List<Survey> surveys;
     private OnSurveyClickListener listener;
 
@@ -24,7 +26,8 @@ public class SurveyAdapter extends RecyclerView.Adapter<SurveyAdapter.SurveyView
         void onSurveyClick(Survey survey);
     }
 
-    public SurveyAdapter(List<Survey> surveys, OnSurveyClickListener listener) {
+    public SurveyAdapter(Context context, List<Survey> surveys, OnSurveyClickListener listener) {
+        this.context = context;
         this.surveys = surveys;
         this.listener = listener;
     }
@@ -48,8 +51,10 @@ public class SurveyAdapter extends RecyclerView.Adapter<SurveyAdapter.SurveyView
         holder.status.setText(survey.getStatus().toString());
 
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
-        holder.date.setText("Date: " + sdf.format(survey.getDueDate()));
-        holder.responses.setText("Responses: " + (survey.getSurveyViewers() != null ? survey.getSurveyViewers().size() : 0));
+        String strDueDate = context.getString(R.string.due_date) + ": " + sdf.format(survey.getDueDate());
+        holder.date.setText(strDueDate);
+        String strResponses =  context.getString(R.string.responses) + ": " + (survey.getSurveyViewers() != null ? survey.getSurveyViewers().size() : 0);
+        holder.responses.setText(strResponses);
 
         holder.itemView.setOnClickListener(v -> {
             if (listener != null) {

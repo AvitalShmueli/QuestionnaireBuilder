@@ -1,5 +1,28 @@
 <resources>
     <string name="app_name" translatable="false">QuestionnaireBuilder</string>
+
+    <!-- Question types -->
+    <string name="open_ended_question">Open-ended question</string>
+    <string name="single_choice">Single choice</string>
+    <string name="dropdown">Dropdown</string>
+    <string name="yes_no">Yes/No</string>
+    <string name="multiple_choice">Multiple choice</string>
+    <string name="date">Date</string>
+    <string name="rating_scale">Rating scale</string>
+    <string name="matrix_question">Matrix question</string>
+    <string name="rating_scale_level">Rating scale level</string>
+
+    <!-- Buttons -->
+    <string name="log_in">Log In</string>
+    <string name="sign_up">Sign Up</string>
+    <string name="continue_btn">Continue</string>
+    <string name="save">Save</string>
+    <string name="cancel">Cancel</string>
+    <string name="skip">Skip</string>
+    <string name="log_out">Log Out</string>
+    <string name="add_question">Add Question</string>
+
+
     <string name="title_activity_home">HomeActivity</string>
     <string name="title_home">Home</string>
     <string name="title_explore">Explore</string>
@@ -8,6 +31,7 @@
     <string name="title">Title</string>
     <string name="description">Description</string>
     <string name="due_date">Due Date</string>
+    <string name="responses">Responses</string>
     <string name="theme">Theme</string>
     <string name="mandatory">Mandatory?</string>
     <string name="question_title">Question Title</string>
@@ -52,32 +76,11 @@
     <string name="edit">Edit</string>
     <string name="share">Share</string>
     <string name="analyze">Analyze</string>
-
-    <!-- Buttons -->
-    <string name="log_in">Log In</string>
-    <string name="sign_up">Sign Up</string>
-    <string name="continue_btn">Continue</string>
-    <string name="save">Save</string>
-    <string name="cancel">Cancel</string>
-    <string name="skip">Skip</string>
-
-    <!-- Question types -->
-    <string name="open_ended_question">Open-ended question</string>
-    <string name="single_choice">Single choice</string>
-    <string name="dropdown">Dropdown</string>
-    <string name="yes_no">Yes/No</string>
-    <string name="multiple_choice">Multiple choice</string>
-    <string name="date">Date</string>
-    <string name="rating_scale">Rating scale</string>
-    <string name="matrix_question">Matrix question</string>
-    <string name="rating_scale_level">Rating scale level</string>
     <string name="email">Email</string>
     <string name="sign_up_msg">Don\'t have an account? Sign up</string>
     <string name="password">Password</string>
     <string name="username">Username</string>
-    <string name="log_out">Log Out</string>
     <string name="hello_user">Hello, %1$s!</string>
-    <string name="add_question">Add Question</string>
     <string name="profile">Profile</string>
     <string name="settings">Settings</string>
     <string name="details">Details</string>
@@ -86,5 +89,9 @@
     <string name="draft">Draft</string>
     <string name="published">Published</string>
     <string name="close">Close</string>
+    <string name="select">Select</string>
+    <string name="done">Done</string>
+    <string name="reorder">Reorder</string>
+
 
 </resources>

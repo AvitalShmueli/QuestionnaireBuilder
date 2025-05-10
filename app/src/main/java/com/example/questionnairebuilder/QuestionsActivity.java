@@ -33,7 +33,7 @@ import com.example.questionnairebuilder.models.Question;
 import com.example.questionnairebuilder.models.QuestionTypeEnum;
 import com.example.questionnairebuilder.models.QuestionTypeManager;
 import com.example.questionnairebuilder.models.RatingScaleQuestion;
-import com.example.questionnairebuilder.utilities.FirebaseManager;
+import com.example.questionnairebuilder.utilities.FirestoreManager;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -267,7 +267,7 @@ public class QuestionsActivity extends AppCompatActivity {
     }
 
     private void startListeningForQuestions() {
-        questionsListener = FirebaseManager.getInstance().listenToSurveyQuestions(surveyID, new QuestionsCallback() {
+        questionsListener = FirestoreManager.getInstance().listenToSurveyQuestions(surveyID, new QuestionsCallback() {
             @Override
             public void onQuestionsLoaded(List<Question> questions) {
                 questionList = questions;

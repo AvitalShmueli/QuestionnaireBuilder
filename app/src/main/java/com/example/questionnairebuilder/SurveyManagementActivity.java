@@ -12,7 +12,7 @@ import androidx.appcompat.widget.AppCompatSpinner;
 
 import com.example.questionnairebuilder.interfaces.OneSurveyCallback;
 import com.example.questionnairebuilder.models.Survey;
-import com.example.questionnairebuilder.utilities.FirebaseManager;
+import com.example.questionnairebuilder.utilities.FirestoreManager;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.materialswitch.MaterialSwitch;
 import com.google.android.material.textview.MaterialTextView;
@@ -54,7 +54,7 @@ public class SurveyManagementActivity extends AppCompatActivity {
             toolbar.setTitle(title);
         }
 
-        FirebaseManager.getInstance().getSurveyById(surveyID, new OneSurveyCallback() {
+        FirestoreManager.getInstance().getSurveyById(surveyID, new OneSurveyCallback() {
             @Override
             public void onSurveyLoaded(Survey loadedSurvey) {
                 survey = loadedSurvey;

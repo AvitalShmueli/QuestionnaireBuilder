@@ -5,9 +5,11 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.example.questionnairebuilder.interfaces.SurveysCallback;
+import com.example.questionnairebuilder.listeners.OnUserFetchListener;
 import com.example.questionnairebuilder.models.Survey;
 import com.example.questionnairebuilder.models.User;
-import com.example.questionnairebuilder.utilities.FirebaseManager;
+import com.example.questionnairebuilder.utilities.AuthenticationManager;
+import com.example.questionnairebuilder.utilities.FirestoreManager;
 import com.google.firebase.firestore.ListenerRegistration;
 
 import java.util.ArrayList;
@@ -32,10 +34,11 @@ public class HomeViewModel extends ViewModel {
     }
 
     private void getCurrentUserUsername(){
-        FirebaseManager firebaseManager = FirebaseManager.getInstance();
-        if (firebaseManager.getCurrentUser() != null) {
-            String currentUserId = firebaseManager.getCurrentUser().getUid();
-            firebaseManager.getUserData(currentUserId, new FirebaseManager.OnUserFetchListener() {
+        FirestoreManager firebaseManager = FirestoreManager.getInstance();
+        AuthenticationManager authenticationManager = AuthenticationManager.getInstance();
+        if (authenticationManager.getCurrentUser() != null) {
+            String currentUserId = authenticationManager.getCurrentUser().getUid();
+            firebaseManager.getUserData(currentUserId, new OnUserFetchListener() {
                 @Override
                 public void onFetched(User user) {
                     if (user != null) {
@@ -71,7 +74,7 @@ public class HomeViewModel extends ViewModel {
     }
 
     public void startListening() {
-        listenerRegistration = FirebaseManager.getInstance().listenToAllSurveys(new SurveysCallback() {
+        listenerRegistration = FirestoreManager.getInstance().listenToAllSurveys(new SurveysCallback() {
             @Override
             public void onSurveysLoaded(List<Survey> surveys) {
                 surveysLiveData.setValue(surveys);

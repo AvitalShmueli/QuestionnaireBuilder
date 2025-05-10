@@ -8,7 +8,8 @@ import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.questionnairebuilder.databinding.ActivityLoginBinding;
-import com.example.questionnairebuilder.utilities.FirebaseManager;
+import com.example.questionnairebuilder.utilities.AuthenticationManager;
+import com.example.questionnairebuilder.utilities.FirestoreManager;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.firebase.auth.AuthResult;
@@ -79,7 +80,7 @@ public class LoginActivity extends AppCompatActivity {
             binding.loginTILPassword.setError(null);
 
         binding.loginBTNLogin.setEnabled(false);
-        FirebaseManager.getInstance().loginUser(email, password, this::onLoginComplete);
+        AuthenticationManager.getInstance().loginUser(email, password, this::onLoginComplete);
     }
 
     private void onLoginComplete(Task<AuthResult> task) {
@@ -87,7 +88,7 @@ public class LoginActivity extends AppCompatActivity {
         if (task.isSuccessful()) {
             String uid = task.getResult().getUser().getUid();
 
-            FirebaseManager.getInstance().getUserData(uid, user -> {
+            FirestoreManager.getInstance().getUserData(uid, user -> {
                 if (user != null) {
                     Intent intent = new Intent(this, MainActivity.class);
                     intent.putExtra("username", user.getUsername()); // Pass username

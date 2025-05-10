@@ -1,6 +1,6 @@
 package com.example.questionnairebuilder.models;
 
-import com.example.questionnairebuilder.utilities.FirebaseManager;
+import com.example.questionnairebuilder.utilities.FirestoreManager;
 
 public abstract class Question {
     private String questionID;
@@ -95,6 +95,6 @@ public abstract class Question {
     }
 
     public void save(){
-        FirebaseManager.getInstance().addQuestion(this);
+        FirestoreManager.getInstance().addQuestion(this);
     }
 }

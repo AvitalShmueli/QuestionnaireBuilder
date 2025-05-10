@@ -20,6 +20,7 @@ legacySupportV4 = "1.0.0"
 firebaseStorage = "21.0.1"
 firebaseAuth = "23.2.0"
 reactiveStreams = "1.0.4"
+gson = "2.10.1"
 
 [libraries]
 firebase-analytics = { module = "com.google.firebase:firebase-analytics" }
@@ -44,6 +45,8 @@ legacy-support-v4 = { group = "androidx.legacy", name = "legacy-support-v4", ver
 firebase-storage = { group = "com.google.firebase", name = "firebase-storage", version.ref = "firebaseStorage" }
 firebase-auth = { group = "com.google.firebase", name = "firebase-auth", version.ref = "firebaseAuth" }
 reactive-streams = { module = "org.reactivestreams:reactive-streams", version.ref = "reactiveStreams" }
+gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
+
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

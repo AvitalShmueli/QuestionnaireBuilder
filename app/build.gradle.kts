@@ -52,6 +52,7 @@ dependencies {
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
     implementation(libs.hdodenhof.circleimageview)
+    implementation (libs.gson)
 
     // Firebase:
     implementation(platform(libs.firebase.bom)) // Import the Firebase BoM

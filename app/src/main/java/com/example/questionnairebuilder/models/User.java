@@ -1,7 +1,7 @@
 package com.example.questionnairebuilder.models;
 
 public class User {
-
+    public static final String USERNAME = "USERNAME";
     private String uid;
     private String username;
     private String email;

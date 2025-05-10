@@ -12,7 +12,7 @@
         android:layout_height="match_parent"
         android:clipToPadding="false"
         android:padding="8dp"
-        tools:listitem="@layout/survey_item" />
+        tools:listitem="@layout/item_survey" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/mySurveys_FAB_add"

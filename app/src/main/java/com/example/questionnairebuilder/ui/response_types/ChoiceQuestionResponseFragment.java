@@ -232,7 +232,7 @@ public class ChoiceQuestionResponseFragment extends Fragment {
     }
 
     private void initDropdownValues(List<String> options) {
-        ArrayAdapter<String> adapterItems_dropdownOptions = new ArrayAdapter<>(requireActivity(), R.layout.dropdown_item, options);
+        ArrayAdapter<String> adapterItems_dropdownOptions = new ArrayAdapter<>(requireActivity(), R.layout.item_dropdown, options);
         responseChoiceQuestion_DD_dropdown.setAdapter(adapterItems_dropdownOptions);
         responseChoiceQuestion_DD_dropdown.setOnItemClickListener((adapterView, view, position, id) -> {
             String selectedItem = adapterItems_dropdownOptions.getItem(position);

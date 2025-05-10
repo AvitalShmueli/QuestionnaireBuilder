@@ -171,7 +171,7 @@ public class ChoiceQuestionFragment extends Fragment implements OnRowCountChange
         }
         String maxSelections = selectedMaxSelectionsAllowed.toString();
         choiceQuestion_DD_maxAllowed.setText(maxSelections);
-        ArrayAdapter<Integer> adapterItems_MaxSelectionsAllowed = new ArrayAdapter<>(requireActivity(), R.layout.dropdown_item, itemsMaxSelectionsAllowed);
+        ArrayAdapter<Integer> adapterItems_MaxSelectionsAllowed = new ArrayAdapter<>(requireActivity(), R.layout.item_dropdown, itemsMaxSelectionsAllowed);
         choiceQuestion_DD_maxAllowed.setAdapter(adapterItems_MaxSelectionsAllowed);
         choiceQuestion_DD_maxAllowed.setOnItemClickListener((adapterView, view, position, id) -> selectedMaxSelectionsAllowed = adapterItems_MaxSelectionsAllowed.getItem(position));
 

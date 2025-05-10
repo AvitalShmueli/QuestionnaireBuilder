@@ -58,7 +58,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="@dimen/input_vertical_margin"
-                tools:listitem="@layout/row_item"
+                tools:listitem="@layout/item_row"
                 tools:itemCount="4"/>
 
             <com.google.android.material.textview.MaterialTextView

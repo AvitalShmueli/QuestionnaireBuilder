@@ -49,7 +49,7 @@ public class ChoicesAdapter extends RecyclerView.Adapter<ChoicesAdapter.ViewHold
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.row_item, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_row, parent, false);
         return new ViewHolder(view);
     }
 

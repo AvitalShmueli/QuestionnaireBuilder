@@ -135,7 +135,7 @@ public class DateQuestionFragment extends Fragment implements UnsavedChangesHand
             selectedMode = DateSelectionModeEnum.SINGLE_DATE;
         dateQuestion_DD_DateSelectionMode.setText(itemsDateSelectionMode.get(selectedMode));
 
-        ArrayAdapter<String> adapterItems_DateSelectionMode = new ArrayAdapter<>(requireActivity(), R.layout.dropdown_item, values);
+        ArrayAdapter<String> adapterItems_DateSelectionMode = new ArrayAdapter<>(requireActivity(), R.layout.item_dropdown, values);
         dateQuestion_DD_DateSelectionMode.setAdapter(adapterItems_DateSelectionMode);
         dateQuestion_DD_DateSelectionMode.setOnItemClickListener((adapterView, view, position, id) -> selectedMode = reverseItems.get(adapterItems_DateSelectionMode.getItem(position)));
     }

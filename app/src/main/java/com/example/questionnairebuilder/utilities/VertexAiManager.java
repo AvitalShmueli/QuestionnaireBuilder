@@ -30,7 +30,11 @@ public class VertexAiManager {
     }
 
     public void analyzeOpenAnswer(String userResponse, OnAnalysisCompleteListener listener) {
-        String prompt = "Analyze the following survey response and summarize the user's sentiment and suggestions:\n\n" + userResponse;
+        //TODO: Dummy data for now — later this would fetch actual responses from Firestore.
+        String combinedText = "User response 1.\nUser response 2.\nUser response 3.";
+
+        //String prompt = "Analyze the following survey response and summarize the user's sentiment and suggestions:\n\n" + userResponse;
+        String prompt = "Analyze the following survey responses:\n\n" + combinedText;
 
         Content content = new Content.Builder()
                 .addText(prompt)

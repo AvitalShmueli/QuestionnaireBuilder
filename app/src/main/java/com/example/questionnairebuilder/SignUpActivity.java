@@ -1,5 +1,7 @@
 package com.example.questionnairebuilder;
 
+import static com.example.questionnairebuilder.models.User.USERNAME;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
@@ -17,6 +19,7 @@ import com.example.questionnairebuilder.databinding.ActivitySignUpBinding;
 import com.example.questionnairebuilder.models.User;
 import com.example.questionnairebuilder.utilities.AuthenticationManager;
 import com.example.questionnairebuilder.utilities.FirestoreManager;
+import com.example.questionnairebuilder.utilities.SharedPreferencesManager;
 import com.google.android.material.appbar.MaterialToolbar;
 
 public class SignUpActivity extends AppCompatActivity {
@@ -39,6 +42,8 @@ public class SignUpActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
 
         toolBar = findViewById(R.id.topAppBar);
+
+        SharedPreferencesManager.init(this);
 
         initViews();
 
@@ -131,6 +136,7 @@ public class SignUpActivity extends AppCompatActivity {
             binding.signUpBTNRegister.setEnabled(true);
             if (success) {
                 Toast.makeText(this, "Registration successful!", Toast.LENGTH_SHORT).show();
+                SharedPreferencesManager.getInstance().putString(USERNAME, user.getUsername());
                 startActivity(new Intent(this, MainActivity.class));
                 finish();
             } else {

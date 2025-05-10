@@ -5,9 +5,7 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.example.questionnairebuilder.interfaces.SurveysCallback;
-import com.example.questionnairebuilder.listeners.OnUserFetchListener;
 import com.example.questionnairebuilder.models.Survey;
-import com.example.questionnairebuilder.models.User;
 import com.example.questionnairebuilder.utilities.AuthenticationManager;
 import com.example.questionnairebuilder.utilities.FirestoreManager;
 import com.google.firebase.firestore.ListenerRegistration;
@@ -25,7 +23,7 @@ public class HomeViewModel extends ViewModel {
     private ListenerRegistration listenerRegistration;
 
     public HomeViewModel() {
-        mUsername.setValue("user");
+        mUsername.setValue(null);
         getCurrentUserUsername();
     }
 
@@ -38,14 +36,11 @@ public class HomeViewModel extends ViewModel {
         AuthenticationManager authenticationManager = AuthenticationManager.getInstance();
         if (authenticationManager.getCurrentUser() != null) {
             String currentUserId = authenticationManager.getCurrentUser().getUid();
-            firebaseManager.getUserData(currentUserId, new OnUserFetchListener() {
-                @Override
-                public void onFetched(User user) {
-                    if (user != null) {
-                        mUsername.setValue(user.getUsername());
-                    }
-                    else mUsername.setValue("user");
+            firebaseManager.getUserData(currentUserId, user -> {
+                if (user != null) {
+                    mUsername.setValue(user.getUsername());
                 }
+                else mUsername.setValue(null);
             });
         }
     }

@@ -1,5 +1,7 @@
 package com.example.questionnairebuilder.ui.home;
 
+import static com.example.questionnairebuilder.models.User.USERNAME;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -18,6 +20,7 @@ import com.example.questionnairebuilder.R;
 import com.example.questionnairebuilder.SurveyManagementActivity;
 import com.example.questionnairebuilder.adapters.SurveyAdapter;
 import com.example.questionnairebuilder.databinding.FragmentHomeBinding;
+import com.example.questionnairebuilder.utilities.SharedPreferencesManager;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -45,9 +48,11 @@ public class HomeFragment extends Fragment {
         binding = FragmentHomeBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
+        SharedPreferencesManager.init(requireContext());
+        String prefUsername = SharedPreferencesManager.getInstance().getString(USERNAME,"<username>");
         final TextView home_LBL_greeting = binding.homeLBLGreeting;
         viewModel.getUsername().observe(getViewLifecycleOwner(), username -> {
-            home_LBL_greeting.setText(getString(R.string.hello_user, Objects.requireNonNullElse(username, "<username>")));
+            home_LBL_greeting.setText(getString(R.string.hello_user, Objects.requireNonNullElse(username, prefUsername)));
         });
 
         binding.homeBTNCreateSurvey.setOnClickListener(v -> {

@@ -63,4 +63,9 @@ dependencies {
     implementation(libs.firebase.storage)
     implementation(libs.google.firebase.firestore)
 
+    // Vertex AI:
+    implementation(libs.firebase.vertexai)
+    implementation(libs.guava)
+    implementation(libs.reactive.streams)
+
 }

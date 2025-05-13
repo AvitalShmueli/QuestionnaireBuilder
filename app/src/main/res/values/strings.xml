@@ -92,6 +92,7 @@
     <string name="select">Select</string>
     <string name="done">Done</string>
     <string name="reorder">Reorder</string>
-
+    <string name="discard_reordering_title">Unsaved order changes</string>
+    <string name="discard_reordering_msg">You’ve changed the order of your questions, but haven’t saved it.\nLeaving now will keep any edits or deletions, but discard the new order.</string>
 
 </resources>

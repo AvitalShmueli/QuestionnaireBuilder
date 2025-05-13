@@ -58,6 +58,10 @@ public class QuestionsAdapter extends RecyclerView.Adapter<QuestionsAdapter.View
         notifyItemRangeChanged(0, getItemCount(), "toggleDrag");
     }
 
+    public boolean isReorderEnabled() {
+        return reorderEnabled;
+    }
+
     @NonNull
     @Override
     public QuestionsAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -99,7 +103,6 @@ public class QuestionsAdapter extends RecyclerView.Adapter<QuestionsAdapter.View
         });
     }
 
-
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         onBindViewHolder(holder, position, new ArrayList<>());
@@ -114,8 +117,16 @@ public class QuestionsAdapter extends RecyclerView.Adapter<QuestionsAdapter.View
         return questionList.get(position);
     }
 
+    public List<Question> getCurrentQuestions() {
+        return this.questionList; // or whatever variable holds your current list
+    }
+
     public Set<Question> getQuestionsToUpdate() {
         return questionsToUpdate;
+    }
+
+    public boolean hasUnsavedChanges(){
+        return !questionsToUpdate.isEmpty();
     }
 
     public void onItemMove(int fromPosition, int toPosition) {

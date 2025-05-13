@@ -40,6 +40,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.firestore.ListenerRegistration;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -63,6 +64,8 @@ public class QuestionsActivity extends AppCompatActivity {
     private ListenerRegistration questionsListener;
     private MenuItem editMenuItem;
     private boolean canEdit;
+
+    public static List<Question> cachedQuestionList = null;
 
 
     @Override
@@ -106,11 +109,14 @@ public class QuestionsActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.action_done) {
-            Set<Question> changedQuestions = questionAdapter.getQuestionsToUpdate();
-            saveToDatabase(changedQuestions);
-            changedQuestions.clear(); // Reset for future edits
-            finish();
-            return true;
+            if(questionAdapter.hasUnsavedChanges()) {
+                Set<Question> changedQuestions = questionAdapter.getQuestionsToUpdate();
+                saveToDatabase(changedQuestions);
+                changedQuestions.clear(); // Reset for future edits
+                cachedQuestionList = null;
+                finish();
+                return true;
+            }
         }
         return super.onOptionsItemSelected(item);
     }
@@ -140,7 +146,11 @@ public class QuestionsActivity extends AppCompatActivity {
         questionAdapter.setCallbackQuestionSelected(new Callback_questionSelected() {
             @Override
             public void select(Question question) {
-                // TODO: add logic of edit mode
+                /*
+                TODO: What will happen if I changed the order of a question and then updated it,
+                 but later I will discard the order changes -
+                 I will get 2 questions (or more) with the same order
+                 */
                 if(canEdit)
                     changeActivityEditQuestion(question);
                 else changeActivityResponse(question);
@@ -161,13 +171,14 @@ public class QuestionsActivity extends AppCompatActivity {
             finish();
         });
 
+        if (canEdit) {
+            ItemTouchHelper touchHelper = new ItemTouchHelper(new ItemMoveCallback(questionAdapter));
+            touchHelper.attachToRecyclerView(recyclerView);
 
-        ItemTouchHelper touchHelper = new ItemTouchHelper(new ItemMoveCallback(questionAdapter));
-        touchHelper.attachToRecyclerView(recyclerView);
-
-        questionAdapter.setOnStartDragListener(viewHolder -> {
-            touchHelper.startDrag(viewHolder);
-        });
+            questionAdapter.setOnStartDragListener(viewHolder -> {
+                touchHelper.startDrag(viewHolder);
+            });
+        }
     }
 
     private void onBack() {
@@ -262,7 +273,22 @@ public class QuestionsActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        startListeningForQuestions();
+        if(cachedQuestionList != null){
+            FirestoreManager.getInstance().getSurveyQuestionsOnce(surveyID, new QuestionsCallback() {
+                @Override
+                public void onQuestionsLoaded(List<Question> questions) {
+                    mergeLocalAndRemoteQuestionsWithDeletion(questions);
+                }
+
+                @Override
+                public void onError(Exception e) {
+                    Log.e("pttt", "Failed to load questions: " + e.getMessage());
+                }
+            });
+        }
+        else {
+            startListeningForQuestions();
+        }
     }
 
     @Override
@@ -271,11 +297,23 @@ public class QuestionsActivity extends AppCompatActivity {
         stopListeningForQuestions();
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        cachedQuestionList = null;
+    }
+
     private void startListeningForQuestions() {
         questionsListener = FirestoreManager.getInstance().listenToSurveyQuestions(surveyID, new QuestionsCallback() {
             @Override
             public void onQuestionsLoaded(List<Question> questions) {
-                questionList = questions;
+                //questionList = questions;
+                //questionAdapter.updateQuestions(questionList);
+                if (cachedQuestionList != null) {
+                    questionList = cachedQuestionList;
+                } else {
+                    questionList = questions;
+                }
                 questionAdapter.updateQuestions(questionList);
                 int editVisibility = canEdit ? VISIBLE : GONE;
                 if (questionList.isEmpty()) {
@@ -305,15 +343,87 @@ public class QuestionsActivity extends AppCompatActivity {
 
     public void showCancelConfirmationDialog() {
         new AlertDialog.Builder(this)
-                .setTitle(R.string.discard_changes_title)
-                .setMessage(R.string.discard_changes_msg)
-                .setPositiveButton(R.string.yes, (dialog, which) -> {
+                .setTitle(R.string.discard_reordering_title)
+                .setMessage(R.string.discard_reordering_msg)
+                .setPositiveButton(R.string.continue_btn, (dialog, which) -> {
                     dialog.dismiss();
                     finish();
                 })
-                .setNegativeButton(R.string.no, (dialog, which) -> dialog.dismiss())
+                .setNegativeButton(R.string.cancel, (dialog, which) -> dialog.dismiss())
                 .setCancelable(true)
                 .show();
     }
 
+    private void mergeLocalAndRemoteQuestions(List<Question> remoteQuestions) {
+        Map<String, Question> localMap = new HashMap<>();
+        for (Question q : cachedQuestionList) {
+            localMap.put(q.getQuestionID(), q);
+        }
+
+        for (Question q : remoteQuestions) {
+            // If the question is new (not in local list), add it
+            if (!localMap.containsKey(q.getQuestionID())) {
+                cachedQuestionList.add(q);
+            } else {
+                // If the title (or other fields) changed in Firestore, update it
+                Question local = localMap.get(q.getQuestionID());
+                local.setQuestionTitle(q.getQuestionTitle());
+                local.setImage(q.getImage());
+                local.setMandatory(q.isMandatory());
+                // Optionally update other fields — but preserve local `order`
+            }
+        }
+
+        // Reapply visual list
+        questionList = cachedQuestionList;
+        questionAdapter.updateQuestions(questionList);
+    }
+
+    /**
+     * TODO: check this - after handling deletion of a question
+     * merge between new questions, updated questions and deleted questions
+     * @param remoteQuestions - fetched question from Firestore
+     */
+    private void mergeLocalAndRemoteQuestionsWithDeletion(List<Question> remoteQuestions) {
+        Map<String, Question> remoteMap = new HashMap<>();
+        for (Question q : remoteQuestions) {
+            remoteMap.put(q.getQuestionID(), q);
+        }
+
+        List<Question> updatedList = new ArrayList<>();
+
+        for (Question local : cachedQuestionList) {
+            Question remote = remoteMap.get(local.getQuestionID());
+
+            if (remote != null) {
+                // Question still exists — update its fields (but preserve order)
+                local.setQuestionTitle(remote.getQuestionTitle());
+                local.setImage(remote.getImage());
+                local.setMandatory(remote.isMandatory());
+                // Add to updated list
+                updatedList.add(local);
+            }
+            // else → deleted question, do NOT add it to updatedList
+        }
+
+        // Add new questions (in Firestore but not in local)
+        for (Question remote : remoteQuestions) {
+            boolean found = false;
+            for (Question local : updatedList) {
+                if (local.getQuestionID().equals(remote.getQuestionID())) {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                // Assign order if needed (at end of list)
+                remote.setOrder(updatedList.size() + 1);
+                updatedList.add(remote);
+            }
+        }
+
+        cachedQuestionList = updatedList;
+        questionList = updatedList;
+        questionAdapter.updateQuestions(updatedList);
+    }
 }

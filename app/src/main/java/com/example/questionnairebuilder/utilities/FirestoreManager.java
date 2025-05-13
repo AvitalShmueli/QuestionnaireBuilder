@@ -147,11 +147,7 @@ public class FirestoreManager {
                     if (value != null) {
                         List<Question> questionList = new ArrayList<>();
                         for (DocumentSnapshot document : value.getDocuments()) {
-                            Log.d("FirestoreDoc", "Document: " + document.getData());
-                            Object mandatoryRaw = document.get("mandatory");
-                            if (mandatoryRaw != null) {
-                                Log.d("FirestoreMandatory", "mandatoryRaw: " + mandatoryRaw + " (type = " + mandatoryRaw.getClass().getSimpleName() + ")");
-                            }
+                            /*
                             String typeString = document.getString("type");
                             QuestionTypeEnum type = QuestionTypeEnum.valueOf(typeString);
                             Question question = null;
@@ -181,12 +177,81 @@ public class FirestoreManager {
                                     question.setMandatory(mandatory);
                                 }
                                 questionList.add(question);
+                            }*/
+                            Question question = mapToQuestion(document);
+                            if (question != null) {
+                                questionList.add(question);
                             }
                         }
                         callback.onQuestionsLoaded(questionList);
                     }
-
                 });
+    }
+
+    public void getSurveyQuestionsOnce(String surveyID, QuestionsCallback callback) {
+        Log.d("pttt", "Fetching questions once for surveyID: " + surveyID);
+
+        questionsRef.whereEqualTo("surveyID", surveyID)
+                .orderBy("order")
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    Log.d("pttt", "Query successful. Documents found: " + queryDocumentSnapshots.size());
+
+                    List<Question> questions = new ArrayList<>();
+                    for (DocumentSnapshot doc : queryDocumentSnapshots.getDocuments()) {
+                        Log.d("pttt", "Processing document: " + doc.getId());
+                        try {
+                            Question question = mapToQuestion(doc);
+                            if (question != null) {
+                                questions.add(question);
+                            } else {
+                                Log.w("pttt", "mapToQuestion returned null for document: " + doc.getId());
+                            }
+                        } catch (Exception e) {
+                            Log.e("pttt", "Error parsing document: " + e.getMessage());
+                        }
+                    }
+                    Log.d("pttt", "Returning " + questions.size() + " parsed questions.");
+                    callback.onQuestionsLoaded(questions);
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("pttt", "Firestore query failed: " + e.getMessage(), e);
+                    callback.onError(e);
+                });
+    }
+
+
+    private Question mapToQuestion(DocumentSnapshot document) {
+        String typeString = document.getString("type");
+        QuestionTypeEnum type = QuestionTypeEnum.valueOf(typeString);
+        Question question = null;
+        switch (type) {
+            case OPEN_ENDED_QUESTION:
+                question = document.toObject(OpenEndedQuestion.class);
+                break;
+            case SINGLE_CHOICE:
+            case YES_NO:
+            case DROPDOWN:
+                question = document.toObject(SingleChoiceQuestion.class);
+                break;
+            case MULTIPLE_CHOICE:
+                question = document.toObject(MultipleChoiceQuestion.class);
+                break;
+            case DATE:
+                question = document.toObject(DateQuestion.class);
+                break;
+            case RATING_SCALE:
+                question = document.toObject(RatingScaleQuestion.class);
+                break;
+        }
+        if (question != null) {
+            question.setQuestionID(document.getId());
+            Boolean mandatory = document.getBoolean("mandatory");
+            if (mandatory != null) {
+                question.setMandatory(mandatory);
+            }
+        }
+        return question;
     }
 
     public void getQuestionById(String questionId, OneQuestionCallback callback) {
@@ -259,20 +324,19 @@ public class FirestoreManager {
         responsesRef.document(response.getResponseID()).set(response);
     }
 
-    public void getResponse(String surveyID, String questionID, String userID, OnResponseCallback callback){
-        responsesRef.whereEqualTo("surveyID",surveyID)
-                .whereEqualTo("questionID",questionID)
-                .whereEqualTo("userID",userID)
+    public void getResponse(String surveyID, String questionID, String userID, OnResponseCallback callback) {
+        responsesRef.whereEqualTo("surveyID", surveyID)
+                .whereEqualTo("questionID", questionID)
+                .whereEqualTo("userID", userID)
                 .limit(1)
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
-                            if(task.getResult().isEmpty()){
+                            if (task.getResult().isEmpty()) {
                                 callback.onResponseLoad(null);
-                            }
-                            else {
+                            } else {
                                 for (QueryDocumentSnapshot document : task.getResult()) {
                                     Response response = document.toObject(Response.class);
                                     callback.onResponseLoad(response);

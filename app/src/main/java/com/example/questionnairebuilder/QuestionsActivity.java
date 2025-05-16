@@ -62,7 +62,6 @@ public class QuestionsActivity extends AppCompatActivity {
     private QuestionsAdapter questionAdapter;
     private List<Question> questionList = new ArrayList<>();
     private ListenerRegistration questionsListener;
-    private MenuItem editMenuItem;
     private boolean canEdit;
 
     public static List<Question> cachedQuestionList = null;
@@ -99,10 +98,10 @@ public class QuestionsActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.toolbar_menu, menu);
-        editMenuItem = menu.findItem(R.id.action_done);
+        getMenuInflater().inflate(R.menu.toolbar_menu_done, menu);
+        MenuItem doneMenuItem = menu.findItem(R.id.action_done);
         questionAdapter.setReorderEnabled(canEdit);
-        editMenuItem.setVisible(canEdit);
+        doneMenuItem.setVisible(canEdit);
         return true;
     }
 
@@ -114,6 +113,7 @@ public class QuestionsActivity extends AppCompatActivity {
                 saveToDatabase(changedQuestions);
                 changedQuestions.clear(); // Reset for future edits
                 cachedQuestionList = null;
+                FirestoreManager.getInstance().fixQuestionOrder(surveyID);
                 finish();
                 return true;
             }
@@ -121,7 +121,7 @@ public class QuestionsActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void saveToDatabase(Set<Question> questionsToUpdate) {
+    private void saveToDatabase(Set<Question> questionsToUpdate) {
         for(Question q : questionsToUpdate){
             q.save();
         }
@@ -146,11 +146,6 @@ public class QuestionsActivity extends AppCompatActivity {
         questionAdapter.setCallbackQuestionSelected(new Callback_questionSelected() {
             @Override
             public void select(Question question) {
-                /*
-                TODO: What will happen if I changed the order of a question and then updated it,
-                 but later I will discard the order changes -
-                 I will get 2 questions (or more) with the same order
-                 */
                 if(canEdit)
                     changeActivityEditQuestion(question);
                 else changeActivityResponse(question);

@@ -1,25 +1,31 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
     <style name="Base.Theme.QuestionnaireBuilder" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your light theme here. -->
         <!-- Primary brand color. -->
         <item name="colorPrimary">@color/blue</item>
         <item name="colorPrimaryVariant">@color/blue</item>
         <item name="colorOnPrimaryContainer">@color/white</item>
         <item name="colorOnPrimary">@color/white</item>
-      
         <item name="colorOnSurface">@color/blackish</item>
 
         <!-- Secondary brand color. -->
         <item name="colorSecondary">@color/light_blue</item>
         <item name="colorSecondaryVariant">@color/dark_blue</item>
         <item name="colorOnSecondary">@color/black</item>
+
         <!-- Status bar color. -->
-        <!--item name="android:statusBarColor">?attr/colorPrimaryVariant</item-->
         <item name="android:statusBarColor">@color/light_blue</item>
         <item name="android:windowLightStatusBar">true</item>
 
+        <!-- Popup Menu -->
         <item name="android:popupMenuStyle">@style/AppPopupMenuStyle</item>
+
+        <!-- Toolbar -->
+        <item name="toolbarStyle">@style/Custom.Widget.Toolbar</item>
+        <!--item name="toolbarNavigationButtonStyle">@style/Custom.Widget.Toolbar.Button.Navigation</item-->
+        <item name="actionMenuTextAppearance">@style/Custom.Widget.Toolbar.MenuText</item>
+        <item name="actionMenuTextColor">@color/dark_blue</item>
+        <item name="android:actionMenuTextColor">@color/dark_blue</item>
 
     </style>
 

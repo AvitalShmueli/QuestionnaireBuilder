@@ -6,6 +6,7 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.example.questionnairebuilder.interfaces.OnQuestionDeleteCallback;
 import com.example.questionnairebuilder.interfaces.OnResponseCallback;
 import com.example.questionnairebuilder.interfaces.OneQuestionCallback;
 import com.example.questionnairebuilder.interfaces.OneSurveyCallback;
@@ -27,6 +28,7 @@ import com.example.questionnairebuilder.models.User;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -34,6 +36,7 @@ import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.WriteBatch;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
@@ -254,6 +257,13 @@ public class FirestoreManager {
         return question;
     }
 
+    public void deleteQuestion(Question question, OnQuestionDeleteCallback callback){
+        questionsRef.document(question.getQuestionID())
+                .delete()
+                .addOnSuccessListener(aVoid -> callback.onDelete())
+                .addOnFailureListener(e -> callback.onError(e));
+    }
+
     public void getQuestionById(String questionId, OneQuestionCallback callback) {
         questionsRef.document(questionId).get()
                 .addOnSuccessListener(documentSnapshot -> {
@@ -292,6 +302,28 @@ public class FirestoreManager {
                 })
                 .addOnFailureListener(e -> callback.onError(e));
     }
+
+    public void fixQuestionOrder(String surveyID) {
+        questionsRef
+                .whereEqualTo("surveyID", surveyID)
+                .orderBy("order")
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    int index = 1;
+                    WriteBatch batch = FirebaseFirestore.getInstance().batch();
+
+                    for (DocumentSnapshot doc : queryDocumentSnapshots.getDocuments()) {
+                        DocumentReference ref = doc.getReference();
+                        batch.update(ref, "order", index++);
+                    }
+
+                    batch.commit()
+                            .addOnSuccessListener(unused -> Log.d("pttt", "Order fixed after deletion."))
+                            .addOnFailureListener(e -> Log.e("pttt", "Failed to fix order: " + e.getMessage()));
+                })
+                .addOnFailureListener(e -> Log.e("pttt", "Failed to load questions for reordering: " + e.getMessage()));
+    }
+
 
     public void uploadUserProfileImage(String uid, Uri imageUri, OnImageUploadListener listener) {
         StorageReference storageRef = FirebaseStorage.getInstance().getReference("ProfileImages").child(uid + ".jpg");

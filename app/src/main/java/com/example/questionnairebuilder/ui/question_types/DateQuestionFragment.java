@@ -1,5 +1,8 @@
 package com.example.questionnairebuilder.ui.question_types;
 
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
+
 import android.os.Bundle;
 
 import androidx.activity.OnBackPressedCallback;
@@ -15,6 +18,7 @@ import android.widget.AutoCompleteTextView;
 import com.example.questionnairebuilder.EditQuestionActivity;
 import com.example.questionnairebuilder.R;
 import com.example.questionnairebuilder.databinding.FragmentDateQuestionBinding;
+import com.example.questionnairebuilder.interfaces.SaveHandler;
 import com.example.questionnairebuilder.interfaces.UnsavedChangesHandler;
 import com.example.questionnairebuilder.models.DateQuestion;
 import com.example.questionnairebuilder.models.DateSelectionModeEnum;
@@ -28,7 +32,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
 
-public class DateQuestionFragment extends Fragment implements UnsavedChangesHandler {
+public class DateQuestionFragment extends Fragment implements UnsavedChangesHandler, SaveHandler {
 
     private FragmentDateQuestionBinding binding;
     private TextInputLayout dateQuestion_TIL_question;
@@ -36,6 +40,7 @@ public class DateQuestionFragment extends Fragment implements UnsavedChangesHand
     private MaterialSwitch dateQuestion_SW_mandatory;
     private MaterialButton dateQuestion_BTN_save;
     private MaterialButton dateQuestion_BTN_cancel;
+    private MaterialButton dateQuestion_BTN_delete;
     private AutoCompleteTextView dateQuestion_DD_DateSelectionMode;
     private DateSelectionModeEnum selectedMode;
     private String surveyID;
@@ -107,6 +112,7 @@ public class DateQuestionFragment extends Fragment implements UnsavedChangesHand
     private void createBinding() {
         dateQuestion_BTN_save = binding.dateQuestionBTNSave;
         dateQuestion_BTN_cancel = binding.dateQuestionBTNCancel;
+        dateQuestion_BTN_delete = binding.dateQuestionBTNDelete;
         dateQuestion_TIL_question = binding.dateQuestionTILQuestion;
         dateQuestion_TXT_question = binding.dateQuestionTXTQuestion;
         dateQuestion_SW_mandatory = binding.dateQuestionSWMandatory;
@@ -117,6 +123,11 @@ public class DateQuestionFragment extends Fragment implements UnsavedChangesHand
         initDropDownValues();
         dateQuestion_BTN_cancel.setOnClickListener(v -> cancel());
         dateQuestion_BTN_save.setOnClickListener(v -> save());
+        if(question != null) {
+            dateQuestion_BTN_delete.setVisibility(VISIBLE);
+            dateQuestion_BTN_delete.setOnClickListener(v -> delete());
+        }
+        else dateQuestion_BTN_delete.setVisibility(GONE);
     }
 
     private void initDropDownValues() {
@@ -191,9 +202,31 @@ public class DateQuestionFragment extends Fragment implements UnsavedChangesHand
             requireActivity().finish();
     }
 
+    private void delete(){
+        ((EditQuestionActivity) requireActivity()).showDeleteConfirmationDialog(question);
+    }
+
     @Override
     public boolean hasUnsavedChanges() {
-        return dateQuestion_TXT_question.getText() != null &&
-                !dateQuestion_TXT_question.getText().toString().trim().isEmpty();
+        String currentText = dateQuestion_TXT_question.getText() != null
+                ? dateQuestion_TXT_question.getText().toString().trim()
+                : "";
+        boolean currentMandatory = dateQuestion_SW_mandatory.isChecked();
+        DateSelectionModeEnum currentDateMode = selectedMode;
+
+        String originalText = question != null ? question.getQuestionTitle() : "";
+        boolean originalMandatory = question != null && question.isMandatory();
+        DateSelectionModeEnum originalDateMode = question != null ? question.getDateMode() : null;
+
+        boolean textChanged = !currentText.equals(originalText);
+        boolean mandatoryChanged = currentMandatory != originalMandatory;
+        boolean dateModeChanged = currentDateMode != originalDateMode;
+
+        return textChanged || mandatoryChanged || dateModeChanged;
+    }
+
+    @Override
+    public void onSaveClicked() {
+        save();
     }
 }

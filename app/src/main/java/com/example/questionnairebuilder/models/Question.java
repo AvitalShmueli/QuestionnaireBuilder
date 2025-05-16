@@ -1,5 +1,8 @@
 package com.example.questionnairebuilder.models;
 
+import android.util.Log;
+
+import com.example.questionnairebuilder.interfaces.OnQuestionDeleteCallback;
 import com.example.questionnairebuilder.utilities.FirestoreManager;
 
 public abstract class Question {
@@ -96,5 +99,19 @@ public abstract class Question {
 
     public void save(){
         FirestoreManager.getInstance().addQuestion(this);
+    }
+
+    public void delete(){
+        FirestoreManager.getInstance().deleteQuestion(this, new OnQuestionDeleteCallback() {
+            @Override
+            public void onDelete() {
+                FirestoreManager.getInstance().fixQuestionOrder(surveyID);
+            }
+
+            @Override
+            public void onError(Exception e) {
+                Log.e("pttt", "Error deleting document: " + e.getMessage(), e);
+            }
+        });
     }
 }

@@ -13,12 +13,14 @@ import android.widget.LinearLayout;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
+import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.questionnairebuilder.EditQuestionActivity;
 import com.example.questionnairebuilder.R;
+import com.example.questionnairebuilder.interfaces.SaveHandler;
 import com.example.questionnairebuilder.interfaces.UnsavedChangesHandler;
 import com.example.questionnairebuilder.adapters.ChoicesAdapter;
 import com.example.questionnairebuilder.databinding.FragmentChoiceQuestionBinding;
@@ -35,9 +37,12 @@ import com.google.android.material.textfield.TextInputLayout;
 import com.google.android.material.textview.MaterialTextView;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
 import java.util.UUID;
 
-public class ChoiceQuestionFragment extends Fragment implements OnRowCountChangeListener, UnsavedChangesHandler {
+public class ChoiceQuestionFragment extends Fragment implements OnRowCountChangeListener, UnsavedChangesHandler, SaveHandler {
 
     private FragmentChoiceQuestionBinding binding;
     private TextInputLayout choiceQuestion_TIL_question;
@@ -53,6 +58,10 @@ public class ChoiceQuestionFragment extends Fragment implements OnRowCountChange
     private ChoicesAdapter choicesAdapter;
     private MaterialButton choiceQuestion_BTN_save;
     private MaterialButton choiceQuestion_BTN_cancel;
+    private MaterialButton choiceQuestion_BTN_delete;
+    private NestedScrollView scrollView;
+    private View scrollHintBottom;
+    private View scrollHintTop;
     private int choiceCount = 0;
     private String strType;
     private QuestionTypeEnum questionTypeEnum;
@@ -134,6 +143,9 @@ public class ChoiceQuestionFragment extends Fragment implements OnRowCountChange
     }
 
     private void createBinding() {
+        scrollView = binding.scrollView;
+        scrollHintBottom = binding.scrollHintBottom;
+        scrollHintTop = binding.scrollHintTop;
         choiceQuestion_TIL_question = binding.choiceQuestionTILQuestion;
         choiceQuestion_TXT_question = binding.choiceQuestionTXTQuestion;
         choiceQuestion_SW_mandatory = binding.choiceQuestionSWMandatory;
@@ -144,6 +156,7 @@ public class ChoiceQuestionFragment extends Fragment implements OnRowCountChange
         choiceQuestion_LBL_ErrorRV = binding.choiceQuestionLBLErrorRV;
         choiceQuestion_BTN_save = binding.choiceQuestionBTNSave;
         choiceQuestion_BTN_cancel = binding.choiceQuestionBTNCancel;
+        choiceQuestion_BTN_delete = binding.choiceQuestionBTNDelete;
     }
 
     private void initView(){
@@ -151,7 +164,6 @@ public class ChoiceQuestionFragment extends Fragment implements OnRowCountChange
         choiceQuestion_SW_other.setOnClickListener(v -> choiceQuestion_RV_choices.clearFocus());
         initDropDownValues();
 
-        // save & cancel buttons
         choiceQuestion_BTN_cancel.setOnClickListener(v -> {
             choiceQuestion_RV_choices.clearFocus();
             cancel();
@@ -159,6 +171,45 @@ public class ChoiceQuestionFragment extends Fragment implements OnRowCountChange
         choiceQuestion_BTN_save.setOnClickListener(v -> {
             choiceQuestion_RV_choices.clearFocus();
             save();
+        });
+        if(question != null) {
+            choiceQuestion_BTN_delete.setVisibility(VISIBLE);
+            choiceQuestion_BTN_delete.setOnClickListener(v -> {
+                choiceQuestion_RV_choices.clearFocus();
+                delete();
+            });
+        }
+        else choiceQuestion_BTN_delete.setVisibility(GONE);
+
+        initScrollHint();
+    }
+
+    private void initScrollHint(){
+        // Hide the gradient when scrolled to bottom
+        scrollView.setOnScrollChangeListener(new View.OnScrollChangeListener() {
+            @Override
+            public void onScrollChange(View v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
+                View child = scrollView.getChildAt(0);
+
+                if (child != null) {
+                    int scrollViewHeight = scrollView.getHeight();
+                    int contentHeight = child.getHeight();
+
+                    boolean atTop = scrollView.getScrollY() == 0;
+                    boolean atBottom = (scrollView.getScrollY() + scrollViewHeight) >= (contentHeight - 1); // tolerance
+
+                    scrollHintTop.setVisibility(atTop ? View.GONE : View.VISIBLE);
+                    scrollHintBottom.setVisibility(atBottom ? View.GONE : View.VISIBLE);
+                }
+            }
+        });
+
+        scrollView.getViewTreeObserver().addOnGlobalLayoutListener(() -> {
+            View child = scrollView.getChildAt(0);
+            if (child != null) {
+                boolean canScroll = (scrollView.getScrollY() + scrollView.getHeight()) < (child.getHeight() - 1);
+                scrollHintBottom.setVisibility(canScroll ? View.VISIBLE : View.GONE);
+            }
         });
     }
 
@@ -268,15 +319,18 @@ public class ChoiceQuestionFragment extends Fragment implements OnRowCountChange
             requireActivity().finish();
         }
         else{
-            choiceQuestion_TIL_question.setError(choiceQuestion_TXT_question.getText().toString().trim().isEmpty()? getString(R.string.error_required) : null);
+            choiceQuestion_TIL_question.setError(!isQuestionTitleValid() ? getString(R.string.error_required) : null);
             choiceQuestion_LBL_ErrorRV.setVisibility(choicesAdapter.getDataList().isEmpty() ? VISIBLE : GONE);
         }
     }
 
     private boolean isValid(){
+        return isQuestionTitleValid() && !choicesAdapter.getDataList().isEmpty();
+    }
+
+    private boolean isQuestionTitleValid(){
         return choiceQuestion_TXT_question.getText() != null &&
-                !choiceQuestion_TXT_question.getText().toString().trim().isEmpty() &&
-                !choicesAdapter.getDataList().isEmpty();
+                !choiceQuestion_TXT_question.getText().toString().trim().isEmpty();
     }
 
     private void cancel(){
@@ -286,10 +340,42 @@ public class ChoiceQuestionFragment extends Fragment implements OnRowCountChange
             requireActivity().finish();
     }
 
+    private void delete(){
+        ((EditQuestionActivity) requireActivity()).showDeleteConfirmationDialog(question);
+    }
+
     public boolean hasUnsavedChanges() {
-        if(choiceQuestion_TXT_question.getText() != null &&
-                !choiceQuestion_TXT_question.getText().toString().trim().isEmpty())
-            return true;
-        else return !choicesAdapter.getDataList().isEmpty() && questionTypeEnum != QuestionTypeEnum.YES_NO;
+        choiceQuestion_RV_choices.clearFocus();
+        String currentText = choiceQuestion_TXT_question.getText() != null
+                ? choiceQuestion_TXT_question.getText().toString().trim()
+                : "";
+        List<String> currentChoices = new ArrayList<>(choicesAdapter.getDataList());
+        boolean currentOther = choiceQuestion_SW_other.isChecked();
+        boolean currentMandatory = choiceQuestion_SW_mandatory.isChecked();
+
+        String originalText = question != null ? question.getQuestionTitle() : "";
+        List<String> originalChoices =  question != null ? question.getChoices() : Collections.emptyList();
+        boolean originalOther = question != null && question.isOther();
+        boolean originalMandatory = question != null && question.isMandatory();
+
+        boolean textChanged = !currentText.equals(originalText);
+        boolean choicesChanged = !new HashSet<>(currentChoices).equals(new HashSet<>(originalChoices));
+        boolean otherChanged = currentOther != originalOther;
+        boolean mandatoryChanged = currentMandatory != originalMandatory;
+        boolean allowedSelectionNumChanged = false;
+
+        if(question instanceof MultipleChoiceQuestion){
+            int currentAllowedSelectionNum = selectedMaxSelectionsAllowed;
+            int originalAllowedSelectionNum = ((MultipleChoiceQuestion) question).getAllowedSelectionNum();
+            allowedSelectionNumChanged = currentAllowedSelectionNum != originalAllowedSelectionNum;
+        }
+
+        return textChanged || choicesChanged || otherChanged || mandatoryChanged || allowedSelectionNumChanged;
+    }
+
+    @Override
+    public void onSaveClicked() {
+        choiceQuestion_RV_choices.clearFocus();
+        save();
     }
 }

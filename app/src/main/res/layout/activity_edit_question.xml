@@ -13,21 +13,22 @@
 
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/topAppBar"
-            app:menu="@menu/top_app_bar_menu"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/android:statusBarColor"
-            android:backgroundTint="@color/light_blue"
+            android:backgroundTint="?attr/android:statusBarColor"
+            android:elevation="@dimen/toolbar_elevation"
+            android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
             android:titleTextColor="@android:color/black"
+            app:actionMenuTextAppearance="@style/Custom.Widget.Toolbar.MenuText"
+            app:menu="@menu/toolbar_menu_save"
             app:navigationIcon="@drawable/arrow_back_24px"
+            app:navigationIconTint="?attr/colorOnSurface"
+            app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
             app:title="New Question"
             app:titleCentered="true"
-            android:elevation="@dimen/toolbar_elevation"
-            app:titleTextColor="?attr/colorOnSurface"
-            app:navigationIconTint="?attr/colorOnSurface"
-            app:titleTextAppearance="@style/toolbarTextStyle"
-            android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
-            app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
+            app:titleTextAppearance="@style/Custom.Widget.Toolbar.TitleStyle"
+            app:titleTextColor="?attr/colorOnSurface"/>
 
     </com.google.android.material.appbar.AppBarLayout>
 

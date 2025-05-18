@@ -11,4 +11,5 @@
     <color name="theme_circle_red">#EE4949</color>
     <color name="blackish">#333333</color>
     <color name="light_blue50">#FFFBFE</color>
+    <color name="red">#E53935</color>
 </resources>

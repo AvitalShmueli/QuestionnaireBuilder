@@ -14,12 +14,18 @@ import android.view.ViewGroup;
 import com.example.questionnairebuilder.QuestionResponseActivity;
 import com.example.questionnairebuilder.R;
 import com.example.questionnairebuilder.databinding.FragmentOpenQuestionResponseBinding;
+import com.example.questionnairebuilder.interfaces.OneResponseCallback;
 import com.example.questionnairebuilder.models.OpenEndedQuestion;
 import com.example.questionnairebuilder.models.Question;
+import com.example.questionnairebuilder.models.Response;
+import com.example.questionnairebuilder.utilities.AuthenticationManager;
+import com.example.questionnairebuilder.utilities.FirestoreManager;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.android.material.textview.MaterialTextView;
+
+import java.util.UUID;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -35,7 +41,7 @@ public class OpenQuestionResponseFragment extends Fragment {
     private TextInputLayout responseOpenQuestion_TIL_answer;
     private TextInputEditText responseOpenQuestion_TXT_answer;
     private Question question;
-
+    private Response response;
 
     public OpenQuestionResponseFragment() {
         // Required empty public constructor
@@ -74,6 +80,7 @@ public class OpenQuestionResponseFragment extends Fragment {
         View root = binding.getRoot();
 
         createBinding();
+        loadResponse(question);
 
         return root;
     }
@@ -114,15 +121,44 @@ public class OpenQuestionResponseFragment extends Fragment {
         }
     }
 
+    private void loadResponse(Question question) {
+        String userID = AuthenticationManager.getInstance().getCurrentUser().getUid();
+        FirestoreManager.getInstance().getResponse(question.getSurveyID(), question.getQuestionID(), userID, new OneResponseCallback() {
+            @Override
+            public void onResponseLoad(Response theResponse) {
+                if(theResponse != null) {
+                    response = theResponse;
+                    if (!response.getResponseValues().isEmpty())
+                        responseOpenQuestion_TXT_answer.setText(response.getResponseValues().get(0));
+                }
+            }
+
+            @Override
+            public void onResponseLoadFailure() {
+                response = null;
+            }
+        });
+    }
+
     private void skipQuestion() {
-        // TODO
         ((QuestionResponseActivity) requireActivity()).skipQuestion();
     }
 
     private void save() {
         if (isValidResponse()) {
             responseOpenQuestion_TIL_answer.setError(null);
-            // TODO: save to firebase + update question order
+            if(response == null) {
+                response = new Response()
+                        .setResponseID(UUID.randomUUID().toString())
+                        .setSurveyID(question.getSurveyID())
+                        .setQuestionID(question.getQuestionID())
+                        .addResponse(responseOpenQuestion_TXT_answer.getText().toString());
+            }
+            else {
+                response.getResponseValues().clear();
+                response.addResponse(responseOpenQuestion_TXT_answer.getText().toString());
+            }
+            ((QuestionResponseActivity)requireActivity()).saveResponse(response);
         }
         else{
             responseOpenQuestion_TIL_answer.setError(getString(R.string.error_required));

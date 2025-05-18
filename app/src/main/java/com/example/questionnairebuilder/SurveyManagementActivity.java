@@ -129,6 +129,7 @@ public class SurveyManagementActivity extends AppCompatActivity {
     private void setupEditClick() {
         management_LL_edit.setOnClickListener(v -> {
             Intent intent = new Intent(SurveyManagementActivity.this, QuestionsActivity.class);
+            intent.putExtra(QuestionsActivity.KEY_EDIT_MODE, true);
             intent.putExtra("surveyID",survey.getID());
             intent.putExtra("survey_title",survey.getSurveyTitle());
             startActivity(intent);

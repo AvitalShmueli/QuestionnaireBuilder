@@ -6,8 +6,11 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.questionnairebuilder.QuestionsActivity;
 import com.example.questionnairebuilder.adapters.QuestionsAdapter;
 import com.example.questionnairebuilder.models.Question;
+
+import java.util.ArrayList;
 
 public class ItemMoveCallback extends ItemTouchHelper.Callback {
 
@@ -52,6 +55,9 @@ public class ItemMoveCallback extends ItemTouchHelper.Callback {
     public void clearView(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder) {
         super.clearView(recyclerView, viewHolder);
 
+        if (!adapter.isReorderEnabled())
+            return;
+
         // Update the order field in each Question
         for (int i = 0; i < adapter.getItemCount(); i++) {
             Question q = adapter.getQuestionAt(i);
@@ -62,8 +68,8 @@ public class ItemMoveCallback extends ItemTouchHelper.Callback {
                 adapter.getQuestionsToUpdate().add(q);
             }
         }
-
-        Log.d("pttt","changed questions: "+adapter.getQuestionsToUpdate());
+        QuestionsActivity.cachedQuestionList = new ArrayList<>(adapter.getCurrentQuestions());
+        Log.d("pttt","changed questions: " + adapter.getQuestionsToUpdate());
     }
 
 }

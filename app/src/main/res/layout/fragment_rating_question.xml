@@ -154,19 +154,30 @@
             app:cornerRadius="20dp"
             android:textAllCaps="false"/>
 
-        <View
-            android:layout_width="0dp"
-            android:layout_height="8dp"/>
-
         <com.google.android.material.button.MaterialButton
             android:id="@+id/ratingQuestion_BTN_cancel"
             style="@style/Widget.Material3.Button.OutlinedButton"
             android:layout_width="match_parent"
             android:layout_height="0dp"
+            android:layout_marginTop="@dimen/input_vertical_margin"
             android:layout_weight="1"
             android:text="@string/cancel"
+            android:textSize="@dimen/button_text_size"
+            android:textStyle="bold"
+            app:strokeColor="?attr/colorPrimary"
+            app:strokeWidth="3dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/ratingQuestion_BTN_delete"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:layout_marginTop="@dimen/input_vertical_margin"
+            android:text="@string/delete"
             app:strokeWidth="3dp"
-            app:strokeColor="@color/blue"
+            android:textColor="@color/red"
+            app:strokeColor="@color/red"
             android:textSize="@dimen/button_text_size"
             android:textStyle="bold"/>
 

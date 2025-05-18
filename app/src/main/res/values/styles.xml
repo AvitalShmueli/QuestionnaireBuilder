@@ -14,6 +14,10 @@
         <item name="android:textSize">@dimen/toolbar_title_size</item>
     </style>
 
+    <style name="Custom.Widget.Toolbar.SubtitleStyle" parent="TextAppearance.Widget.AppCompat.Toolbar.Subtitle">
+        <item name="android:textSize">@dimen/toolbar_subtitle_size</item>
+    </style>
+
     <style name="Custom.Widget.Toolbar.MenuText" parent="TextAppearance.Widget.AppCompat.Toolbar.Title">
         <item name="textAllCaps">false</item>
         <item name="android:textSize">@dimen/toolbar_title_size</item>
@@ -25,15 +29,24 @@
         <item name="android:paddingRight">@dimen/toolbar_text_horizontal_padding</item>
     </style>
 
-    <!--style name="Custom.Widget.Toolbar.Button.Navigation" parent="Widget.AppCompat.Toolbar.Button.Navigation">
-        <item name="android:minWidth">48dp</item>
-    </style-->
-
     <!-- ShapeableImageView-->
     <style name="circleImageView" parent="">
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">50%</item>
     </style>
+
+    <!-- res/values/styles.xml -->
+    <style name="PillShapeFab" parent="Widget.MaterialComponents.ExtendedFloatingActionButton">
+        <item name="shapeAppearance">@style/PillShapeAppearance</item>
+        <item name="textAllCaps">false</item>
+        <item name="android:textColor">?attr/colorOnPrimary</item>
+    </style>
+
+    <style name="PillShapeAppearance" parent="ShapeAppearance.MaterialComponents.SmallComponent">
+        <item name="cornerSize">50%</item>
+
+    </style>
+
 
     <style name="CustomRatingBarHearts" parent="@android:style/Widget.RatingBar">
         <item name="android:progressDrawable">@drawable/custom_ratingbar_heart_selector</item>

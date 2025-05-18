@@ -25,7 +25,7 @@ import android.widget.Toast;
 import com.example.questionnairebuilder.QuestionResponseActivity;
 import com.example.questionnairebuilder.R;
 import com.example.questionnairebuilder.databinding.FragmentChoiceQuestionResponseBinding;
-import com.example.questionnairebuilder.interfaces.OnResponseCallback;
+import com.example.questionnairebuilder.interfaces.OneResponseCallback;
 import com.example.questionnairebuilder.models.ChoiceQuestion;
 import com.example.questionnairebuilder.models.MultipleChoiceQuestion;
 import com.example.questionnairebuilder.models.Question;
@@ -264,7 +264,7 @@ public class ChoiceQuestionResponseFragment extends Fragment {
 
     private void loadResponse(Question question) {
         String userID = AuthenticationManager.getInstance().getCurrentUser().getUid();
-        FirestoreManager.getInstance().getResponse(question.getSurveyID(), question.getQuestionID(), userID, new OnResponseCallback() {
+        FirestoreManager.getInstance().getResponse(question.getSurveyID(), question.getQuestionID(), userID, new OneResponseCallback() {
             @Override
             public void onResponseLoad(Response theResponse) {
                 if(theResponse != null) {

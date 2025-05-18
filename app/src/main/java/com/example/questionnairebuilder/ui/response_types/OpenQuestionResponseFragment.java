@@ -14,7 +14,7 @@ import android.view.ViewGroup;
 import com.example.questionnairebuilder.QuestionResponseActivity;
 import com.example.questionnairebuilder.R;
 import com.example.questionnairebuilder.databinding.FragmentOpenQuestionResponseBinding;
-import com.example.questionnairebuilder.interfaces.OnResponseCallback;
+import com.example.questionnairebuilder.interfaces.OneResponseCallback;
 import com.example.questionnairebuilder.models.OpenEndedQuestion;
 import com.example.questionnairebuilder.models.Question;
 import com.example.questionnairebuilder.models.Response;
@@ -123,7 +123,7 @@ public class OpenQuestionResponseFragment extends Fragment {
 
     private void loadResponse(Question question) {
         String userID = AuthenticationManager.getInstance().getCurrentUser().getUid();
-        FirestoreManager.getInstance().getResponse(question.getSurveyID(), question.getQuestionID(), userID, new OnResponseCallback() {
+        FirestoreManager.getInstance().getResponse(question.getSurveyID(), question.getQuestionID(), userID, new OneResponseCallback() {
             @Override
             public void onResponseLoad(Response theResponse) {
                 if(theResponse != null) {

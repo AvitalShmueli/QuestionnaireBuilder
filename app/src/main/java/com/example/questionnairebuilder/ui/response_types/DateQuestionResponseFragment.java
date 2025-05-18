@@ -17,7 +17,7 @@ import android.view.ViewGroup;
 
 import com.example.questionnairebuilder.QuestionResponseActivity;
 import com.example.questionnairebuilder.databinding.FragmentDateQuestionResponseBinding;
-import com.example.questionnairebuilder.interfaces.OnResponseCallback;
+import com.example.questionnairebuilder.interfaces.OneResponseCallback;
 import com.example.questionnairebuilder.models.DateQuestion;
 import com.example.questionnairebuilder.models.DateSelectionModeEnum;
 import com.example.questionnairebuilder.models.Question;
@@ -129,7 +129,7 @@ public class DateQuestionResponseFragment extends Fragment {
 
     private void loadResponse(Question question) {
         String userID = AuthenticationManager.getInstance().getCurrentUser().getUid();
-        FirestoreManager.getInstance().getResponse(question.getSurveyID(), question.getQuestionID(), userID, new OnResponseCallback() {
+        FirestoreManager.getInstance().getResponse(question.getSurveyID(), question.getQuestionID(), userID, new OneResponseCallback() {
             @Override
             public void onResponseLoad(Response theResponse) {
                 if(theResponse != null) {

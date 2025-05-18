@@ -15,6 +15,7 @@ import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 
 import androidx.activity.OnBackPressedCallback;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -22,9 +23,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.questionnairebuilder.adapters.QuestionsAdapter;
 import com.example.questionnairebuilder.databinding.ActivityQuestionsBinding;
-import com.example.questionnairebuilder.interfaces.Callback_questionSelected;
 import com.example.questionnairebuilder.interfaces.ItemMoveCallback;
 import com.example.questionnairebuilder.interfaces.QuestionsCallback;
+import com.example.questionnairebuilder.interfaces.ResponsesCallback;
 import com.example.questionnairebuilder.models.ChoiceQuestion;
 import com.example.questionnairebuilder.models.DateQuestion;
 import com.example.questionnairebuilder.models.MultipleChoiceQuestion;
@@ -33,9 +34,11 @@ import com.example.questionnairebuilder.models.Question;
 import com.example.questionnairebuilder.models.QuestionTypeEnum;
 import com.example.questionnairebuilder.models.QuestionTypeManager;
 import com.example.questionnairebuilder.models.RatingScaleQuestion;
+import com.example.questionnairebuilder.utilities.AuthenticationManager;
 import com.example.questionnairebuilder.utilities.FirestoreManager;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.firestore.ListenerRegistration;
 
@@ -43,6 +46,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 public class QuestionsActivity extends AppCompatActivity {
@@ -56,14 +60,16 @@ public class QuestionsActivity extends AppCompatActivity {
     private Map<QuestionTypeEnum, String> menu;
     private RecyclerView recyclerView;
     private MaterialButton questions_BTN_skip;
+    private ExtendedFloatingActionButton questions_FAB_start;
     private String surveyID;
     private String surveyTitle;
 
-    private QuestionsAdapter questionAdapter;
-    private List<Question> questionList = new ArrayList<>();
+    private QuestionsAdapter questionsAdapter;
+    private List<Question> questionsList = new ArrayList<>();
     private ListenerRegistration questionsListener;
     private boolean canEdit;
-
+    private int answeredCount = 0;
+    private int totalCount = 0;
     public static List<Question> cachedQuestionList = null;
 
 
@@ -93,6 +99,7 @@ public class QuestionsActivity extends AppCompatActivity {
         question_FAB_add = binding.questionFABAdd;
         question_FAB_add_bottom = binding.questionFABAddBottom;
         questions_BTN_skip = binding.questionsBTNSkip;
+        questions_FAB_start = binding.questionsFABStart;
         recyclerView = binding.recyclerView;
     }
 
@@ -100,7 +107,7 @@ public class QuestionsActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.toolbar_menu_done, menu);
         MenuItem doneMenuItem = menu.findItem(R.id.action_done);
-        questionAdapter.setReorderEnabled(canEdit);
+        questionsAdapter.setReorderEnabled(canEdit);
         doneMenuItem.setVisible(canEdit);
         return true;
     }
@@ -108,8 +115,8 @@ public class QuestionsActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.action_done) {
-            if(questionAdapter.hasUnsavedChanges()) {
-                Set<Question> changedQuestions = questionAdapter.getQuestionsToUpdate();
+            if(questionsAdapter.hasUnsavedChanges()) {
+                Set<Question> changedQuestions = questionsAdapter.getQuestionsToUpdate();
                 saveToDatabase(changedQuestions);
                 changedQuestions.clear(); // Reset for future edits
                 cachedQuestionList = null;
@@ -142,16 +149,26 @@ public class QuestionsActivity extends AppCompatActivity {
 
         // Setup RecyclerView
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        questionAdapter = new QuestionsAdapter(questionList);
-        questionAdapter.setCallbackQuestionSelected(new Callback_questionSelected() {
+        questionsAdapter = new QuestionsAdapter(questionsList);
+        questionsAdapter.setCallbackQuestionSelected(question -> {
+            if(canEdit)
+                changeActivityEditQuestion(question);
+            else changeActivityResponse(question);
+        });
+        recyclerView.setAdapter(questionsAdapter);
+
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
-            public void select(Question question) {
-                if(canEdit)
-                    changeActivityEditQuestion(question);
-                else changeActivityResponse(question);
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                if (dy > 10 && questions_FAB_start.isExtended()) {
+                    questions_FAB_start.shrink();
+                } else if (dy < -10 && !questions_FAB_start.isExtended()) {
+                    questions_FAB_start.extend();
+                }
             }
         });
-        recyclerView.setAdapter(questionAdapter);
+
 
         // Setup Add Question button
         question_FAB_add.setOnClickListener(this::showQuestionTypeMenu);
@@ -167,17 +184,25 @@ public class QuestionsActivity extends AppCompatActivity {
         });
 
         if (canEdit) {
-            ItemTouchHelper touchHelper = new ItemTouchHelper(new ItemMoveCallback(questionAdapter));
+            ItemTouchHelper touchHelper = new ItemTouchHelper(new ItemMoveCallback(questionsAdapter));
             touchHelper.attachToRecyclerView(recyclerView);
 
-            questionAdapter.setOnStartDragListener(viewHolder -> {
+            questionsAdapter.setOnStartDragListener(viewHolder -> {
                 touchHelper.startDrag(viewHolder);
+            });
+        }
+        else{
+            questions_FAB_start.setOnClickListener(v -> {
+                Question nextQuestion = questionsAdapter.findFirstUnansweredQuestion();
+                if (nextQuestion != null) {
+                    changeActivityResponse(nextQuestion); // you already have this method
+                }
             });
         }
     }
 
     private void onBack() {
-        if(questionAdapter.getQuestionsToUpdate().isEmpty())
+        if(questionsAdapter.getQuestionsToUpdate().isEmpty())
             finish();
         else showCancelConfirmationDialog();
     }
@@ -209,7 +234,7 @@ public class QuestionsActivity extends AppCompatActivity {
         Bundle args = new Bundle();
         args.putString("questionType", type.toString());
         args.putString("surveyID", surveyID);
-        args.putInt("order", questionAdapter.getItemCount() + 1);
+        args.putInt("order", questionsAdapter.getItemCount() + 1);
         intent.putExtra(EditQuestionActivity.KEY_QUESTION_ARGS,args);
         startActivity(intent);
     }
@@ -284,6 +309,8 @@ public class QuestionsActivity extends AppCompatActivity {
         else {
             startListeningForQuestions();
         }
+        if(!canEdit)
+            fetchUserResponses();
     }
 
     @Override
@@ -305,16 +332,18 @@ public class QuestionsActivity extends AppCompatActivity {
                 //questionList = questions;
                 //questionAdapter.updateQuestions(questionList);
                 if (cachedQuestionList != null) {
-                    questionList = cachedQuestionList;
+                    questionsList = cachedQuestionList;
                 } else {
-                    questionList = questions;
+                    questionsList = questions;
                 }
-                questionAdapter.updateQuestions(questionList);
+                questionsAdapter.updateQuestions(questionsList);
+                totalCount = questionsAdapter.getItemCount();
                 int editVisibility = canEdit ? VISIBLE : GONE;
-                if (questionList.isEmpty()) {
+                if (questionsList.isEmpty()) {
                     questions_BTN_skip.setVisibility(editVisibility);
                     question_LL_add_first_question.setVisibility(editVisibility);
                     question_FAB_add_bottom.setVisibility(GONE);
+                    questions_FAB_start.setVisibility(GONE);
                 } else {
                     questions_BTN_skip.setVisibility(GONE);
                     question_LL_add_first_question.setVisibility(GONE);
@@ -349,33 +378,7 @@ public class QuestionsActivity extends AppCompatActivity {
                 .show();
     }
 
-    private void mergeLocalAndRemoteQuestions(List<Question> remoteQuestions) {
-        Map<String, Question> localMap = new HashMap<>();
-        for (Question q : cachedQuestionList) {
-            localMap.put(q.getQuestionID(), q);
-        }
-
-        for (Question q : remoteQuestions) {
-            // If the question is new (not in local list), add it
-            if (!localMap.containsKey(q.getQuestionID())) {
-                cachedQuestionList.add(q);
-            } else {
-                // If the title (or other fields) changed in Firestore, update it
-                Question local = localMap.get(q.getQuestionID());
-                local.setQuestionTitle(q.getQuestionTitle());
-                local.setImage(q.getImage());
-                local.setMandatory(q.isMandatory());
-                // Optionally update other fields — but preserve local `order`
-            }
-        }
-
-        // Reapply visual list
-        questionList = cachedQuestionList;
-        questionAdapter.updateQuestions(questionList);
-    }
-
     /**
-     * TODO: check this - after handling deletion of a question
      * merge between new questions, updated questions and deleted questions
      * @param remoteQuestions - fetched question from Firestore
      */
@@ -391,14 +394,13 @@ public class QuestionsActivity extends AppCompatActivity {
             Question remote = remoteMap.get(local.getQuestionID());
 
             if (remote != null) {
-                // Question still exists — update its fields (but preserve order)
+                // Question still exists — update its fields and preserve order
                 local.setQuestionTitle(remote.getQuestionTitle());
                 local.setImage(remote.getImage());
                 local.setMandatory(remote.isMandatory());
-                // Add to updated list
                 updatedList.add(local);
             }
-            // else → deleted question, do NOT add it to updatedList
+            // else - deleted question, do NOT add it to updatedList
         }
 
         // Add new questions (in Firestore but not in local)
@@ -411,14 +413,43 @@ public class QuestionsActivity extends AppCompatActivity {
                 }
             }
             if (!found) {
-                // Assign order if needed (at end of list)
+                // Assign order at end of list
                 remote.setOrder(updatedList.size() + 1);
                 updatedList.add(remote);
             }
         }
 
         cachedQuestionList = updatedList;
-        questionList = updatedList;
-        questionAdapter.updateQuestions(updatedList);
+        questionsList = updatedList;
+        questionsAdapter.updateQuestions(updatedList);
+        totalCount = questionsAdapter.getItemCount();
+    }
+
+    private void fetchUserResponses() {
+        String userId = AuthenticationManager.getInstance().getCurrentUser().getUid();
+        FirestoreManager.getInstance().getUserResponsesForSurvey(surveyID, userId, new ResponsesCallback() {
+            @Override
+            public void onResponsesLoaded(Set<String> answeredQuestionIds) {
+                answeredCount = answeredQuestionIds.size();
+                String questionsProgress = getString(R.string.survey_responses_subtitle, Objects.requireNonNullElse(answeredCount,0), Objects.requireNonNullElse(totalCount,0));
+                runOnUiThread(() -> {
+                    questionsAdapter.setAnsweredQuestionIds(answeredQuestionIds);
+                    toolbar.setSubtitle(questionsProgress);
+                    if (answeredCount == 0) {
+                        questions_FAB_start.setText(getString(R.string.start_survey));
+                        questions_FAB_start.setIconResource(R.drawable.ic_start);
+                    } else {
+                        questions_FAB_start.setText(getString(R.string.continue_survey));
+                        questions_FAB_start.setIconResource(R.drawable.ic_resume);
+                    }
+                    questions_FAB_start.setVisibility(questionsList.isEmpty() || answeredCount == totalCount ? GONE : VISIBLE);
+                });
+            }
+
+            @Override
+            public void onError(Exception e) {
+                Log.e("QuestionsActivity", "Failed to load user responses", e);
+            }
+        });
     }
 }

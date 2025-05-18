@@ -97,4 +97,7 @@
     <string name="discard_reordering_msg">You’ve changed the order of your questions, but haven’t saved it.\nLeaving now will keep any edits or deletions, but discard the new order.</string>
     <string name="delete_question_title">Delete question</string>
     <string name="delete_question_msg">Are you sure you want to delete this question?\nPlease note that this is an irreversible action.</string>
+    <string name="start_survey">Start Survey</string>
+    <string name="continue_survey">Continue Survey</string>
+    <string name="survey_responses_subtitle">%1$d of %2$d answered</string>
 </resources>

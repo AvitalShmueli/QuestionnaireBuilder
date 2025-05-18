@@ -7,10 +7,11 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.example.questionnairebuilder.interfaces.OnQuestionDeleteCallback;
-import com.example.questionnairebuilder.interfaces.OnResponseCallback;
+import com.example.questionnairebuilder.interfaces.OneResponseCallback;
 import com.example.questionnairebuilder.interfaces.OneQuestionCallback;
 import com.example.questionnairebuilder.interfaces.OneSurveyCallback;
 import com.example.questionnairebuilder.interfaces.QuestionsCallback;
+import com.example.questionnairebuilder.interfaces.ResponsesCallback;
 import com.example.questionnairebuilder.interfaces.SurveysCallback;
 import com.example.questionnairebuilder.listeners.OnImageUploadListener;
 import com.example.questionnairebuilder.listeners.OnUserFetchListener;
@@ -40,9 +41,11 @@ import com.google.firebase.firestore.WriteBatch;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
+import java.util.HashSet;
 import java.util.List;
 
 import java.util.ArrayList;
+import java.util.Set;
 
 public class FirestoreManager {
     private static FirestoreManager instance;
@@ -223,7 +226,6 @@ public class FirestoreManager {
                 });
     }
 
-
     private Question mapToQuestion(DocumentSnapshot document) {
         String typeString = document.getString("type");
         QuestionTypeEnum type = QuestionTypeEnum.valueOf(typeString);
@@ -324,7 +326,6 @@ public class FirestoreManager {
                 .addOnFailureListener(e -> Log.e("pttt", "Failed to load questions for reordering: " + e.getMessage()));
     }
 
-
     public void uploadUserProfileImage(String uid, Uri imageUri, OnImageUploadListener listener) {
         StorageReference storageRef = FirebaseStorage.getInstance().getReference("ProfileImages").child(uid + ".jpg");
         storageRef.putFile(imageUri)
@@ -356,7 +357,7 @@ public class FirestoreManager {
         responsesRef.document(response.getResponseID()).set(response);
     }
 
-    public void getResponse(String surveyID, String questionID, String userID, OnResponseCallback callback) {
+    public void getResponse(String surveyID, String questionID, String userID, OneResponseCallback callback) {
         responsesRef.whereEqualTo("surveyID", surveyID)
                 .whereEqualTo("questionID", questionID)
                 .whereEqualTo("userID", userID)
@@ -381,4 +382,20 @@ public class FirestoreManager {
                 });
     }
 
+    public void getUserResponsesForSurvey(String surveyId, String userId, ResponsesCallback callback) {
+        responsesRef.whereEqualTo("surveyID", surveyId)
+                .whereEqualTo("userID", userId)
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    Set<String> answeredQuestionIds = new HashSet<>();
+                    for (DocumentSnapshot doc : queryDocumentSnapshots) {
+                        String questionID = doc.getString("questionID");
+                        if (questionID != null) {
+                            answeredQuestionIds.add(questionID);
+                        }
+                    }
+                    callback.onResponsesLoaded(answeredQuestionIds);
+                })
+                .addOnFailureListener(callback::onError);
+    }
 }

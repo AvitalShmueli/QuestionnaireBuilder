@@ -32,6 +32,7 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.Filter;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.ListenerRegistration;
@@ -95,6 +96,54 @@ public class FirestoreManager {
                 callback.onSurveysLoaded(surveyList);
             }
         });
+    }
+
+    public ListenerRegistration listenToMyActiveSurveys(String currentUserId, SurveysCallback callback) {
+        /*return surveysRef.whereEqualTo("author.uid", currentUserId)
+                .whereNotEqualTo("status","Close")
+                .orderBy("created")
+                .addSnapshotListener((value, error) -> {
+                    if (error != null) {
+                        callback.onError(error);
+                        return;
+                    }
+
+                    if (value != null) {
+                        List<Survey> surveyList = new ArrayList<>();
+                        for (DocumentSnapshot document : value.getDocuments()) {
+                            Survey survey = document.toObject(Survey.class);
+                            if (survey != null) {
+                                survey.setID(document.getId());
+                                surveyList.add(survey);
+                            }
+                        }
+                        callback.onSurveysLoaded(surveyList);
+                    }
+                });*/
+
+        return surveysRef.whereEqualTo("author.uid", currentUserId)
+                .where(Filter.or(
+                        Filter.equalTo("status","Draft"),
+                        Filter.equalTo("status","Published")
+                ))
+                .addSnapshotListener((value, error) -> {
+                    if (error != null) {
+                        callback.onError(error);
+                        return;
+                    }
+
+                    if (value != null) {
+                        List<Survey> surveyList = new ArrayList<>();
+                        for (DocumentSnapshot document : value.getDocuments()) {
+                            Survey survey = document.toObject(Survey.class);
+                            if (survey != null) {
+                                survey.setID(document.getId());
+                                surveyList.add(survey);
+                            }
+                        }
+                        callback.onSurveysLoaded(surveyList);
+                    }
+                });
     }
 
     public ListenerRegistration listenToMySurveys(String currentUserId, SurveysCallback callback) {

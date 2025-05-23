@@ -56,7 +56,7 @@ public class QuestionsActivity extends AppCompatActivity {
     private MaterialToolbar toolbar;
     private LinearLayout question_LL_add_first_question;
     private FloatingActionButton question_FAB_add;
-    private FloatingActionButton question_FAB_add_bottom;
+    private ExtendedFloatingActionButton question_FAB_add_bottom;
     private Map<QuestionTypeEnum, String> menu;
     private RecyclerView recyclerView;
     private MaterialButton questions_BTN_skip;
@@ -121,9 +121,9 @@ public class QuestionsActivity extends AppCompatActivity {
                 changedQuestions.clear(); // Reset for future edits
                 cachedQuestionList = null;
                 FirestoreManager.getInstance().fixQuestionOrder(surveyID);
-                finish();
-                return true;
             }
+            finish();
+            return true;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -160,11 +160,21 @@ public class QuestionsActivity extends AppCompatActivity {
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
-                if (dy > 10 && questions_FAB_start.isExtended()) {
-                    questions_FAB_start.shrink();
-                } else if (dy < -10 && !questions_FAB_start.isExtended()) {
-                    questions_FAB_start.extend();
+                if(questions_FAB_start.getVisibility() == VISIBLE) {
+                    super.onScrolled(recyclerView, dx, dy);
+                    if (dy > 10 && questions_FAB_start.isExtended()) {
+                        questions_FAB_start.shrink();
+                    } else if (dy < -10 && !questions_FAB_start.isExtended()) {
+                        questions_FAB_start.extend();
+                    }
+                }
+
+                if(question_FAB_add_bottom.getVisibility() == VISIBLE) {
+                    if (dy > 10 && question_FAB_add_bottom.isExtended()) {
+                        question_FAB_add_bottom.shrink();
+                    } else if (dy < -10 && !question_FAB_add_bottom.isExtended()) {
+                        question_FAB_add_bottom.extend();
+                    }
                 }
             }
         });

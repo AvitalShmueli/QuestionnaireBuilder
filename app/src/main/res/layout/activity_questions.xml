@@ -48,16 +48,30 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_marginEnd="@dimen/activity_horizontal_margin"
-        android:layout_marginBottom="32dp"
+        android:layout_marginBottom="@dimen/extended_fab_vertical_margin"
         android:backgroundTint="?attr/colorPrimary"
         android:elevation="@dimen/fab_elevation"
+        android:scaleType="center"
         android:text="@string/start_survey"
         android:textSize="@dimen/button_text_size"
         android:visibility="gone"
         app:icon="@drawable/ic_start"
+        app:iconTint="?attr/colorOnPrimary" />
+
+    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+        android:id="@+id/question_FAB_add_bottom"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_marginEnd="@dimen/activity_horizontal_margin"
+        android:layout_marginBottom="@dimen/extended_fab_vertical_margin"
+        android:backgroundTint="?attr/colorPrimary"
+        android:elevation="@dimen/fab_elevation"
         android:scaleType="center"
-        app:iconTint="?attr/colorOnPrimary"
-        app:strokeColor="@color/blue" />
+        android:text="@string/add_question"
+        android:visibility="gone"
+        app:icon="@drawable/add_24px"
+        app:iconTint="@android:color/white" />
 
     <LinearLayout
         android:id="@+id/question_LL_add_first_question"
@@ -108,19 +122,6 @@
         app:strokeColor="@color/blue"
         android:layout_marginBottom="36dp"
         app:strokeWidth="3dp"
-        android:visibility="gone"/>
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/question_FAB_add_bottom"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="20dp"
-        android:contentDescription="@string/add_question"
-        app:srcCompat="@drawable/add_24px"
-        app:backgroundTint="@color/blue"
-        app:maxImageSize="32dp"
-        app:tint="@android:color/white"
         android:visibility="gone"/>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

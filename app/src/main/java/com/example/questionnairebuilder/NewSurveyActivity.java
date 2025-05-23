@@ -14,6 +14,9 @@ import androidx.core.content.ContextCompat;
 import androidx.core.graphics.ColorUtils;
 
 import com.example.questionnairebuilder.models.Survey;
+import com.example.questionnairebuilder.models.User;
+import com.example.questionnairebuilder.utilities.AuthenticationManager;
+import com.example.questionnairebuilder.utilities.FirestoreManager;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.datepicker.MaterialDatePicker;
@@ -40,6 +43,7 @@ public class NewSurveyActivity extends AppCompatActivity {
     private TextInputEditText newSurvey_TXT_title;
     private TextInputEditText newSurvey_TXT_description;
     private String selectedTheme = null;
+    private User author;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,6 +65,16 @@ public class NewSurveyActivity extends AppCompatActivity {
     }
 
     private void initViews() {
+        FirestoreManager firebaseManager = FirestoreManager.getInstance();
+        AuthenticationManager authenticationManager = AuthenticationManager.getInstance();
+
+        if (authenticationManager.getCurrentUser() != null) {
+            String currentUserId = authenticationManager.getCurrentUser().getUid();
+            firebaseManager.getUserData(currentUserId, user -> {
+                author = user;
+            });
+        }
+
         myToolBar.setNavigationOnClickListener(v -> showCancelConfirmationDialog());
 
         newSurvey_BTN_continue.setOnClickListener(v -> {
@@ -84,7 +98,7 @@ public class NewSurveyActivity extends AppCompatActivity {
                         .setDescription(newSurvey_TXT_description.getText().toString().trim())
                         .setDueDate(dueDate)
                         .setStatus(Survey.SurveyStatus.Draft)
-                        .setAuthor(null)
+                        .setAuthor(author)
                         .setCreated(now)
                         .setModified(now)
                         .setTheme(getThemeEnumFromString(selectedTheme))
@@ -95,6 +109,7 @@ public class NewSurveyActivity extends AppCompatActivity {
 
                 Intent intent = new Intent(NewSurveyActivity.this, QuestionsActivity.class);
                 intent.putExtra("surveyID",survey.getID());
+                intent.putExtra(QuestionsActivity.KEY_EDIT_MODE, true);
                 startActivity(intent);
                 finish();
             }

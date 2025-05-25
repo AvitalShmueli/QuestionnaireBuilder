@@ -53,6 +53,6 @@
             android:layout_height="wrap_content"
             android:clipToPadding="false"
             android:padding="8dp"
-            tools:listitem="@layout/survey_item" />
+            tools:listitem="@layout/item_survey" />
     </RelativeLayout>
 </FrameLayout>

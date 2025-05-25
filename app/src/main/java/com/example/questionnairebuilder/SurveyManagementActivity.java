@@ -24,6 +24,7 @@ import java.util.Locale;
 public class SurveyManagementActivity extends AppCompatActivity {
     private MaterialToolbar toolbar;
     private LinearLayout management_LL_edit;
+    private LinearLayout management_LL_analyze;
     private MaterialTextView management_LBL_isOpen;
     private MaterialSwitch management_SW_isOpen;
     private MaterialTextView management_LBL_totalResponses;
@@ -112,17 +113,26 @@ public class SurveyManagementActivity extends AppCompatActivity {
         toolbar.setNavigationOnClickListener(v -> getOnBackPressedDispatcher().onBackPressed());
         initIsOpenSwitch();
         setupEditClick();
+        setupAnalyzeClick();
         initSpinner();
+    }
+
+    private void setupAnalyzeClick() {
+        management_LL_analyze.setOnClickListener(v -> {
+            Intent intent = new Intent(SurveyManagementActivity.this, AnalyzeResponsesActivity.class);
+            intent.putExtra("surveyID", survey.getID());
+            startActivity(intent);
+        });
     }
 
     private void initSpinner() {
         String[] statuses = {getString(R.string.draft), getString(R.string.published), getString(R.string.close)};
         ArrayAdapter<String> statusAdapter = new ArrayAdapter<>(
                 this,
-                R.layout.spinner_item,
+                R.layout.item_spinner,
                 statuses
         );
-        statusAdapter.setDropDownViewResource(R.layout.spinner_item);
+        statusAdapter.setDropDownViewResource(R.layout.item_spinner);
         management_SP_status.setAdapter(statusAdapter);
     }
 
@@ -159,6 +169,7 @@ public class SurveyManagementActivity extends AppCompatActivity {
     private void findViews() {
         toolbar = findViewById(R.id.topAppBar);
         management_LL_edit = findViewById(R.id.management_LL_edit);
+        management_LL_analyze = findViewById(R.id.management_LL_analyze);
         management_LBL_isOpen = findViewById(R.id.management_LBL_isOpen);
         management_SW_isOpen = findViewById(R.id.management_SW_isOpen);
         management_LBL_totalResponses = findViewById(R.id.management_LBL_totalResponses);

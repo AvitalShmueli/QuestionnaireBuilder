@@ -239,7 +239,7 @@ public class ChoiceQuestionResponseFragment extends Fragment {
     }
 
     private void initDropdownValues(List<String> options) {
-        ArrayAdapter<String> adapterItems_dropdownOptions = new ArrayAdapter<>(requireActivity(), R.layout.dropdown_item, options);
+        ArrayAdapter<String> adapterItems_dropdownOptions = new ArrayAdapter<>(requireActivity(), R.layout.item_dropdown, options);
         if(!selectedChoices.isEmpty())
             responseChoiceQuestion_DD_dropdown.setText(selectedChoices.get(0));
         responseChoiceQuestion_DD_dropdown.setAdapter(adapterItems_dropdownOptions);

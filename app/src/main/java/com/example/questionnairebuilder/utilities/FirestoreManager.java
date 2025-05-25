@@ -99,9 +99,11 @@ public class FirestoreManager {
     }
 
     public ListenerRegistration listenToMyActiveSurveys(String currentUserId, SurveysCallback callback) {
-        /*return surveysRef.whereEqualTo("author.uid", currentUserId)
-                .whereNotEqualTo("status","Close")
-                .orderBy("created")
+        return surveysRef.whereEqualTo("author.uid", currentUserId)
+                .where(Filter.or(
+                        Filter.equalTo("status","Draft"),
+                        Filter.equalTo("status","Published")
+                )).orderBy("dueDate")
                 .addSnapshotListener((value, error) -> {
                     if (error != null) {
                         callback.onError(error);
@@ -119,13 +121,14 @@ public class FirestoreManager {
                         }
                         callback.onSurveysLoaded(surveyList);
                     }
-                });*/
+                });
+    }
 
-        return surveysRef.whereEqualTo("author.uid", currentUserId)
-                .where(Filter.or(
+    public ListenerRegistration listenToAllActiveSurveys(SurveysCallback callback) {
+        return surveysRef.where(Filter.or(
                         Filter.equalTo("status","Draft"),
                         Filter.equalTo("status","Published")
-                ))
+                )).orderBy("dueDate")
                 .addSnapshotListener((value, error) -> {
                     if (error != null) {
                         callback.onError(error);
@@ -148,6 +151,7 @@ public class FirestoreManager {
 
     public ListenerRegistration listenToMySurveys(String currentUserId, SurveysCallback callback) {
         return surveysRef.whereEqualTo("author.uid", currentUserId)
+                .orderBy("dueDate")
                 .addSnapshotListener((value, error) -> {
                     if (error != null) {
                         callback.onError(error);
@@ -202,37 +206,6 @@ public class FirestoreManager {
                     if (value != null) {
                         List<Question> questionList = new ArrayList<>();
                         for (DocumentSnapshot document : value.getDocuments()) {
-                            /*
-                            String typeString = document.getString("type");
-                            QuestionTypeEnum type = QuestionTypeEnum.valueOf(typeString);
-                            Question question = null;
-                            switch (type) {
-                                case OPEN_ENDED_QUESTION:
-                                    question = document.toObject(OpenEndedQuestion.class);
-                                    break;
-                                case SINGLE_CHOICE:
-                                case YES_NO:
-                                case DROPDOWN:
-                                    question = document.toObject(SingleChoiceQuestion.class);
-                                    break;
-                                case MULTIPLE_CHOICE:
-                                    question = document.toObject(MultipleChoiceQuestion.class);
-                                    break;
-                                case DATE:
-                                    question = document.toObject(DateQuestion.class);
-                                    break;
-                                case RATING_SCALE:
-                                    question = document.toObject(RatingScaleQuestion.class);
-                                    break;
-                            }
-                            if (question != null) {
-                                question.setQuestionID(document.getId());
-                                Boolean mandatory = document.getBoolean("mandatory");
-                                if (mandatory != null) {
-                                    question.setMandatory(mandatory);
-                                }
-                                questionList.add(question);
-                            }*/
                             Question question = mapToQuestion(document);
                             if (question != null) {
                                 questionList.add(question);
@@ -319,7 +292,7 @@ public class FirestoreManager {
         questionsRef.document(questionId).get()
                 .addOnSuccessListener(documentSnapshot -> {
                     if (documentSnapshot.exists()) {
-                        String typeString = documentSnapshot.getString("type");
+                        /*String typeString = documentSnapshot.getString("type");
                         QuestionTypeEnum type = QuestionTypeEnum.valueOf(typeString);
                         Question question = null;
                         switch (type) {
@@ -340,7 +313,8 @@ public class FirestoreManager {
                             case RATING_SCALE:
                                 question = documentSnapshot.toObject(RatingScaleQuestion.class);
                                 break;
-                        }
+                        }*/
+                        Question question = mapToQuestion(documentSnapshot);
                         if (question != null) {
                             question.setQuestionID(documentSnapshot.getId()); // set ID manually
                             callback.onQuestionLoaded(question);

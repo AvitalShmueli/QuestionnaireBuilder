@@ -1,13 +1,17 @@
 package com.example.questionnairebuilder;
 
+import static android.content.ContentValues.TAG;
+
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
 import com.example.questionnairebuilder.databinding.ActivityQuestionResponseBinding;
+import com.example.questionnairebuilder.interfaces.QuestionsCallback;
 import com.example.questionnairebuilder.interfaces.UnsavedChangesHandler;
 import com.example.questionnairebuilder.models.ChoiceQuestion;
 import com.example.questionnairebuilder.models.DateQuestion;
@@ -18,12 +22,14 @@ import com.example.questionnairebuilder.models.Question;
 import com.example.questionnairebuilder.models.QuestionTypeEnum;
 import com.example.questionnairebuilder.models.QuestionTypeManager;
 import com.example.questionnairebuilder.models.RatingScaleQuestion;
+import com.example.questionnairebuilder.models.Response;
 import com.example.questionnairebuilder.models.SingleChoiceQuestion;
-import com.example.questionnairebuilder.models.Survey;
 import com.example.questionnairebuilder.ui.response_types.ChoiceQuestionResponseFragment;
 import com.example.questionnairebuilder.ui.response_types.DateQuestionResponseFragment;
 import com.example.questionnairebuilder.ui.response_types.OpenQuestionResponseFragment;
 import com.example.questionnairebuilder.ui.response_types.RatingQuestionResponseFragment;
+import com.example.questionnairebuilder.utilities.AuthenticationManager;
+import com.example.questionnairebuilder.utilities.FirestoreManager;
 import com.google.android.material.appbar.MaterialToolbar;
 
 import java.util.ArrayList;
@@ -32,6 +38,7 @@ import java.util.List;
 public class QuestionResponseActivity extends AppCompatActivity {
     public static final String KEY_QUESTION_HEADER = "KEY_QUESTION_HEADER";
     public static final String KEY_QUESTION_ARGS = "KEY_QUESTION_ARGS";
+
     private ActivityQuestionResponseBinding binding;
 
     private OpenQuestionResponseFragment openQuestionResponseFragment;
@@ -90,7 +97,6 @@ public class QuestionResponseActivity extends AppCompatActivity {
                 getSupportActionBar().setTitle(title);
         }
     }
-
 
     private void loadQuestionFragment(QuestionTypeEnum selectedType, Bundle args){
         switch (selectedType) {
@@ -154,19 +160,31 @@ public class QuestionResponseActivity extends AppCompatActivity {
 
 
     public void skipQuestion(){
-        Survey s = new Survey(); // TODO : get survey from FirebaseManger based on surveyID
-        s.setQuestions(questionListDemo());
-        List<Question> questionList = s.getQuestions();
+        FirestoreManager.getInstance().listenToSurveyQuestions(surveyID, new QuestionsCallback() {
+            @Override
+            public void onQuestionsLoaded(List<Question> questions) {
+                if (currentQuestionOrder < questions.size() - 1) {
+                    Question q = questions.get(currentQuestionOrder++);
+                    String questionOrder = "Q" + currentQuestionOrder;
+                    setTitle(questionOrder);
+                    loadQuestionFragment(q.getType(),createQuestionArgsBundle(q));
+                } else {
+                    finish(); // or show a "done" screen
+                }
+            }
 
-        if (currentQuestionOrder < questionList.size() - 1) {
-            Question q = questionList.get(currentQuestionOrder++);
-            String questionOrder = "Q" + currentQuestionOrder;
-            setTitle(questionOrder);
-            loadQuestionFragment(q.getType(),createQuestionArgsBundle(q));
-        } else {
-            finish(); // or show a "done" screen
-        }
+            @Override
+            public void onError(Exception e) {
+                Log.e(TAG,e.getMessage());
+            }
+        });
+    }
 
+    public void saveResponse(Response response){
+        String userID = AuthenticationManager.getInstance().getCurrentUser().getUid();
+        response.setUserID(userID);
+        response.save();
+        skipQuestion();
     }
 
     private Bundle createQuestionArgsBundle(Question q){
@@ -190,7 +208,7 @@ public class QuestionResponseActivity extends AppCompatActivity {
             args.putInt("ratingScaleLevel", ((RatingScaleQuestion) q).getRatingScaleLevel());
             args.putInt("iconResourceId", ((RatingScaleQuestion) q).getIconResourceId());
         }
-       return args;
+        return args;
     }
 
     // TODO: remove

@@ -1,5 +1,8 @@
 package com.example.questionnairebuilder.ui.question_types;
 
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
+
 import android.os.Bundle;
 
 import androidx.activity.OnBackPressedCallback;
@@ -16,6 +19,7 @@ import com.example.questionnairebuilder.EditQuestionActivity;
 import com.example.questionnairebuilder.R;
 import com.example.questionnairebuilder.adapters.IconsAdapter;
 import com.example.questionnairebuilder.databinding.FragmentRatingQuestionBinding;
+import com.example.questionnairebuilder.interfaces.SaveHandler;
 import com.example.questionnairebuilder.interfaces.UnsavedChangesHandler;
 import com.example.questionnairebuilder.models.IconItem;
 import com.example.questionnairebuilder.models.RatingScaleQuestion;
@@ -29,7 +33,7 @@ import java.util.ArrayList;
 import java.util.UUID;
 
 
-public class RatingQuestionFragment extends Fragment implements UnsavedChangesHandler {
+public class RatingQuestionFragment extends Fragment implements UnsavedChangesHandler, SaveHandler {
 
     private FragmentRatingQuestionBinding binding;
     private TextInputLayout ratingQuestion_TIL_question;
@@ -37,6 +41,7 @@ public class RatingQuestionFragment extends Fragment implements UnsavedChangesHa
     private MaterialSwitch ratingQuestion_SW_mandatory;
     private MaterialButton ratingQuestion_BTN_save;
     private MaterialButton ratingQuestion_BTN_cancel;
+    private MaterialButton ratingQuestion_BTN_delete;
     private AutoCompleteTextView ratingQuestion_DD_RatingScaleLevel;
     private AutoCompleteTextView ratingQuestion_DD_RatingScaleIcon;
     private ShapeableImageView ratingQuestion_IMG_selectedIcon;
@@ -112,6 +117,7 @@ public class RatingQuestionFragment extends Fragment implements UnsavedChangesHa
     private void createBinding() {
         ratingQuestion_BTN_save = binding.ratingQuestionBTNSave;
         ratingQuestion_BTN_cancel = binding.ratingQuestionBTNCancel;
+        ratingQuestion_BTN_delete = binding.ratingQuestionBTNDelete;
         ratingQuestion_TIL_question = binding.ratingQuestionTILQuestion;
         ratingQuestion_TXT_question = binding.ratingQuestionTXTQuestion;
         ratingQuestion_SW_mandatory = binding.ratingQuestionSWMandatory;
@@ -125,6 +131,11 @@ public class RatingQuestionFragment extends Fragment implements UnsavedChangesHa
         initIconsDropDownValues(); // Rating Scale Level dropdown
         ratingQuestion_BTN_cancel.setOnClickListener(v -> cancel());
         ratingQuestion_BTN_save.setOnClickListener(v -> save());
+        if(question != null) {
+            ratingQuestion_BTN_delete.setVisibility(VISIBLE);
+            ratingQuestion_BTN_delete.setOnClickListener(v -> delete());
+        }
+        else  ratingQuestion_BTN_delete.setVisibility(GONE);
     }
 
     private void initDropDownValues() {
@@ -217,9 +228,38 @@ public class RatingQuestionFragment extends Fragment implements UnsavedChangesHa
             requireActivity().finish();
     }
 
+    private void delete(){
+        ((EditQuestionActivity) requireActivity()).showDeleteConfirmationDialog(question);
+    }
+
     @Override
     public boolean hasUnsavedChanges() {
-        return ratingQuestion_TXT_question.getText() != null &&
-                !ratingQuestion_TXT_question.getText().toString().trim().isEmpty();
+        // TODO: compare to stored question
+        /*return ratingQuestion_TXT_question.getText() != null &&
+                !ratingQuestion_TXT_question.getText().toString().trim().isEmpty();*/
+
+        String currentText = ratingQuestion_TXT_question.getText() != null
+                ? ratingQuestion_TXT_question.getText().toString().trim()
+                : "";
+        boolean currentMandatory = ratingQuestion_SW_mandatory.isChecked();
+        Integer currentRatingScaleLevel = selectedRatingScaleLevel;
+        Integer currentIconResourceId = selectedRatingScaleIcon;
+
+        String originalText = question != null ? question.getQuestionTitle() : "";
+        boolean originalMandatory = question != null && question.isMandatory();
+        Integer originalRatingScaleLevel = question != null ? question.getRatingScaleLevel() : null;
+        Integer originalIconResourceId = question != null ? question.getIconResourceId() : null;
+
+        boolean textChanged = !currentText.equals(originalText);
+        boolean mandatoryChanged = currentMandatory != originalMandatory;
+        boolean ratingScaleLevelChanged = !currentRatingScaleLevel.equals(originalRatingScaleLevel);
+        boolean iconResourceIdChanged = !currentIconResourceId.equals(originalIconResourceId);
+
+        return textChanged || mandatoryChanged || ratingScaleLevelChanged || iconResourceIdChanged;
+    }
+
+    @Override
+    public void onSaveClicked() {
+        save();
     }
 }

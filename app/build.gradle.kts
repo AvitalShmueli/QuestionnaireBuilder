@@ -48,10 +48,12 @@ dependencies {
     implementation(libs.navigation.fragment)
     implementation(libs.navigation.ui)
     implementation(libs.legacy.support.v4)
+    implementation(libs.scenecore)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
     implementation(libs.hdodenhof.circleimageview)
+    implementation (libs.gson)
 
     // Firebase:
     implementation(platform(libs.firebase.bom)) // Import the Firebase BoM

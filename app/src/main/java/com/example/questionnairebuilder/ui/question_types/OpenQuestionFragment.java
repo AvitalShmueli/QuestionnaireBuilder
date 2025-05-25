@@ -1,5 +1,8 @@
 package com.example.questionnairebuilder.ui.question_types;
 
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
+
 import android.os.Bundle;
 
 import androidx.activity.OnBackPressedCallback;
@@ -13,6 +16,7 @@ import android.view.ViewGroup;
 import com.example.questionnairebuilder.EditQuestionActivity;
 import com.example.questionnairebuilder.R;
 import com.example.questionnairebuilder.databinding.FragmentOpenQuestionBinding;
+import com.example.questionnairebuilder.interfaces.SaveHandler;
 import com.example.questionnairebuilder.interfaces.UnsavedChangesHandler;
 import com.example.questionnairebuilder.models.OpenEndedQuestion;
 import com.example.questionnairebuilder.models.Question;
@@ -28,7 +32,7 @@ import java.util.UUID;
  * Use the {@link OpenQuestionFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class OpenQuestionFragment extends Fragment implements UnsavedChangesHandler {
+public class OpenQuestionFragment extends Fragment implements UnsavedChangesHandler, SaveHandler {
 
     private FragmentOpenQuestionBinding binding;
     private TextInputLayout openQuestion_TIL_question;
@@ -36,6 +40,7 @@ public class OpenQuestionFragment extends Fragment implements UnsavedChangesHand
     private MaterialSwitch openQuestion_SW_mandatory;
     private MaterialButton openQuestion_BTN_save;
     private MaterialButton openQuestion_BTN_cancel;
+    private MaterialButton openQuestion_BTN_delete;
     private String surveyID;
     private OpenEndedQuestion question;
     private int currentQuestionOrder;
@@ -104,6 +109,7 @@ public class OpenQuestionFragment extends Fragment implements UnsavedChangesHand
     private void createBinding() {
         openQuestion_BTN_save = binding.openQuestionBTNSave;
         openQuestion_BTN_cancel = binding.openQuestionBTNCancel;
+        openQuestion_BTN_delete = binding.openQuestionBTNDelete;
         openQuestion_TIL_question = binding.openQuestionTILQuestion;
         openQuestion_TXT_question = binding.openQuestionTXTQuestion;
         openQuestion_SW_mandatory = binding.openQuestionSWMandatory;
@@ -112,6 +118,11 @@ public class OpenQuestionFragment extends Fragment implements UnsavedChangesHand
     private void initView(){
         openQuestion_BTN_cancel.setOnClickListener(v -> cancel());
         openQuestion_BTN_save.setOnClickListener(v -> save());
+        if(question != null) {
+            openQuestion_BTN_delete.setVisibility(VISIBLE);
+            openQuestion_BTN_delete.setOnClickListener(v -> delete());
+        }
+        else  openQuestion_BTN_delete.setVisibility(GONE);
     }
 
     private void loadQuestionDetails(Question q){
@@ -162,9 +173,28 @@ public class OpenQuestionFragment extends Fragment implements UnsavedChangesHand
             requireActivity().finish();
     }
 
+    private void delete(){
+        ((EditQuestionActivity) requireActivity()).showDeleteConfirmationDialog(question);
+    }
+
     @Override
     public boolean hasUnsavedChanges() {
-        return openQuestion_TXT_question.getText() != null &&
-                !openQuestion_TXT_question.getText().toString().trim().isEmpty();
+        String currentText = openQuestion_TXT_question.getText() != null
+                ? openQuestion_TXT_question.getText().toString().trim()
+                : "";
+        boolean currentMandatory = openQuestion_SW_mandatory.isChecked();
+
+        String originalText = question != null ? question.getQuestionTitle() : "";
+        boolean originalMandatory = question != null && question.isMandatory();
+
+        boolean textChanged = !currentText.equals(originalText);
+        boolean mandatoryChanged = currentMandatory != originalMandatory;
+
+        return textChanged || mandatoryChanged;
+    }
+
+    @Override
+    public void onSaveClicked() {
+        save();
     }
 }

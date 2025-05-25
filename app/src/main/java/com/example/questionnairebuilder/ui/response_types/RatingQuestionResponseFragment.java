@@ -13,15 +13,20 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RatingBar;
-import android.widget.Toast;
 
 import com.example.questionnairebuilder.QuestionResponseActivity;
 import com.example.questionnairebuilder.R;
 import com.example.questionnairebuilder.databinding.FragmentRatingQuestionResponseBinding;
+import com.example.questionnairebuilder.interfaces.OneResponseCallback;
 import com.example.questionnairebuilder.models.Question;
 import com.example.questionnairebuilder.models.RatingScaleQuestion;
+import com.example.questionnairebuilder.models.Response;
+import com.example.questionnairebuilder.utilities.AuthenticationManager;
+import com.example.questionnairebuilder.utilities.FirestoreManager;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textview.MaterialTextView;
+
+import java.util.UUID;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -37,12 +42,12 @@ public class RatingQuestionResponseFragment extends Fragment {
     private MaterialButton responseRatingQuestion_BTN_save;
     private MaterialButton responseRatingQuestion_BTN_skip;
     private Question question;
+    private Response response;
     private float selectedRating = 0;
 
     public RatingQuestionResponseFragment() {
         // Required empty public constructor
     }
-
 
     /**
      * Use this factory method to create a new instance of
@@ -57,7 +62,6 @@ public class RatingQuestionResponseFragment extends Fragment {
         fragment.setArguments(questionArgs);
         return fragment;
     }
-
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -74,7 +78,6 @@ public class RatingQuestionResponseFragment extends Fragment {
         }
     }
 
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -82,10 +85,10 @@ public class RatingQuestionResponseFragment extends Fragment {
         View root = binding.getRoot();
 
         createBinding();
+        loadResponse(question);
 
         return root;
     }
-
 
     private void createBinding() {
         responseRatingQuestion_LBL_question = binding.responseRatingQuestionLBLQuestion;
@@ -116,16 +119,13 @@ public class RatingQuestionResponseFragment extends Fragment {
 
             customRatingBar.setNumStars(((RatingScaleQuestion)question).getRatingScaleLevel());
             customRatingBar.setStepSize(1);
-            customRatingBar.setRating(selectedRating);
 
             customRatingBar.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
                 @Override
                 public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
-                    Toast.makeText(requireContext(), "Rated: " + rating, Toast.LENGTH_SHORT).show();
                     selectedRating = rating;
                 }
             });
-
 
             // listeners
             responseRatingQuestion_BTN_save.setOnClickListener(v -> save());
@@ -133,22 +133,49 @@ public class RatingQuestionResponseFragment extends Fragment {
         }
     }
 
+    private void loadResponse(Question question) {
+        String userID = AuthenticationManager.getInstance().getCurrentUser().getUid();
+        FirestoreManager.getInstance().getResponse(question.getSurveyID(), question.getQuestionID(), userID, new OneResponseCallback() {
+            @Override
+            public void onResponseLoad(Response theResponse) {
+                if(theResponse != null) {
+                    response = theResponse;
+                    selectedRating = Float.parseFloat(response.getResponseValues().get(0));
+                    customRatingBar.setRating(selectedRating);
+                }
+            }
+
+            @Override
+            public void onResponseLoadFailure() {
+                response = null;
+            }
+        });
+    }
+
     private void switchRatingBarStyle(RatingBar ratingBar, int styleResId) {
         Drawable drawable = ContextCompat.getDrawable(requireContext(), styleResId);
         ratingBar.setProgressDrawableTiled(drawable);
     }
 
-
     private void skipQuestion() {
-        // TODO
         ((QuestionResponseActivity) requireActivity()).skipQuestion();
     }
-
 
     private void save() {
        if(isValidResponse()) {
            responseRatingQuestion_LBL_error.setVisibility(GONE);
-           // TODO: save to firebase + update question order
+           if(response == null) {
+               response = new Response()
+                       .setResponseID(UUID.randomUUID().toString())
+                       .setSurveyID(question.getSurveyID())
+                       .setQuestionID(question.getQuestionID())
+                       .addResponse(String.valueOf(selectedRating));
+           }
+           else {
+               response.getResponseValues().clear();
+               response.addResponse(String.valueOf(selectedRating));
+           }
+           ((QuestionResponseActivity)requireActivity()).saveResponse(response);
        }
        else
            responseRatingQuestion_LBL_error.setVisibility(VISIBLE);
@@ -157,6 +184,4 @@ public class RatingQuestionResponseFragment extends Fragment {
     private boolean isValidResponse() {
         return !question.isMandatory() || selectedRating > 0;
     }
-
-
 }

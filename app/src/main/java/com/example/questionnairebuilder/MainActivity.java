@@ -37,14 +37,6 @@ public class MainActivity extends AppCompatActivity {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_activity_home);
         NavigationUI.setupWithNavController(binding.navView, navController);
 
-        // Get username from intent
-        String username = getIntent().getStringExtra("username");
-        if (username != null) {
-            Bundle bundle = new Bundle();
-            bundle.putString("username", username);
-            navController.navigate(R.id.navigation_home, bundle); // Set the username as arguments for the start destination (HomeFragment)
-        }
-
         String destination = getIntent().getStringExtra("navigateTo");
         if ("navigation_my_surveys".equals(destination)) {
             binding.navView.setSelectedItemId(R.id.navigation_my_surveys);
@@ -65,7 +57,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.top_app_bar_menu, menu);
+        getMenuInflater().inflate(R.menu.toolbar_menu_profile, menu);
         return true;
     }
 }

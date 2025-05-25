@@ -3,12 +3,16 @@ package com.example.questionnairebuilder;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
 import com.example.questionnairebuilder.databinding.ActivityEditQuestionBinding;
+import com.example.questionnairebuilder.interfaces.SaveHandler;
 import com.example.questionnairebuilder.interfaces.UnsavedChangesHandler;
+import com.example.questionnairebuilder.models.Question;
 import com.example.questionnairebuilder.models.QuestionTypeEnum;
 import com.example.questionnairebuilder.models.QuestionTypeManager;
 import com.example.questionnairebuilder.ui.question_types.ChoiceQuestionFragment;
@@ -30,6 +34,7 @@ public class EditQuestionActivity extends AppCompatActivity {
     private String surveyID;
     private String type;
     private QuestionTypeEnum selectedType;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,6 +76,25 @@ public class EditQuestionActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.toolbar_menu_save, menu);
+        MenuItem saveMenuItem = menu.findItem(R.id.action_save);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.action_save) {
+            Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.editQuestion_FRAME_question);
+            if (currentFragment instanceof SaveHandler) {
+                ((SaveHandler) currentFragment).onSaveClicked();
+                return true;
+            }
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
     private void loadQuestionFragment(QuestionTypeEnum selectedType, Bundle args){
         switch (selectedType) {
             case OPEN_ENDED_QUESTION:
@@ -104,7 +128,6 @@ public class EditQuestionActivity extends AppCompatActivity {
         }
     }
 
-
     private void onBack(){
         Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.editQuestion_FRAME_question);
         if (fragment instanceof UnsavedChangesHandler) {
@@ -118,12 +141,25 @@ public class EditQuestionActivity extends AppCompatActivity {
         }
     }
 
-
     public void showCancelConfirmationDialog() {
         new AlertDialog.Builder(this)
                 .setTitle(R.string.discard_changes_title)
                 .setMessage(R.string.discard_changes_msg)
                 .setPositiveButton(R.string.yes, (dialog, which) -> {
+                    dialog.dismiss();
+                    finish();
+                })
+                .setNegativeButton(R.string.no, (dialog, which) -> dialog.dismiss())
+                .setCancelable(true)
+                .show();
+    }
+
+    public void showDeleteConfirmationDialog(Question question) {
+        new AlertDialog.Builder(this)
+                .setTitle(R.string.delete_question_title)
+                .setMessage(R.string.delete_question_msg)
+                .setPositiveButton(R.string.yes, (dialog, which) -> {
+                    question.delete();
                     dialog.dismiss();
                     finish();
                 })

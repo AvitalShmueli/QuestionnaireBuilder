@@ -4,10 +4,18 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".ui.question_types.ChoiceQuestionFragment"
-    android:layout_margin="@dimen/activity_vertical_margin">
+    tools:context=".ui.question_types.ChoiceQuestionFragment">
+
+    <View
+        android:id="@+id/scrollHintTop"
+        android:layout_width="match_parent"
+        android:layout_height="8dp"
+        android:layout_gravity="top"
+        android:background="@drawable/top_fade"
+        android:visibility="gone"/>
 
     <androidx.core.widget.NestedScrollView
+        android:id="@+id/scrollView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fillViewport="true">
@@ -15,6 +23,8 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/activity_vertical_margin"
+            android:layout_marginHorizontal="@dimen/activity_vertical_margin"
             android:orientation="vertical">
 
             <com.google.android.material.textfield.TextInputLayout
@@ -150,19 +160,30 @@
                     app:cornerRadius="20dp"
                     android:textAllCaps="false"/>
 
-                <View
-                    android:layout_width="0dp"
-                    android:layout_height="8dp"/>
-
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/choiceQuestion_BTN_cancel"
                     style="@style/Widget.Material3.Button.OutlinedButton"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
+                    android:layout_marginTop="@dimen/input_vertical_margin"
                     android:layout_weight="1"
                     android:text="@string/cancel"
+                    android:textSize="@dimen/button_text_size"
+                    android:textStyle="bold"
+                    app:strokeColor="?attr/colorPrimary"
+                    app:strokeWidth="3dp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/choiceQuestion_BTN_delete"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:layout_marginVertical="@dimen/input_vertical_margin"
+                    android:text="@string/delete"
                     app:strokeWidth="3dp"
-                    app:strokeColor="@color/blue"
+                    android:textColor="@color/red"
+                    app:strokeColor="@color/red"
                     android:textSize="@dimen/button_text_size"
                     android:textStyle="bold"/>
 
@@ -172,5 +193,12 @@
 
     </androidx.core.widget.NestedScrollView>
 
+    <View
+        android:id="@+id/scrollHintBottom"
+        android:layout_width="match_parent"
+        android:layout_height="8dp"
+        android:layout_gravity="bottom"
+        android:background="@drawable/bottom_fade"
+        android:visibility="gone"/>
 
 </FrameLayout>

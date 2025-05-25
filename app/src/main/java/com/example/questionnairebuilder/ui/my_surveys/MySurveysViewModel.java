@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel;
 
 import com.example.questionnairebuilder.interfaces.SurveysCallback;
 import com.example.questionnairebuilder.models.Survey;
+import com.example.questionnairebuilder.utilities.AuthenticationManager;
 import com.example.questionnairebuilder.utilities.FirestoreManager;
 import com.google.firebase.firestore.ListenerRegistration;
 
@@ -19,11 +20,11 @@ public class MySurveysViewModel extends ViewModel {
     private final MutableLiveData<List<Survey>> surveysLiveData = new MutableLiveData<>();
     private final MutableLiveData<List<Survey>> fakeSurveysLiveData = new MutableLiveData<>();
     private ListenerRegistration listenerRegistration;
-    private MutableLiveData<String> mCurrentUserId;
+    private final MutableLiveData<String> mCurrentUserId;
 
     public MySurveysViewModel() {
         mCurrentUserId = new MutableLiveData<>();
-        mCurrentUserId.setValue("currentUserId");
+        mCurrentUserId.setValue(AuthenticationManager.getInstance().getCurrentUser().getUid());
     }
 
     public LiveData<String> getCurrentUserId() {
@@ -63,6 +64,7 @@ public class MySurveysViewModel extends ViewModel {
             @Override
             public void onError(Exception e) {
                 // Optional: you can post an error LiveData too
+                // TODO
             }
         });
     }

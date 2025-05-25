@@ -9,7 +9,7 @@
 
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/topAppBar"
-        app:menu="@menu/top_app_bar_menu"
+        app:menu="@menu/toolbar_menu_profile"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="?attr/android:statusBarColor"
@@ -20,7 +20,7 @@
         app:titleCentered="true"
         android:elevation="@dimen/toolbar_elevation"
         app:titleTextColor="@color/blackish"
-        app:titleTextAppearance="@style/toolbarTextStyle"
+        app:titleTextAppearance="@style/Custom.Widget.Toolbar.TitleStyle"
         android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
 

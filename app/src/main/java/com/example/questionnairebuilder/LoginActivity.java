@@ -1,5 +1,7 @@
 package com.example.questionnairebuilder;
 
+import static com.example.questionnairebuilder.models.User.USERNAME;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Toast;
@@ -10,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.questionnairebuilder.databinding.ActivityLoginBinding;
 import com.example.questionnairebuilder.utilities.AuthenticationManager;
 import com.example.questionnairebuilder.utilities.FirestoreManager;
+import com.example.questionnairebuilder.utilities.SharedPreferencesManager;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.firebase.auth.AuthResult;
@@ -26,6 +29,8 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
 
         toolBar = findViewById(R.id.topAppBar);
+
+        SharedPreferencesManager.init(this);
 
         initViews();
 
@@ -90,8 +95,8 @@ public class LoginActivity extends AppCompatActivity {
 
             FirestoreManager.getInstance().getUserData(uid, user -> {
                 if (user != null) {
+                    SharedPreferencesManager.getInstance().putString(USERNAME, user.getUsername());
                     Intent intent = new Intent(this, MainActivity.class);
-                    intent.putExtra("username", user.getUsername()); // Pass username
                     startActivity(intent);
                     finish();
                 } else {

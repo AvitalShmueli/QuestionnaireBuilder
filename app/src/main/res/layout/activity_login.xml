@@ -20,7 +20,7 @@
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
         app:title="@string/log_in"
         app:titleCentered="true"
-        app:titleTextAppearance="@style/toolbarTextStyle"
+        app:titleTextAppearance="@style/Custom.Widget.Toolbar.TitleStyle"
         app:titleTextColor="@color/blackish" />
 
     <LinearLayout

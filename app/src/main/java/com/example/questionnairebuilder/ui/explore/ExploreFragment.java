@@ -1,5 +1,6 @@
 package com.example.questionnairebuilder.ui.explore;
 
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -12,7 +13,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.questionnairebuilder.SurveyManagementActivity;
+import com.example.questionnairebuilder.QuestionsActivity;
 import com.example.questionnairebuilder.adapters.SurveyAdapter;
 import com.example.questionnairebuilder.databinding.FragmentExploreBinding;
 
@@ -45,7 +46,9 @@ public class ExploreFragment extends Fragment {
 
         surveyAdapter = new SurveyAdapter(requireContext(), new ArrayList<>(), survey -> {
             // OnSurveyClickListener
-            Intent intent = new Intent(getActivity(), SurveyManagementActivity.class);
+            //Intent intent = new Intent(getActivity(), SurveyManagementActivity.class);
+            Intent intent = new Intent(getActivity(), QuestionsActivity.class);
+            intent.putExtra(QuestionsActivity.KEY_EDIT_MODE, false);
             intent.putExtra("survey_title", survey.getSurveyTitle());
             intent.putExtra("surveyID", survey.getID());
             intent.putExtra("status", survey.getStatus().toString());

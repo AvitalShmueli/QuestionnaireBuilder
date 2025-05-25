@@ -27,15 +27,15 @@ import java.util.List;
 import java.util.Set;
 
 public class QuestionsAdapter extends RecyclerView.Adapter<QuestionsAdapter.ViewHolder> {
-    private List<Question> questionList;
+    private List<Question> questionsList;
     private Callback_questionSelected callback_questionSelected;
     private boolean reorderEnabled = false;
     private OnStartDragListener startDragListener;
     private final Set<Question> questionsToUpdate = new HashSet<>();
+    private Set<String> answeredQuestionIds = new HashSet<>();
 
-
-    public QuestionsAdapter(List<Question> questionList) {
-        this.questionList = questionList;
+    public QuestionsAdapter(List<Question> questionsList) {
+        this.questionsList = questionsList;
     }
 
     public QuestionsAdapter setCallbackQuestionSelected(Callback_questionSelected callback_questionSelected) {
@@ -49,13 +49,31 @@ public class QuestionsAdapter extends RecyclerView.Adapter<QuestionsAdapter.View
     }
 
     public void updateQuestions(List<Question> newQuestions) {
-        this.questionList = newQuestions;
+        this.questionsList = newQuestions;
         notifyDataSetChanged();
     }
 
     public void setReorderEnabled(boolean enabled){
         this.reorderEnabled = enabled;
         notifyItemRangeChanged(0, getItemCount(), "toggleDrag");
+    }
+
+    public boolean isReorderEnabled() {
+        return reorderEnabled;
+    }
+
+    public void setAnsweredQuestionIds(Set<String> answeredQuestionIds) {
+        this.answeredQuestionIds = answeredQuestionIds;
+        notifyDataSetChanged(); // Refresh the UI with the new state
+    }
+
+    public Question findFirstUnansweredQuestion() {
+        for (Question question : questionsList) {
+            if (!answeredQuestionIds.contains(question.getQuestionID())) {
+                return question;
+            }
+        }
+        return null;
     }
 
     @NonNull
@@ -72,8 +90,8 @@ public class QuestionsAdapter extends RecyclerView.Adapter<QuestionsAdapter.View
             return;
         }
 
-        if (!questionList.isEmpty()) {
-            Question question = questionList.get(position);
+        if (!questionsList.isEmpty()) {
+            Question question = questionsList.get(position);
             int order = question.getOrder();
             holder.rv_mandatory_star.setVisibility(question.isMandatory()? VISIBLE : GONE);
             holder.rv_title.setText(question.getQuestionTitle() + " | " + order);
@@ -85,6 +103,12 @@ public class QuestionsAdapter extends RecyclerView.Adapter<QuestionsAdapter.View
             });
 
             setupDragHandleTouch(holder.dragHandle, holder);
+
+            if (!reorderEnabled && answeredQuestionIds.contains(question.getQuestionID())) {
+                holder.answeredIndicator.setVisibility(View.VISIBLE);
+            } else {
+                holder.answeredIndicator.setVisibility(View.GONE);
+            }
         }
     }
 
@@ -99,7 +123,6 @@ public class QuestionsAdapter extends RecyclerView.Adapter<QuestionsAdapter.View
         });
     }
 
-
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         onBindViewHolder(holder, position, new ArrayList<>());
@@ -107,19 +130,27 @@ public class QuestionsAdapter extends RecyclerView.Adapter<QuestionsAdapter.View
 
     @Override
     public int getItemCount() {
-        return questionList == null ? 0 : questionList.size();
+        return questionsList == null ? 0 : questionsList.size();
     }
 
     public Question getQuestionAt(int position) {
-        return questionList.get(position);
+        return questionsList.get(position);
+    }
+
+    public List<Question> getCurrentQuestions() {
+        return this.questionsList; // or whatever variable holds your current list
     }
 
     public Set<Question> getQuestionsToUpdate() {
         return questionsToUpdate;
     }
 
+    public boolean hasUnsavedChanges(){
+        return !questionsToUpdate.isEmpty();
+    }
+
     public void onItemMove(int fromPosition, int toPosition) {
-        Collections.swap(questionList, fromPosition, toPosition);
+        Collections.swap(questionsList, fromPosition, toPosition);
         notifyItemMoved(fromPosition, toPosition);
     }
 
@@ -128,6 +159,7 @@ public class QuestionsAdapter extends RecyclerView.Adapter<QuestionsAdapter.View
         private MaterialTextView rv_title;
         private MaterialTextView rv_mandatory_star;
         private ShapeableImageView dragHandle;
+        private ShapeableImageView answeredIndicator;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -135,6 +167,7 @@ public class QuestionsAdapter extends RecyclerView.Adapter<QuestionsAdapter.View
             rv_title = itemView.findViewById(R.id.rv_title);
             rv_mandatory_star = itemView.findViewById(R.id.rv_mandatory_star);
             dragHandle = itemView.findViewById(R.id.rv_dragHandle);
+            answeredIndicator = itemView.findViewById(R.id.answeredIndicator);
         }
     }
 }

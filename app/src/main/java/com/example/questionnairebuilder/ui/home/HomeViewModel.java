@@ -5,9 +5,7 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.example.questionnairebuilder.interfaces.SurveysCallback;
-import com.example.questionnairebuilder.listeners.OnUserFetchListener;
 import com.example.questionnairebuilder.models.Survey;
-import com.example.questionnairebuilder.models.User;
 import com.example.questionnairebuilder.utilities.AuthenticationManager;
 import com.example.questionnairebuilder.utilities.FirestoreManager;
 import com.google.firebase.firestore.ListenerRegistration;
@@ -20,12 +18,15 @@ import java.util.UUID;
 public class HomeViewModel extends ViewModel {
 
     private final MutableLiveData<String> mUsername = new MutableLiveData<>();
-    private final MutableLiveData<List<Survey>> surveysLiveData = new MutableLiveData<>(new ArrayList<>());
+    private final MutableLiveData<String> mCurrentUserId;
+    private final MutableLiveData<List<Survey>> surveysLiveData = new MutableLiveData<>();
     private final MutableLiveData<List<Survey>> fakeSurveysLiveData = new MutableLiveData<>();
     private ListenerRegistration listenerRegistration;
 
     public HomeViewModel() {
-        mUsername.setValue("user");
+        mCurrentUserId = new MutableLiveData<>();
+        mCurrentUserId.setValue(AuthenticationManager.getInstance().getCurrentUser().getUid());
+        mUsername.setValue(null);
         getCurrentUserUsername();
     }
 
@@ -38,14 +39,11 @@ public class HomeViewModel extends ViewModel {
         AuthenticationManager authenticationManager = AuthenticationManager.getInstance();
         if (authenticationManager.getCurrentUser() != null) {
             String currentUserId = authenticationManager.getCurrentUser().getUid();
-            firebaseManager.getUserData(currentUserId, new OnUserFetchListener() {
-                @Override
-                public void onFetched(User user) {
-                    if (user != null) {
-                        mUsername.setValue(user.getUsername());
-                    }
-                    else mUsername.setValue("user");
+            firebaseManager.getUserData(currentUserId, user -> {
+                if (user != null) {
+                    mUsername.setValue(user.getUsername());
                 }
+                else mUsername.setValue(null);
             });
         }
     }
@@ -74,7 +72,7 @@ public class HomeViewModel extends ViewModel {
     }
 
     public void startListening() {
-        listenerRegistration = FirestoreManager.getInstance().listenToAllSurveys(new SurveysCallback() {
+        listenerRegistration = FirestoreManager.getInstance().listenToMyActiveSurveys(mCurrentUserId.getValue(), new SurveysCallback() {
             @Override
             public void onSurveysLoaded(List<Survey> surveys) {
                 surveysLiveData.setValue(surveys);
@@ -83,6 +81,7 @@ public class HomeViewModel extends ViewModel {
             @Override
             public void onError(Exception e) {
                 // Optional: you can post an error LiveData too
+                // TODO
             }
         });
     }

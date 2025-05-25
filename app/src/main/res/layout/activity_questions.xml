@@ -13,7 +13,7 @@
 
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/topAppBar"
-            app:menu="@menu/toolbar_menu"
+            app:menu="@menu/toolbar_menu_done"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/android:statusBarColor"
@@ -21,11 +21,14 @@
             android:titleTextColor="@android:color/black"
             app:navigationIcon="@drawable/arrow_back_24px"
             app:title="@string/title"
+            tools:subtitle="@string/survey_responses_subtitle"
             app:titleCentered="true"
+            app:subtitleCentered="true"
             android:elevation="@dimen/toolbar_elevation"
             app:titleTextColor="?attr/colorOnSurface"
             app:navigationIconTint="?attr/colorOnSurface"
-            app:titleTextAppearance="@style/toolbarTextStyle"
+            app:titleTextAppearance="@style/Custom.Widget.Toolbar.TitleStyle"
+            app:subtitleTextAppearance="@style/Custom.Widget.Toolbar.SubtitleStyle"
             android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
             app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
 
@@ -33,17 +36,50 @@
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
-        android:nestedScrollingEnabled="false"
+        android:nestedScrollingEnabled="true"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        />
+
+    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+        android:id="@+id/questions_FAB_start"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_marginEnd="@dimen/activity_horizontal_margin"
+        android:layout_marginBottom="@dimen/extended_fab_vertical_margin"
+        android:backgroundTint="?attr/colorPrimary"
+        android:elevation="@dimen/fab_elevation"
+        android:scaleType="center"
+        android:text="@string/start_survey"
+        android:textSize="@dimen/button_text_size"
+        android:visibility="gone"
+        app:icon="@drawable/ic_start"
+        app:iconTint="?attr/colorOnPrimary" />
+
+    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+        android:id="@+id/question_FAB_add_bottom"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_marginEnd="@dimen/activity_horizontal_margin"
+        android:layout_marginBottom="@dimen/extended_fab_vertical_margin"
+        android:backgroundTint="?attr/colorPrimary"
+        android:elevation="@dimen/fab_elevation"
+        android:scaleType="center"
+        android:text="@string/add_question"
+        android:visibility="gone"
+        app:icon="@drawable/add_24px"
+        app:iconTint="@android:color/white" />
 
     <LinearLayout
         android:id="@+id/question_LL_add_first_question"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_gravity="center">
+        android:layout_gravity="center"
+        android:visibility="gone">
 
         <TextView
             android:id="@+id/question_LBL_add"
@@ -67,7 +103,7 @@
             android:elevation="@dimen/fab_elevation"
             android:scaleType="centerCrop"
             android:src="@drawable/add_24px"
-            app:backgroundTint="@color/blue"
+            app:backgroundTint="?attr/colorPrimary"
             app:maxImageSize="32dp"
             app:tint="@color/white" />
 
@@ -85,19 +121,7 @@
         android:layout_gravity="bottom|center"
         app:strokeColor="@color/blue"
         android:layout_marginBottom="36dp"
-        app:strokeWidth="3dp"/>
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/question_FAB_add_bottom"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="20dp"
-        android:contentDescription="@string/add_question"
-        app:srcCompat="@drawable/add_24px"
-        app:backgroundTint="@color/blue"
-        app:maxImageSize="32dp"
-        app:tint="@android:color/white"
+        app:strokeWidth="3dp"
         android:visibility="gone"/>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

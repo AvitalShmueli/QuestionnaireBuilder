@@ -34,8 +34,10 @@ import com.example.questionnairebuilder.models.Question;
 import com.example.questionnairebuilder.models.QuestionTypeEnum;
 import com.example.questionnairebuilder.models.QuestionTypeManager;
 import com.example.questionnairebuilder.models.RatingScaleQuestion;
+import com.example.questionnairebuilder.models.SurveyResponseStatus;
 import com.example.questionnairebuilder.utilities.AuthenticationManager;
 import com.example.questionnairebuilder.utilities.FirestoreManager;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
@@ -63,6 +65,7 @@ public class QuestionsActivity extends AppCompatActivity {
     private ExtendedFloatingActionButton questions_FAB_start;
     private String surveyID;
     private String surveyTitle;
+    private String currentUserId;
 
     private QuestionsAdapter questionsAdapter;
     private List<Question> questionsList = new ArrayList<>();
@@ -79,6 +82,8 @@ public class QuestionsActivity extends AppCompatActivity {
         binding = ActivityQuestionsBinding.inflate(getLayoutInflater());
         View root = binding.getRoot();
         setContentView(root);
+
+        currentUserId = AuthenticationManager.getInstance().getCurrentUser().getUid();
 
         Intent previousIntent = getIntent();
         canEdit = previousIntent.getBooleanExtra(KEY_EDIT_MODE,false);
@@ -206,6 +211,17 @@ public class QuestionsActivity extends AppCompatActivity {
                 Question nextQuestion = questionsAdapter.findFirstUnansweredQuestion();
                 if (nextQuestion != null) {
                     changeActivityResponse(nextQuestion); // you already have this method
+                }
+                if(questions_FAB_start.getText().equals(getString(R.string.start_survey))){
+                    FirestoreManager.getInstance().updateSurveyResponseStatus(
+                            surveyID, currentUserId, SurveyResponseStatus.ResponseStatus.IN_PROGRESS,
+                            new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void unused) {
+                                  Log.d("Survey", "Status updated to in_progress");
+                                }
+                            },e -> {}
+                    );
                 }
             });
         }
@@ -436,8 +452,7 @@ public class QuestionsActivity extends AppCompatActivity {
     }
 
     private void fetchUserResponses() {
-        String userId = AuthenticationManager.getInstance().getCurrentUser().getUid();
-        FirestoreManager.getInstance().getUserResponsesForSurvey(surveyID, userId, new ResponsesCallback() {
+        FirestoreManager.getInstance().getUserResponsesForSurvey(surveyID, currentUserId, new ResponsesCallback() {
             @Override
             public void onResponsesLoaded(Set<String> answeredQuestionIds) {
                 answeredCount = answeredQuestionIds.size();

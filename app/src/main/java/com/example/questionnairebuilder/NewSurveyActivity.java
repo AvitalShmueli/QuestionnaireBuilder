@@ -102,7 +102,7 @@ public class NewSurveyActivity extends AppCompatActivity {
                         .setCreated(now)
                         .setModified(now)
                         .setTheme(getThemeEnumFromString(selectedTheme))
-                        .setQuestions(new ArrayList<>())
+                        //.setQuestions(new ArrayList<>())
                         .setSurveyViewers(new ArrayList<>());
 
                 survey.save();

@@ -25,7 +25,7 @@ public class Survey {
     private Date modified;
     private Theme theme;
 
-    private List<Question> questions;
+    //private List<Question> questions;
     //private AnalyticsManager analytics;
     //private ErrorHandler errorHandler;
     private List<User> surveyViewers;
@@ -33,7 +33,7 @@ public class Survey {
     // Constructors
 
     public Survey() {
-        this.questions = new ArrayList<>();
+        //this.questions = new ArrayList<>();
         this.surveyViewers = new ArrayList<>();
     }
 
@@ -119,14 +119,15 @@ public class Survey {
         return this;
     }
 
-    public List<Question> getQuestions() {
+    /*public List<Question> getQuestions() {
         return questions;
-    }
+    }*/
 
+    /*
     public Survey setQuestions(List<Question> questions) {
         this.questions = questions;
         return this;
-    }
+    }*/
 
     /*public AnalyticsManager getAnalyticsManager() {
         return analytics;
@@ -155,9 +156,10 @@ public class Survey {
 
     // Methods from UML
 
+    /*
     public List<Question> getSurveyQuestions() {
         return questions;
-    }
+    }*/
 
     /*public Map<String, String> getAnalytics() {
         if (analytics != null) {

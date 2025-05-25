@@ -10,14 +10,18 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatSpinner;
 
+import com.example.questionnairebuilder.listeners.OnCountListener;
 import com.example.questionnairebuilder.interfaces.OneSurveyCallback;
 import com.example.questionnairebuilder.models.Survey;
+import com.example.questionnairebuilder.models.SurveyResponseStatus;
 import com.example.questionnairebuilder.utilities.FirestoreManager;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.materialswitch.MaterialSwitch;
 import com.google.android.material.textview.MaterialTextView;
 
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Locale;
 
@@ -32,7 +36,7 @@ public class SurveyManagementActivity extends AppCompatActivity {
     private MaterialTextView management_LBL_modifiedDate;
     private MaterialTextView management_LBL_dueDate;
     private MaterialTextView management_LBL_questionCount;
-    private MaterialTextView management_LBL_pageCount;
+    //private MaterialTextView management_LBL_pageCount;
     private AppCompatSpinner management_SP_status;
     private Survey survey;
 
@@ -54,17 +58,51 @@ public class SurveyManagementActivity extends AppCompatActivity {
             toolbar.setTitle(title);
         }
 
+        // Completed Responses
+        FirestoreManager.getInstance().getSurveyResponseStatusCount(
+                surveyID,
+                Collections.singletonList(SurveyResponseStatus.ResponseStatus.COMPLETED),
+                new OnCountListener() {
+                    @Override
+                    public void onCountSuccess(int count) {
+                        management_LBL_completedResponses.setText(String.valueOf(count));
+                    }
+                    @Override
+                    public void onCountFailure(Exception e) {
+                        Log.e("Survey", "Failed to get completed responses count", e);
+                    }
+                }
+        );
+
+        // Total Responses
+        FirestoreManager.getInstance().getSurveyResponseStatusCount(
+                surveyID,
+                Arrays.asList(SurveyResponseStatus.ResponseStatus.IN_PROGRESS, SurveyResponseStatus.ResponseStatus.COMPLETED),
+                new OnCountListener() {
+                    @Override
+                    public void onCountSuccess(int count) {
+                        management_LBL_totalResponses.setText(String.valueOf(count));
+                    }
+                    @Override
+                    public void onCountFailure(Exception e) {
+                        Log.e("Survey", "Failed to get total responses count", e);
+                    }
+                }
+        );
+
         FirestoreManager.getInstance().getSurveyById(surveyID, new OneSurveyCallback() {
             @Override
             public void onSurveyLoaded(Survey loadedSurvey) {
                 survey = loadedSurvey;
 
+                /*
                 // Total Responses
                 int totalResponses = survey.getSurveyViewers() != null ? survey.getSurveyViewers().size() : 0;
                 management_LBL_totalResponses.setText(String.valueOf(totalResponses));
 
                 // Completed Responses
                 management_LBL_completedResponses.setText(String.valueOf(totalResponses));
+                */
 
                 // Created Date
                 if (survey.getCreated() != null) {
@@ -81,12 +119,8 @@ public class SurveyManagementActivity extends AppCompatActivity {
                     management_LBL_dueDate.setText(formatDate(survey.getDueDate()));
                 }
 
-                // Question Count
-                int questionCount = survey.getQuestions() != null ? survey.getQuestions().size() : 0;
-                management_LBL_questionCount.setText(String.valueOf(questionCount));
-
                 // Page Count
-                management_LBL_pageCount.setText("1");
+                //management_LBL_pageCount.setText("1");
 
                 // Status Switch & Label
                 boolean isPublished = survey.getStatus() == Survey.SurveyStatus.Published;
@@ -97,6 +131,20 @@ public class SurveyManagementActivity extends AppCompatActivity {
             @Override
             public void onError(Exception e) {
                 Log.e("pttt","Failed to load survey: " + e.getMessage());
+            }
+        });
+
+        // Question Count
+        FirestoreManager.getInstance().countSurveysQuestions(surveyID, new OnCountListener() {
+            @Override
+            public void onCountSuccess(int count) {
+                //int questionCount = survey.getQuestions() != null ? survey.getQuestions().size() : 0;
+                management_LBL_questionCount.setText(String.valueOf(count));
+            }
+
+            @Override
+            public void onCountFailure(Exception e) {
+                Log.e("pttt",e.getMessage());
             }
         });
     }
@@ -167,7 +215,7 @@ public class SurveyManagementActivity extends AppCompatActivity {
         management_LBL_modifiedDate = findViewById(R.id.management_LBL_modifiedDate);
         management_LBL_dueDate = findViewById(R.id.management_LBL_dueDate);
         management_LBL_questionCount = findViewById(R.id.management_LBL_questionCount);
-        management_LBL_pageCount = findViewById(R.id.management_LBL_pageCount);
+        //management_LBL_pageCount = findViewById(R.id.management_LBL_pageCount);
         management_SP_status = findViewById(R.id.management_SP_status);
     }
 }

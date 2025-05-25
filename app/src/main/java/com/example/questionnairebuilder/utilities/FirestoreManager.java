@@ -6,6 +6,7 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.example.questionnairebuilder.listeners.OnCountListener;
 import com.example.questionnairebuilder.interfaces.OnQuestionDeleteCallback;
 import com.example.questionnairebuilder.interfaces.OneResponseCallback;
 import com.example.questionnairebuilder.interfaces.OneQuestionCallback;
@@ -25,9 +26,15 @@ import com.example.questionnairebuilder.models.RatingScaleQuestion;
 import com.example.questionnairebuilder.models.Response;
 import com.example.questionnairebuilder.models.SingleChoiceQuestion;
 import com.example.questionnairebuilder.models.Survey;
+import com.example.questionnairebuilder.models.SurveyResponseStatus;
 import com.example.questionnairebuilder.models.User;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.AggregateQuery;
+import com.google.firebase.firestore.AggregateQuerySnapshot;
+import com.google.firebase.firestore.AggregateSource;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -36,32 +43,37 @@ import com.google.firebase.firestore.Filter;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.ListenerRegistration;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.WriteBatch;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
+import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.Set;
 
 public class FirestoreManager {
     private static FirestoreManager instance;
-    private FirebaseFirestore database;
-    private CollectionReference surveysRef;
-    private CollectionReference questionsRef;
-    private CollectionReference usersRef;
-    private CollectionReference responsesRef;
+    private final CollectionReference surveysRef;
+    private final CollectionReference questionsRef;
+    private final CollectionReference usersRef;
+    private final CollectionReference responsesRef;
+    private CollectionReference surveyResponseStatusRef;
 
     private FirestoreManager() {
-        database = FirebaseFirestore.getInstance();
+        FirebaseFirestore database = FirebaseFirestore.getInstance();
         surveysRef = database.collection("Surveys");
         questionsRef = database.collection("Questions");
         usersRef = database.collection("Users");
         responsesRef = database.collection("Responses");
+        surveyResponseStatusRef = database.collection("SurveyResponseStatus");
     }
 
     public static synchronized FirestoreManager getInstance() {
@@ -101,8 +113,8 @@ public class FirestoreManager {
     public ListenerRegistration listenToMyActiveSurveys(String currentUserId, SurveysCallback callback) {
         return surveysRef.whereEqualTo("author.uid", currentUserId)
                 .where(Filter.or(
-                        Filter.equalTo("status","Draft"),
-                        Filter.equalTo("status","Published")
+                        Filter.equalTo("status",Survey.SurveyStatus.Draft),
+                        Filter.equalTo("status",Survey.SurveyStatus.Published)
                 )).orderBy("dueDate")
                 .addSnapshotListener((value, error) -> {
                     if (error != null) {
@@ -126,8 +138,8 @@ public class FirestoreManager {
 
     public ListenerRegistration listenToAllActiveSurveys(SurveysCallback callback) {
         return surveysRef.where(Filter.or(
-                        Filter.equalTo("status","Draft"),
-                        Filter.equalTo("status","Published")
+                        Filter.equalTo("status",Survey.SurveyStatus.Draft),
+                        Filter.equalTo("status",Survey.SurveyStatus.Published)
                 )).orderBy("dueDate")
                 .addSnapshotListener((value, error) -> {
                     if (error != null) {
@@ -187,7 +199,7 @@ public class FirestoreManager {
                         callback.onError(new Exception("Survey not found"));
                     }
                 })
-                .addOnFailureListener(e -> callback.onError(e));
+                .addOnFailureListener(callback::onError);
     }
 
     public void addQuestion(Question question) {
@@ -325,7 +337,7 @@ public class FirestoreManager {
                         callback.onError(new Exception("Question not found"));
                     }
                 })
-                .addOnFailureListener(e -> callback.onError(e));
+                .addOnFailureListener(callback::onError);
     }
 
     public void fixQuestionOrder(String surveyID) {
@@ -376,6 +388,66 @@ public class FirestoreManager {
                 .addOnFailureListener(e -> listener.onFetched(null));
     }
 
+    /**
+     * Create or update a SurveyResponseStatus document for a user-survey pair
+     * @param status survey's response status item to create or update
+     *  @param onSuccess callback on success
+     *  @param onFailure callback on failure
+     */
+    public void addSurveyResponseStatus(SurveyResponseStatus status, OnSuccessListener<Void> onSuccess, OnFailureListener onFailure) {
+        String docId = status.getSurveyId() + "_" + status.getUserId();
+        surveyResponseStatusRef.document(docId)
+                .set(status)
+                .addOnSuccessListener(onSuccess)
+                .addOnFailureListener(onFailure);
+    }
+
+    /**
+     * Update status field only (e.g. to mark completed)
+     * @param surveyId unique identifier of the survey
+     * @param userId unique identifier of the user
+     * @param newStatus new response status
+     * @param onSuccess callback on success
+     * @param onFailure callback on failure
+     */
+    public void updateSurveyResponseStatus(String surveyId, String userId, SurveyResponseStatus.ResponseStatus newStatus, OnSuccessListener<Void> onSuccess, OnFailureListener onFailure) {
+        String docId = surveyId + "_" + userId;
+        Map<String, Object> updates = new HashMap<>();
+        updates.put("status", newStatus);
+        if (newStatus == SurveyResponseStatus.ResponseStatus.COMPLETED) {
+            updates.put("completedAt", new Date());
+        }
+        if (newStatus == SurveyResponseStatus.ResponseStatus.IN_PROGRESS) {
+            updates.put("startedAt", new Date());
+        }
+
+        surveyResponseStatusRef.document(docId)
+                .update(updates)
+                .addOnSuccessListener(onSuccess)
+                .addOnFailureListener(onFailure);
+    }
+
+    public void getSurveyResponseStatusCount(String surveyId, List<SurveyResponseStatus.ResponseStatus> statuses, OnCountListener listener) {
+        Query query = surveyResponseStatusRef.whereEqualTo("surveyId", surveyId);
+
+        if (statuses != null && !statuses.isEmpty()) {
+            // Convert enum list to list of strings
+            List<String> statusStrings = new ArrayList<>();
+            for (SurveyResponseStatus.ResponseStatus status : statuses) {
+                statusStrings.add(status.name());
+            }
+            query = query.whereIn("status", statusStrings);
+        }
+
+        query.count()
+                .get(AggregateSource.SERVER)
+                .addOnSuccessListener(aggregateQuerySnapshot -> {
+                    int count = (int) aggregateQuerySnapshot.getCount();
+                    listener.onCountSuccess(count);
+                })
+                .addOnFailureListener(listener::onCountFailure);
+    }
+
     public void addResponse(Response response) {
         responsesRef.document(response.getResponseID()).set(response);
     }
@@ -420,5 +492,26 @@ public class FirestoreManager {
                     callback.onResponsesLoaded(answeredQuestionIds);
                 })
                 .addOnFailureListener(callback::onError);
+    }
+
+    public void countSurveysQuestions(String surveyID, OnCountListener callback){
+        Query query = questionsRef.whereEqualTo("surveyID", surveyID);
+        AggregateQuery countQuery = query.count();
+        countQuery.get(AggregateSource.SERVER)
+                .addOnCompleteListener(new OnCompleteListener<AggregateQuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AggregateQuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            // Count fetched successfully
+                            AggregateQuerySnapshot snapshot = task.getResult();
+                            callback.onCountSuccess((int) snapshot.getCount());
+                            Log.d("pttt", "Count: " + snapshot.getCount());
+                        } else {
+                            callback.onCountFailure(new Exception("Could not fetch questions count"));
+                            Log.d("pttt", "Count failed: ", task.getException());
+                        }
+                    }
+                })
+                .addOnFailureListener(callback::onCountFailure);
     }
 }

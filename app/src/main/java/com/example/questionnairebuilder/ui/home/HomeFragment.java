@@ -77,6 +77,7 @@ public class HomeFragment extends Fragment {
         });
 
         recyclerView.setAdapter(surveyAdapter);
+
         if(testMode){
             viewModel.getFakeSurveys().observe(getViewLifecycleOwner(), surveys -> {
                 surveyAdapter.updateSurveys(surveys); // Update UI automatically when LiveData changes

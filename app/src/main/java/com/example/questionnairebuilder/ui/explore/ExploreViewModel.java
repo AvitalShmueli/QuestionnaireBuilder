@@ -21,7 +21,7 @@ public class ExploreViewModel extends ViewModel {
     }
 
     public void startListening() {
-        listenerRegistration = FirestoreManager.getInstance().listenToAllSurveys(new SurveysCallback() {
+        listenerRegistration = FirestoreManager.getInstance().listenToAllActiveSurveys(new SurveysCallback() {
             @Override
             public void onSurveysLoaded(List<Survey> surveys) {
                 surveysLiveData.setValue(surveys);

@@ -18,11 +18,14 @@ import java.util.UUID;
 public class HomeViewModel extends ViewModel {
 
     private final MutableLiveData<String> mUsername = new MutableLiveData<>();
-    private final MutableLiveData<List<Survey>> surveysLiveData = new MutableLiveData<>(new ArrayList<>());
+    private final MutableLiveData<String> mCurrentUserId;
+    private final MutableLiveData<List<Survey>> surveysLiveData = new MutableLiveData<>();
     private final MutableLiveData<List<Survey>> fakeSurveysLiveData = new MutableLiveData<>();
     private ListenerRegistration listenerRegistration;
 
     public HomeViewModel() {
+        mCurrentUserId = new MutableLiveData<>();
+        mCurrentUserId.setValue(AuthenticationManager.getInstance().getCurrentUser().getUid());
         mUsername.setValue(null);
         getCurrentUserUsername();
     }
@@ -69,7 +72,7 @@ public class HomeViewModel extends ViewModel {
     }
 
     public void startListening() {
-        listenerRegistration = FirestoreManager.getInstance().listenToAllSurveys(new SurveysCallback() {
+        listenerRegistration = FirestoreManager.getInstance().listenToMyActiveSurveys(mCurrentUserId.getValue(), new SurveysCallback() {
             @Override
             public void onSurveysLoaded(List<Survey> surveys) {
                 surveysLiveData.setValue(surveys);
@@ -78,6 +81,7 @@ public class HomeViewModel extends ViewModel {
             @Override
             public void onError(Exception e) {
                 // Optional: you can post an error LiveData too
+                // TODO
             }
         });
     }

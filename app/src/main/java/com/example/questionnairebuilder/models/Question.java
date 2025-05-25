@@ -2,6 +2,9 @@ package com.example.questionnairebuilder.models;
 
 import com.example.questionnairebuilder.utilities.FirestoreManager;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 public abstract class Question {
     private String questionID;
     private String surveyID;
@@ -19,7 +22,7 @@ public abstract class Question {
         this.type = type;
     }
 
-    public Question setQuestionTitle(Question q){
+    public Question setQuestionTitle(Question q) {
         this.questionTitle = q.questionTitle;
         this.type = q.type;
         this.order = q.order;
@@ -94,7 +97,7 @@ public abstract class Question {
         return this;
     }
 
-    public void save(){
+    public void save() {
         FirestoreManager.getInstance().addQuestion(this);
     }
 }

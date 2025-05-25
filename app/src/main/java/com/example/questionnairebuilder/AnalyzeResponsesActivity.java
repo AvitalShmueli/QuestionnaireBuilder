@@ -1,7 +1,6 @@
 package com.example.questionnairebuilder;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -10,11 +9,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.questionnairebuilder.adapters.AnalyzeAdapter;
 import com.example.questionnairebuilder.interfaces.QuestionsCallback;
-import com.example.questionnairebuilder.listeners.OnAnalysisCompleteListener;
-import com.example.questionnairebuilder.models.OpenEndedQuestion;
 import com.example.questionnairebuilder.models.Question;
 import com.example.questionnairebuilder.utilities.FirestoreManager;
-import com.example.questionnairebuilder.utilities.VertexAiManager;
 import com.google.android.material.appbar.MaterialToolbar;
 
 import java.util.ArrayList;

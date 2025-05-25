@@ -68,4 +68,7 @@ dependencies {
     implementation(libs.guava)
     implementation(libs.reactive.streams)
 
+    // analysis:
+    implementation(libs.mpandroidchart)
+
 }

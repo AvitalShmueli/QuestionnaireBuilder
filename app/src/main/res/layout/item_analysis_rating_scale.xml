@@ -23,8 +23,8 @@
             android:text="Question title"
             android:textSize="16sp" />
 
-        <com.github.mikephil.charting.charts.PieChart
-            android:id="@+id/itemAnalysis_LBL_chartPie"
+        <com.github.mikephil.charting.charts.BarChart
+            android:id="@+id/itemAnalysis_LBL_chartBar"
             android:layout_width="match_parent"
             android:layout_height="200dp"
             android:layout_marginTop="16dp" />

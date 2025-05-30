@@ -22,7 +22,7 @@
     <string name="log_out">Log Out</string>
     <string name="add_question">Add Question</string>
     <string name="delete">Delete</string>
-
+    <string name="complete_survey">Complete</string>
 
     <string name="title_activity_home">HomeActivity</string>
     <string name="title_home">Home</string>
@@ -100,4 +100,6 @@
     <string name="start_survey">Start Survey</string>
     <string name="continue_survey">Continue Survey</string>
     <string name="survey_responses_subtitle">%1$d of %2$d answered</string>
+    <string name="thank_you">Thank you! Your answers have been submitted successfully.</string>
+    <string name="survey_submitted">Survey submitted</string>
 </resources>

@@ -25,6 +25,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class QuestionsAdapter extends RecyclerView.Adapter<QuestionsAdapter.ViewHolder> {
     private List<Question> questionsList;
@@ -131,6 +132,12 @@ public class QuestionsAdapter extends RecyclerView.Adapter<QuestionsAdapter.View
     @Override
     public int getItemCount() {
         return questionsList == null ? 0 : questionsList.size();
+    }
+
+    public int getMandatoryCount(){
+        return questionsList.stream()
+                .filter(Question::isMandatory)
+                .collect(Collectors.toCollection(ArrayList::new)).size();
     }
 
     public Question getQuestionAt(int position) {

@@ -15,6 +15,7 @@ import com.example.questionnairebuilder.interfaces.QuestionsCallback;
 import com.example.questionnairebuilder.interfaces.ResponsesCallback;
 import com.example.questionnairebuilder.interfaces.SurveysCallback;
 import com.example.questionnairebuilder.listeners.OnImageUploadListener;
+import com.example.questionnairebuilder.listeners.OnSurveyResponseStatusListener;
 import com.example.questionnairebuilder.listeners.OnUserFetchListener;
 import com.example.questionnairebuilder.listeners.OnUserSaveListener;
 import com.example.questionnairebuilder.models.DateQuestion;
@@ -425,6 +426,21 @@ public class FirestoreManager {
                 .update(updates)
                 .addOnSuccessListener(onSuccess)
                 .addOnFailureListener(onFailure);
+    }
+
+    public void getSurveyResponseStatus(String surveyId, String userId, OnSurveyResponseStatusListener listener) {
+        String docId = surveyId + "_" + userId;
+        surveyResponseStatusRef.document(docId)
+                .get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        SurveyResponseStatus status = documentSnapshot.toObject(SurveyResponseStatus.class);
+                        listener.onSuccess(status);
+                    } else {
+                        listener.onFailure(new Exception("No status found for surveyId: " + surveyId + " and userId: " + userId));
+                    }
+                })
+                .addOnFailureListener(listener::onFailure);
     }
 
     public void getSurveyResponseStatusCount(String surveyId, List<SurveyResponseStatus.ResponseStatus> statuses, OnCountListener listener) {

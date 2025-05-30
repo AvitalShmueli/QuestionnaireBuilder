@@ -42,6 +42,7 @@ public class OpenQuestionResponseFragment extends Fragment {
     private TextInputEditText responseOpenQuestion_TXT_answer;
     private Question question;
     private Response response;
+    private boolean isSurveyCompleted;
 
     public OpenQuestionResponseFragment() {
         // Required empty public constructor
@@ -71,6 +72,8 @@ public class OpenQuestionResponseFragment extends Fragment {
                     .setSurveyID(args.getString("surveyID"))
                     .setOrder(args.getInt("order"));
         }
+        isSurveyCompleted = ((QuestionResponseActivity) requireActivity()).isSurveyCompleted();
+
     }
 
     @Override
@@ -95,13 +98,24 @@ public class OpenQuestionResponseFragment extends Fragment {
 
         if(question != null){
             responseOpenQuestion_LBL_question.setText(question.getQuestionTitle());
-            if(question.isMandatory()) {
-                responseOpenQuestion_LBL_mandatory.setVisibility(VISIBLE);
+            responseOpenQuestion_TXT_answer.setEnabled(!isSurveyCompleted);
+
+            if (isSurveyCompleted) {
                 responseOpenQuestion_BTN_skip.setVisibility(GONE);
+                responseOpenQuestion_BTN_save.setVisibility(GONE);
             }
             else {
-                responseOpenQuestion_LBL_mandatory.setVisibility(GONE);
-                responseOpenQuestion_BTN_skip.setVisibility(VISIBLE);
+                if (question.isMandatory()) {
+                    responseOpenQuestion_LBL_mandatory.setVisibility(VISIBLE);
+                    responseOpenQuestion_BTN_skip.setVisibility(GONE);
+                } else {
+                    responseOpenQuestion_LBL_mandatory.setVisibility(GONE);
+                    responseOpenQuestion_BTN_skip.setVisibility(VISIBLE);
+                }
+
+                // listeners
+                responseOpenQuestion_BTN_save.setOnClickListener(v -> save());
+                responseOpenQuestion_BTN_skip.setOnClickListener(v -> skipQuestion());
             }
 
             /*
@@ -114,10 +128,6 @@ public class OpenQuestionResponseFragment extends Fragment {
                 responseOpenQuestion_TXT_answer.setMaxLines(1);
             }
             */
-
-            // listeners
-            responseOpenQuestion_BTN_save.setOnClickListener(v -> save());
-            responseOpenQuestion_BTN_skip.setOnClickListener(v -> skipQuestion());
         }
     }
 

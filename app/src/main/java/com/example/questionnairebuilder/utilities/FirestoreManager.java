@@ -6,6 +6,7 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.example.questionnairebuilder.interfaces.UpdateSurveyDetailsCallback;
 import com.example.questionnairebuilder.listeners.OnCountListener;
 import com.example.questionnairebuilder.interfaces.OnQuestionDeleteCallback;
 import com.example.questionnairebuilder.interfaces.OneResponseCallback;
@@ -85,6 +86,39 @@ public class FirestoreManager {
 
     public void addSurvey(Survey survey) {
         surveysRef.document(survey.getID()).set(survey);
+    }
+
+    public void updateSurvey(String surveyId, Map<String, Object> updates, UpdateSurveyDetailsCallback callback) {
+        surveysRef.document(surveyId).update(updates)
+                .addOnSuccessListener(aVoid -> {
+                    // After update, fetch the updated survey document
+                    surveysRef.document(surveyId).get()
+                            .addOnSuccessListener(documentSnapshot -> {
+                                if (documentSnapshot.exists()) {
+                                    Survey updatedSurvey = documentSnapshot.toObject(Survey.class);
+                                    if (updatedSurvey != null) {
+                                        updatedSurvey.setID(documentSnapshot.getId()); // set ID manually
+                                        callback.onSuccess(updatedSurvey);
+                                    } else {
+                                        callback.onFailure(new Exception("Survey is null"));
+                                    }
+                                    Log.d("pttt FirestoreManager", "Survey status updated and fetched.");
+                                    callback.onSuccess(updatedSurvey);
+                                } else {
+                                    if (callback != null)
+                                        callback.onFailure(new Exception("Survey not found after update."));
+                                }
+                            })
+                            .addOnFailureListener(e -> {
+                                Log.e("pttt FirestoreManager", "Failed to fetch updated survey: ", e);
+                                if (callback != null) callback.onFailure(e);
+                            });
+
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("pttt FirestoreManager", "Failed to update survey status: ", e);
+                    if (callback != null) callback.onFailure(e);
+                });
     }
 
     public ListenerRegistration listenToAllSurveys(SurveysCallback callback) {

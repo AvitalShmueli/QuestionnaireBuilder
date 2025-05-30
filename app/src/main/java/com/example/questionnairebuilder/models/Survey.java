@@ -24,6 +24,7 @@ public class Survey {
     private Date created;
     private Date modified;
     private Theme theme;
+    private boolean newResponseAlert = false;
 
     //private List<Question> questions;
     //private AnalyticsManager analytics;
@@ -116,6 +117,15 @@ public class Survey {
 
     public Survey setTheme(Theme theme) {
         this.theme = theme;
+        return this;
+    }
+
+    public boolean isNewResponseAlert() {
+        return newResponseAlert;
+    }
+
+    public Survey setNewResponseAlert(boolean newResponseAlert) {
+        this.newResponseAlert = newResponseAlert;
         return this;
     }
 

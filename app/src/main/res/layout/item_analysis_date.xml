@@ -9,31 +9,24 @@
     app:cardElevation="4dp">
 
     <LinearLayout
+        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
         android:padding="16dp">
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/itemAnalysis_LBL_title"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Question title"
-            android:textColor="@color/black"
-            android:textSize="16sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:textSize="16sp" />
 
-        <!--com.github.mikephil.charting.charts.BarChart
-            android:id="@+id/itemAnalysis_LBL_chartBar"
+        <com.github.mikephil.charting.charts.BarChart
+            android:id="@+id/itemAnalysis_chart_date"
             android:layout_width="match_parent"
             android:layout_height="200dp"
-            android:layout_marginTop="16dp" /-->
-        <LinearLayout
-            android:id="@+id/itemAnalysis_container_ratings"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:orientation="vertical" />
+            android:layout_marginTop="16dp"/>
     </LinearLayout>
+
 
 </androidx.cardview.widget.CardView>

@@ -6,6 +6,7 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.example.questionnairebuilder.interfaces.AllResponsesCallback;
 import com.example.questionnairebuilder.interfaces.OnQuestionDeleteCallback;
 import com.example.questionnairebuilder.interfaces.OneResponseCallback;
 import com.example.questionnairebuilder.interfaces.OneQuestionCallback;
@@ -292,28 +293,6 @@ public class FirestoreManager {
         questionsRef.document(questionId).get()
                 .addOnSuccessListener(documentSnapshot -> {
                     if (documentSnapshot.exists()) {
-                        /*String typeString = documentSnapshot.getString("type");
-                        QuestionTypeEnum type = QuestionTypeEnum.valueOf(typeString);
-                        Question question = null;
-                        switch (type) {
-                            case OPEN_ENDED_QUESTION:
-                                question = documentSnapshot.toObject(OpenEndedQuestion.class);
-                                break;
-                            case SINGLE_CHOICE:
-                            case YES_NO:
-                            case DROPDOWN:
-                                question = documentSnapshot.toObject(SingleChoiceQuestion.class);
-                                break;
-                            case MULTIPLE_CHOICE:
-                                question = documentSnapshot.toObject(MultipleChoiceQuestion.class);
-                                break;
-                            case DATE:
-                                question = documentSnapshot.toObject(DateQuestion.class);
-                                break;
-                            case RATING_SCALE:
-                                question = documentSnapshot.toObject(RatingScaleQuestion.class);
-                                break;
-                        }*/
                         Question question = mapToQuestion(documentSnapshot);
                         if (question != null) {
                             question.setQuestionID(documentSnapshot.getId()); // set ID manually
@@ -419,6 +398,13 @@ public class FirestoreManager {
                     }
                     callback.onResponsesLoaded(answeredQuestionIds);
                 })
+                .addOnFailureListener(callback::onError);
+    }
+
+    public void getAllResponsesForSurvey(String surveyId, AllResponsesCallback callback) {
+        responsesRef.whereEqualTo("surveyID", surveyId)
+                .get()
+                .addOnSuccessListener(snapshot -> callback.onResponsesLoaded(snapshot.getDocuments()))
                 .addOnFailureListener(callback::onError);
     }
 }

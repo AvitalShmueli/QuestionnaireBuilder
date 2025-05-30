@@ -3,12 +3,13 @@ package com.example.questionnairebuilder.models;
 import com.example.questionnairebuilder.interfaces.AnalyzableQuestion;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedHashMap;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class SingleChoiceQuestion extends ChoiceQuestion implements AnalyzableQuestion {
 
+    private Map<String, Integer> answerDistribution = new HashMap<>();
     public SingleChoiceQuestion() {
         super();
     }
@@ -23,10 +24,13 @@ public class SingleChoiceQuestion extends ChoiceQuestion implements AnalyzableQu
 
     @Override
     public Map<String, Integer> getAnswerDistribution() {
-        Map<String, Integer> distribution = new LinkedHashMap<>();
-        for (String answer : getResponses()) {
-            distribution.put(answer, distribution.getOrDefault(answer, 0) + 1);
+        return answerDistribution;
+    }
+
+    @Override
+    public void accumulateAnswers(List<String> values) {
+        for (String value : values) {
+            answerDistribution.merge(value, 1, Integer::sum);
         }
-        return distribution;
     }
 }

@@ -21,7 +21,7 @@
             android:elevation="@dimen/toolbar_elevation"
             android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
             android:titleTextColor="@android:color/black"
-            app:menu="@menu/toolbar_menu_profile"
+            app:menu="@menu/toolbar_menu_save"
             app:navigationIcon="@drawable/arrow_back_24px"
             app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
             app:title="Survey Title #1"
@@ -235,8 +235,9 @@
 
                 <androidx.appcompat.widget.AppCompatSpinner
                     android:id="@+id/management_SP_status"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight="1"
                     android:background="@drawable/spinner_background"
                     android:paddingEnd="24dp"
                     android:spinnerMode="dropdown" />
@@ -249,8 +250,7 @@
                 android:alpha="0.3"
                 android:background="@color/blue" />
 
-
-            <LinearLayout
+            <!--LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center_vertical"
@@ -285,12 +285,12 @@
                 android:layout_height="3dp"
                 android:layout_marginVertical="@dimen/bufferMargin"
                 android:alpha="0.3"
-                android:background="@color/blue" />
+                android:background="@color/blue" /-->
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
+                android:layout_marginTop="8dp"
                 android:gravity="center_vertical"
                 android:orientation="horizontal">
 
@@ -301,7 +301,7 @@
                     android:text="@string/new_response_alert" />
 
                 <com.google.android.material.materialswitch.MaterialSwitch
-                    android:id="@+id/switch_alert"
+                    android:id="@+id/management_SW_alert"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:checked="false" />
@@ -325,9 +325,53 @@
                 android:textStyle="bold" />
 
             <LinearLayout
+                android:id="@+id/management_LL_description"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:showDividers="middle"
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true">
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/description" />
+
+                <com.google.android.material.imageview.ShapeableImageView
+                    android:id="@+id/management_IMG_edit_description"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_marginBottom="2dp"
+                    android:layout_marginEnd="2dp"
+                    android:src="@drawable/edit_24px"
+                    app:tint="@color/blue" />
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/management_LBL_description"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:maxWidth="150dp"
+                    android:layout_marginEnd="8dp"
+                    android:gravity="end"
+                    tools:text="survey's description" />
+
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="3dp"
+                android:alpha="0.3"
+                android:background="@color/blue" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
                 android:showDividers="middle">
@@ -383,11 +427,15 @@
                 android:background="@color/blue" />
 
             <LinearLayout
+                android:id="@+id/management_LL_dueDate"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true"
                 android:showDividers="middle">
 
                 <com.google.android.material.textview.MaterialTextView
@@ -395,6 +443,15 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="@string/due_date" />
+
+                <com.google.android.material.imageview.ShapeableImageView
+                    android:id="@+id/management_IMG_edit_dueDate"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_marginEnd="@dimen/input_horizontal_margin"
+                    android:layout_marginBottom="2dp"
+                    android:src="@drawable/ic_calendar"
+                    app:tint="@color/blue" />
 
                 <com.google.android.material.textview.MaterialTextView
                     android:id="@+id/management_LBL_dueDate"
@@ -440,7 +497,7 @@
                 android:alpha="0.3"
                 android:background="@color/blue" />
 
-            <LinearLayout
+            <!--LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
@@ -449,8 +506,8 @@
                 android:showDividers="middle">
 
                 <com.google.android.material.textview.MaterialTextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:layout_width="343dp"
+                    android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:text="@string/pages" />
 
@@ -467,7 +524,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="3dp"
                 android:alpha="0.3"
-                android:background="@color/blue" />
+                android:background="@color/blue" /-->
 
         </LinearLayout>
 

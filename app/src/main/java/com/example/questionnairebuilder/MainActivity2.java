@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.questionnairebuilder.adapters.QuestionsAdapter;
-import com.example.questionnairebuilder.interfaces.Callback_questionSelected;
+import com.example.questionnairebuilder.interfaces.QuestionSelectedCallback;
 import com.example.questionnairebuilder.listeners.OnQuestionListChangedListener;
 import com.example.questionnairebuilder.listeners.OnStartDragListener;
 import com.example.questionnairebuilder.models.ChoiceQuestion;
@@ -78,12 +78,7 @@ public class MainActivity2 extends AppCompatActivity implements OnQuestionListCh
         findViews();
         questionList = questionListDemo();
         QuestionsAdapter questionsAdapter = new QuestionsAdapter(questionList);
-        questionsAdapter.setCallbackQuestionSelected(new Callback_questionSelected() {
-            @Override
-            public void select(Question question) {
-                changeActivity(question);
-            }
-        });
+        questionsAdapter.setCallbackQuestionSelected(this::changeActivity);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         linearLayoutManager.setOrientation(RecyclerView.VERTICAL);
         recyclerView.setLayoutManager(linearLayoutManager);

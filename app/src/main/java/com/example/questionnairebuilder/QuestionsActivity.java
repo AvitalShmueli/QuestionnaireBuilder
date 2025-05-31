@@ -2,17 +2,22 @@ package com.example.questionnairebuilder;
 
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
+import static android.widget.Toast.LENGTH_SHORT;
+
+import static com.example.questionnairebuilder.QuestionResponseActivity.KEY_SURVEY_COMPLETED;
 
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.PopupMenu;
+import android.widget.Toast;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
@@ -26,6 +31,7 @@ import com.example.questionnairebuilder.databinding.ActivityQuestionsBinding;
 import com.example.questionnairebuilder.interfaces.ItemMoveCallback;
 import com.example.questionnairebuilder.interfaces.QuestionsCallback;
 import com.example.questionnairebuilder.interfaces.ResponsesCallback;
+import com.example.questionnairebuilder.listeners.OnSurveyResponseStatusListener;
 import com.example.questionnairebuilder.models.ChoiceQuestion;
 import com.example.questionnairebuilder.models.DateQuestion;
 import com.example.questionnairebuilder.models.MultipleChoiceQuestion;
@@ -34,17 +40,23 @@ import com.example.questionnairebuilder.models.Question;
 import com.example.questionnairebuilder.models.QuestionTypeEnum;
 import com.example.questionnairebuilder.models.QuestionTypeManager;
 import com.example.questionnairebuilder.models.RatingScaleQuestion;
+import com.example.questionnairebuilder.models.SurveyResponseStatus;
 import com.example.questionnairebuilder.utilities.AuthenticationManager;
 import com.example.questionnairebuilder.utilities.FirestoreManager;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.textview.MaterialTextView;
 import com.google.firebase.firestore.ListenerRegistration;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -61,15 +73,20 @@ public class QuestionsActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private MaterialButton questions_BTN_skip;
     private ExtendedFloatingActionButton questions_FAB_start;
+    private MaterialButton questions_BTN_complete;
+    private MaterialTextView questions_LBL_completed;
     private String surveyID;
     private String surveyTitle;
-
+    private String currentUserId;
     private QuestionsAdapter questionsAdapter;
     private List<Question> questionsList = new ArrayList<>();
     private ListenerRegistration questionsListener;
     private boolean canEdit;
     private int answeredCount = 0;
+    private int answeredMandatoryCount = 0;
     private int totalCount = 0;
+    private int totalMandatoryCount = 0;
+    private SurveyResponseStatus surveyResponseStatus = null;
     public static List<Question> cachedQuestionList = null;
 
 
@@ -80,6 +97,8 @@ public class QuestionsActivity extends AppCompatActivity {
         View root = binding.getRoot();
         setContentView(root);
 
+        currentUserId = AuthenticationManager.getInstance().getCurrentUser().getUid();
+
         Intent previousIntent = getIntent();
         canEdit = previousIntent.getBooleanExtra(KEY_EDIT_MODE,false);
 
@@ -88,6 +107,23 @@ public class QuestionsActivity extends AppCompatActivity {
 
         surveyID = getIntent().getStringExtra("surveyID");
         surveyTitle = getIntent().getStringExtra("survey_title");
+
+        FirestoreManager.getInstance().getSurveyResponseStatus(
+                surveyID,
+                currentUserId,
+                new OnSurveyResponseStatusListener() {
+                    @Override
+                    public void onSuccess(SurveyResponseStatus status) {
+                        Log.d("Survey", "Status: " + status.getStatus());
+                        surveyResponseStatus = status;
+                    }
+
+                    @Override
+                    public void onFailure(Exception e) {
+                        Log.e("Survey", "Failed to get response status", e);
+                    }
+                }
+        );
 
         createBinding();
         setupViews();
@@ -100,6 +136,8 @@ public class QuestionsActivity extends AppCompatActivity {
         question_FAB_add_bottom = binding.questionFABAddBottom;
         questions_BTN_skip = binding.questionsBTNSkip;
         questions_FAB_start = binding.questionsFABStart;
+        questions_BTN_complete = binding.questionsBTNComplete;
+        questions_LBL_completed = binding.questionsLBLCompleted;
         recyclerView = binding.recyclerView;
     }
 
@@ -202,10 +240,43 @@ public class QuestionsActivity extends AppCompatActivity {
             });
         }
         else{
+            questions_BTN_complete.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    FirestoreManager.getInstance().updateSurveyResponseStatus(
+                            surveyID, currentUserId, SurveyResponseStatus.ResponseStatus.COMPLETED,
+                            new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void unused) {
+                                    Log.d("pttt", "Status updated to completed");
+                                    Toast.makeText(getApplicationContext(),getString(R.string.thank_you),LENGTH_SHORT).show();
+                                    finish();
+                                }
+                            },e -> {
+                                //TODO
+                            }
+                    );
+                }
+            });
+
             questions_FAB_start.setOnClickListener(v -> {
                 Question nextQuestion = questionsAdapter.findFirstUnansweredQuestion();
                 if (nextQuestion != null) {
                     changeActivityResponse(nextQuestion); // you already have this method
+                }
+
+                if(questions_FAB_start.getText().equals(getString(R.string.start_survey))){
+                    FirestoreManager.getInstance().updateSurveyResponseStatus(
+                            surveyID, currentUserId, SurveyResponseStatus.ResponseStatus.IN_PROGRESS,
+                            new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void unused) {
+                                    Log.d("Survey", "Status updated to in progress");
+                                }
+                            },e -> {
+                                //TODO
+                            }
+                    );
                 }
             });
         }
@@ -266,6 +337,8 @@ public class QuestionsActivity extends AppCompatActivity {
 
         String questionOrder = "Q" + q.getOrder();
         intent.putExtra(QuestionResponseActivity.KEY_QUESTION_HEADER, questionOrder);
+        boolean surveyCompleted = surveyResponseStatus != null && surveyResponseStatus.getStatus()== SurveyResponseStatus.ResponseStatus.COMPLETED;
+        intent.putExtra(KEY_SURVEY_COMPLETED,surveyCompleted);
 
         Bundle args = createQuestionArgsBundle(q);
         intent.putExtra(QuestionResponseActivity.KEY_QUESTION_ARGS,args);
@@ -348,6 +421,7 @@ public class QuestionsActivity extends AppCompatActivity {
                 }
                 questionsAdapter.updateQuestions(questionsList);
                 totalCount = questionsAdapter.getItemCount();
+                totalMandatoryCount = questionsAdapter.getMandatoryCount();
                 int editVisibility = canEdit ? VISIBLE : GONE;
                 if (questionsList.isEmpty()) {
                     questions_BTN_skip.setVisibility(editVisibility);
@@ -433,26 +507,53 @@ public class QuestionsActivity extends AppCompatActivity {
         questionsList = updatedList;
         questionsAdapter.updateQuestions(updatedList);
         totalCount = questionsAdapter.getItemCount();
+        totalMandatoryCount = questionsAdapter.getMandatoryCount();
     }
 
     private void fetchUserResponses() {
-        String userId = AuthenticationManager.getInstance().getCurrentUser().getUid();
-        FirestoreManager.getInstance().getUserResponsesForSurvey(surveyID, userId, new ResponsesCallback() {
+        FirestoreManager.getInstance().getUserResponsesForSurvey(surveyID, currentUserId, new ResponsesCallback() {
             @Override
-            public void onResponsesLoaded(Set<String> answeredQuestionIds) {
-                answeredCount = answeredQuestionIds.size();
+            public void onResponsesLoaded(Map<String, Boolean> answeredQuestions) {
+                answeredCount = answeredQuestions.size();
+                answeredMandatoryCount = (int) answeredQuestions.values().stream()
+                        .filter(Boolean.TRUE::equals)
+                        .count();
                 String questionsProgress = getString(R.string.survey_responses_subtitle, Objects.requireNonNullElse(answeredCount,0), Objects.requireNonNullElse(totalCount,0));
                 runOnUiThread(() -> {
-                    questionsAdapter.setAnsweredQuestionIds(answeredQuestionIds);
+                    questionsAdapter.setAnsweredQuestionIds(answeredQuestions.keySet());
                     toolbar.setSubtitle(questionsProgress);
                     if (answeredCount == 0) {
                         questions_FAB_start.setText(getString(R.string.start_survey));
                         questions_FAB_start.setIconResource(R.drawable.ic_start);
                     } else {
-                        questions_FAB_start.setText(getString(R.string.continue_survey));
-                        questions_FAB_start.setIconResource(R.drawable.ic_resume);
+                        if(answeredMandatoryCount == totalMandatoryCount /*answeredCount == totalCount || (answeredCount >= totalMandatoryCount && answeredCount > 0)*/) {
+                            if(surveyResponseStatus == null || surveyResponseStatus.getStatus() != SurveyResponseStatus.ResponseStatus.COMPLETED) {
+                                questions_BTN_complete.setVisibility(VISIBLE);
+                                questions_LBL_completed.setVisibility(GONE);
+                            }
+                            else {
+                                questions_BTN_complete.setVisibility(GONE);
+                                questions_LBL_completed.setText(formatDateTime(surveyResponseStatus.getCompletedAt()));
+                                questions_LBL_completed.setVisibility(VISIBLE);
+                            }
+                            adjustRecyclerViewPadding();
+                        }
+                        else {
+                            questions_FAB_start.setText(getString(R.string.continue_survey));
+                            questions_FAB_start.setIconResource(R.drawable.ic_resume);
+                            questions_BTN_complete.setVisibility(GONE);
+                            questions_LBL_completed.setVisibility(GONE);
+                        }
                     }
-                    questions_FAB_start.setVisibility(questionsList.isEmpty() || answeredCount == totalCount ? GONE : VISIBLE);
+                    int x = 1;
+                    // TODO: start / continue button
+                    if(questionsList.isEmpty() || answeredMandatoryCount == totalMandatoryCount/*answeredCount == totalCount*/)
+                        questions_FAB_start.setVisibility(GONE);
+                    //else if(answeredCount >= totalMandatoryCount && answeredCount > 0)
+                    //    questions_FAB_start.setVisibility(GONE);
+                    else
+                        questions_FAB_start.setVisibility(VISIBLE);
+                    //questions_FAB_start.setVisibility(questionsList.isEmpty() || answeredCount == totalCount || answeredCount >= totalMandatoryCount? GONE : VISIBLE);
                 });
             }
 
@@ -461,5 +562,34 @@ public class QuestionsActivity extends AppCompatActivity {
                 Log.e("QuestionsActivity", "Failed to load user responses", e);
             }
         });
+
+    }
+
+    private void adjustRecyclerViewPadding(){
+        if (questions_BTN_complete.getVisibility() == View.VISIBLE) {
+            int bottomPadding = (int) TypedValue.applyDimension(
+                    TypedValue.COMPLEX_UNIT_DIP,
+                    72,
+                    getResources().getDisplayMetrics());
+            recyclerView.setPadding(
+                    recyclerView.getPaddingLeft(),
+                    recyclerView.getPaddingTop(),
+                    recyclerView.getPaddingRight(),
+                    bottomPadding);
+        } else {
+            recyclerView.setPadding(
+                    recyclerView.getPaddingLeft(),
+                    recyclerView.getPaddingTop(),
+                    recyclerView.getPaddingRight(),
+                    0);
+        }
+    }
+
+    private String formatDateTime(Date date){
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+        SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
+        String datePart = dateFormat.format(date);
+        String timePart = timeFormat.format(date);
+        return getString(R.string.survey_submitted, Objects.requireNonNullElse(datePart, ""),Objects.requireNonNullElse(timePart, ""));
     }
 }

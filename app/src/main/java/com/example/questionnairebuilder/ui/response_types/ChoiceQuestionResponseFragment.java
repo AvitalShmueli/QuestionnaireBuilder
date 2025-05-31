@@ -62,6 +62,7 @@ public class ChoiceQuestionResponseFragment extends Fragment {
     private Response response;
     private int currentSelectionCount = 0;
     private final List<String> selectedChoices = new ArrayList<>();
+    private boolean isSurveyCompleted;
 
     public ChoiceQuestionResponseFragment() {
         // Required empty public constructor
@@ -100,6 +101,7 @@ public class ChoiceQuestionResponseFragment extends Fragment {
                     .setSurveyID(args.getString("surveyID"))
                     .setOrder(args.getInt("order"));
         }
+        isSurveyCompleted = ((QuestionResponseActivity) requireActivity()).isSurveyCompleted();
     }
 
     @Override
@@ -124,22 +126,29 @@ public class ChoiceQuestionResponseFragment extends Fragment {
         choiceQuestion_DD_layout_dropdown = binding.choiceQuestionDDLayoutDropdown;
         responseChoiceQuestion_DD_dropdown = binding.responseChoiceQuestionDDDropdown;
 
-        if(question != null) {
+        if (question != null) {
             responseChoiceQuestion_LBL_question.setText(question.getQuestionTitle());
-            if (question.isMandatory()) {
-                responseChoiceQuestion_LBL_mandatory.setVisibility(VISIBLE);
+
+            if (isSurveyCompleted) {
                 responseChoiceQuestion_BTN_skip.setVisibility(GONE);
-            } else {
-                responseChoiceQuestion_LBL_mandatory.setVisibility(GONE);
-                responseChoiceQuestion_BTN_skip.setVisibility(VISIBLE);
+                responseChoiceQuestion_BTN_save.setVisibility(GONE);
+            }
+            else {
+                if (question.isMandatory()) {
+                    responseChoiceQuestion_LBL_mandatory.setVisibility(VISIBLE);
+                    responseChoiceQuestion_BTN_skip.setVisibility(GONE);
+                } else {
+                    responseChoiceQuestion_LBL_mandatory.setVisibility(GONE);
+                    responseChoiceQuestion_BTN_skip.setVisibility(VISIBLE);
+                }
+
+                // listeners
+                responseChoiceQuestion_BTN_save.setOnClickListener(v -> save());
+                responseChoiceQuestion_BTN_skip.setOnClickListener(v -> skipQuestion());
             }
 
             selectedChoices.clear();
             loadResponse(question);
-
-            // listeners
-            responseChoiceQuestion_BTN_save.setOnClickListener(v -> save());
-            responseChoiceQuestion_BTN_skip.setOnClickListener(v -> skipQuestion());
         }
     }
 
@@ -173,29 +182,31 @@ public class ChoiceQuestionResponseFragment extends Fragment {
             if (selectedChoices.contains(option)) {
                 radioButton.setChecked(true);
             }
-
+            radioButton.setEnabled(!isSurveyCompleted);
             responseChoiceQuestion_RadioGroup.addView(radioButton);
         }
         responseChoiceQuestion_RadioGroup.setVisibility(VISIBLE);
         responseChoiceQuestion_LL_checkBoxContainer.setVisibility(GONE);
         choiceQuestion_DD_layout_dropdown.setVisibility(GONE);
+        responseChoiceQuestion_RadioGroup.setEnabled(!isSurveyCompleted);
 
-        responseChoiceQuestion_RadioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
-                RadioButton selectedButton = group.findViewById(checkedId);
-                if (selectedButton != null) {
-                    String selectedText = selectedButton.getText().toString();
-                    selectedChoices.clear();
-                    selectedChoices.add(selectedText);
-                    Log.d("RadioGroup", "Selected: " + selectedText);
+        if (!isSurveyCompleted) {
+            responseChoiceQuestion_RadioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(RadioGroup group, int checkedId) {
+                    RadioButton selectedButton = group.findViewById(checkedId);
+                    if (selectedButton != null) {
+                        String selectedText = selectedButton.getText().toString();
+                        selectedChoices.clear();
+                        selectedChoices.add(selectedText);
+                        Log.d("RadioGroup", "Selected: " + selectedText);
+                    }
                 }
-            }
-        });
+            });
+        }
     }
 
     private void initCheckboxes(List<String> options, int maxSelections){
-
         currentSelectionCount = 0;
         for (String option : options) {
             CheckBox checkBox = new CheckBox(getContext());
@@ -212,25 +223,29 @@ public class ChoiceQuestionResponseFragment extends Fragment {
             if (selectedChoices.contains(option)) {
                 checkBox.setChecked(true);
             }
-
-            checkBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
-                if (isChecked) {
-                    if (currentSelectionCount >= maxSelections) {
-                        // Max reached: undo the check and show a warning
-                        buttonView.setChecked(false);
-                        Toast.makeText(getContext(), "You can select up to " + maxSelections + " options.", Toast.LENGTH_SHORT).show();
+            if(isSurveyCompleted){
+                checkBox.setEnabled(false);
+            }
+            else {
+                checkBox.setEnabled(true);
+                checkBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                    if (isChecked) {
+                        if (currentSelectionCount >= maxSelections) {
+                            // Max reached: undo the check and show a warning
+                            buttonView.setChecked(false);
+                            Toast.makeText(getContext(), "You can select up to " + maxSelections + " options.", Toast.LENGTH_SHORT).show();
+                        } else {
+                            currentSelectionCount++;
+                            selectedChoices.add(option);
+                            Log.d("CheckBox", checkBox.getText() + " selected");
+                        }
                     } else {
-                        currentSelectionCount++;
-                        selectedChoices.add(option);
-                        Log.d("CheckBox", checkBox.getText() + " selected");
+                        currentSelectionCount--;
+                        selectedChoices.remove(option);
+                        Log.d("CheckBox", checkBox.getText() + " unselected");
                     }
-                } else {
-                    currentSelectionCount--;
-                    selectedChoices.remove(option);
-                    Log.d("CheckBox", checkBox.getText() + " unselected");
-                }
-            });
-
+                });
+            }
             responseChoiceQuestion_LL_checkBoxContainer.addView(checkBox);
         }
         responseChoiceQuestion_RadioGroup.setVisibility(GONE);
@@ -242,7 +257,9 @@ public class ChoiceQuestionResponseFragment extends Fragment {
         ArrayAdapter<String> adapterItems_dropdownOptions = new ArrayAdapter<>(requireActivity(), R.layout.item_dropdown, options);
         if(!selectedChoices.isEmpty())
             responseChoiceQuestion_DD_dropdown.setText(selectedChoices.get(0));
+
         responseChoiceQuestion_DD_dropdown.setAdapter(adapterItems_dropdownOptions);
+
         responseChoiceQuestion_DD_dropdown.setOnItemClickListener((adapterView, view, position, id) -> {
             String selectedItem = adapterItems_dropdownOptions.getItem(position);
             if (selectedItem != null) {
@@ -251,10 +268,12 @@ public class ChoiceQuestionResponseFragment extends Fragment {
                 Log.d("RadioGroup", "Selected: " + selectedItem);
             }
         });
+
         responseChoiceQuestion_RadioGroup.setVisibility(GONE);
         responseChoiceQuestion_LL_checkBoxContainer.setVisibility(GONE);
         choiceQuestion_DD_layout_dropdown.setVisibility(VISIBLE);
-
+        choiceQuestion_DD_layout_dropdown.setEnabled(!isSurveyCompleted);
+        choiceQuestion_DD_layout_dropdown.setHint(isSurveyCompleted ? null : getString(R.string.select));
     }
 
     private int dpToPx(int dp) {
@@ -296,6 +315,7 @@ public class ChoiceQuestionResponseFragment extends Fragment {
                         .setResponseID(UUID.randomUUID().toString())
                         .setSurveyID(question.getSurveyID())
                         .setQuestionID(question.getQuestionID())
+                        .setMandatory(question.isMandatory())
                         .setResponseValues(selectedChoices);
             }
             else {

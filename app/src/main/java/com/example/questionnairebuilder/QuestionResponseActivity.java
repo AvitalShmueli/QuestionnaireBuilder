@@ -31,16 +31,18 @@ import com.example.questionnairebuilder.ui.response_types.RatingQuestionResponse
 import com.example.questionnairebuilder.utilities.AuthenticationManager;
 import com.example.questionnairebuilder.utilities.FirestoreManager;
 import com.google.android.material.appbar.MaterialToolbar;
+import com.google.firebase.Timestamp;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class QuestionResponseActivity extends AppCompatActivity {
     public static final String KEY_QUESTION_HEADER = "KEY_QUESTION_HEADER";
     public static final String KEY_QUESTION_ARGS = "KEY_QUESTION_ARGS";
+    public static final String KEY_SURVEY_COMPLETED = "KEY_SURVEY_COMPLETED";
 
     private ActivityQuestionResponseBinding binding;
-
     private OpenQuestionResponseFragment openQuestionResponseFragment;
     private ChoiceQuestionResponseFragment choiceQuestionResponseFragment;
     private DateQuestionResponseFragment dateQuestionResponseFragment;
@@ -48,6 +50,7 @@ public class QuestionResponseActivity extends AppCompatActivity {
 
     private int currentQuestionOrder = -1;
     private String surveyID = null;
+    boolean surveyCompleted = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,6 +64,7 @@ public class QuestionResponseActivity extends AppCompatActivity {
 
             Intent previousIntent = getIntent();
             String title = previousIntent.getStringExtra(KEY_QUESTION_HEADER);
+            surveyCompleted = previousIntent.getBooleanExtra(KEY_SURVEY_COMPLETED,false);
             Bundle args = previousIntent.getBundleExtra(KEY_QUESTION_ARGS);
             if (args != null) {
                 String type = args.getString("questionType");
@@ -183,6 +187,7 @@ public class QuestionResponseActivity extends AppCompatActivity {
     public void saveResponse(Response response){
         String userID = AuthenticationManager.getInstance().getCurrentUser().getUid();
         response.setUserID(userID);
+        response.setModified(new Timestamp(new Date()));
         response.save();
         skipQuestion();
     }
@@ -248,5 +253,9 @@ public class QuestionResponseActivity extends AppCompatActivity {
                 .addChoice("No")
         );
         return list;
+    }
+
+    public boolean isSurveyCompleted(){
+        return surveyCompleted;
     }
 }

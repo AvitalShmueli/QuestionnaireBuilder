@@ -44,6 +44,7 @@ public class RatingQuestionResponseFragment extends Fragment {
     private Question question;
     private Response response;
     private float selectedRating = 0;
+    private boolean isSurveyCompleted;
 
     public RatingQuestionResponseFragment() {
         // Required empty public constructor
@@ -76,6 +77,7 @@ public class RatingQuestionResponseFragment extends Fragment {
                     .setSurveyID(args.getString("surveyID"))
                     .setOrder(args.getInt("order"));
         }
+        isSurveyCompleted = ((QuestionResponseActivity) requireActivity()).isSurveyCompleted();
     }
 
     @Override
@@ -100,13 +102,31 @@ public class RatingQuestionResponseFragment extends Fragment {
 
         if(question != null){
             responseRatingQuestion_LBL_question.setText(question.getQuestionTitle());
-            if(question.isMandatory()) {
-                responseRatingQuestion_LBL_mandatory.setVisibility(VISIBLE);
+            customRatingBar.setEnabled(!isSurveyCompleted);
+
+            if (isSurveyCompleted) {
                 responseRatingQuestion_BTN_skip.setVisibility(GONE);
+                responseRatingQuestion_BTN_save.setVisibility(GONE);
             }
             else {
-                responseRatingQuestion_LBL_mandatory.setVisibility(GONE);
-                responseRatingQuestion_BTN_skip.setVisibility(VISIBLE);
+                if (question.isMandatory()) {
+                    responseRatingQuestion_LBL_mandatory.setVisibility(VISIBLE);
+                    responseRatingQuestion_BTN_skip.setVisibility(GONE);
+                } else {
+                    responseRatingQuestion_LBL_mandatory.setVisibility(GONE);
+                    responseRatingQuestion_BTN_skip.setVisibility(VISIBLE);
+                }
+
+                // listeners
+                responseRatingQuestion_BTN_save.setOnClickListener(v -> save());
+                responseRatingQuestion_BTN_skip.setOnClickListener(v -> skipQuestion());
+
+                customRatingBar.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
+                    @Override
+                    public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
+                        selectedRating = rating;
+                    }
+                });
             }
 
             if (((RatingScaleQuestion)question).getIconResourceId() == R.drawable.ic_heart_filled){
@@ -119,17 +139,6 @@ public class RatingQuestionResponseFragment extends Fragment {
 
             customRatingBar.setNumStars(((RatingScaleQuestion)question).getRatingScaleLevel());
             customRatingBar.setStepSize(1);
-
-            customRatingBar.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
-                @Override
-                public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
-                    selectedRating = rating;
-                }
-            });
-
-            // listeners
-            responseRatingQuestion_BTN_save.setOnClickListener(v -> save());
-            responseRatingQuestion_BTN_skip.setOnClickListener(v -> skipQuestion());
         }
     }
 
@@ -169,6 +178,7 @@ public class RatingQuestionResponseFragment extends Fragment {
                        .setResponseID(UUID.randomUUID().toString())
                        .setSurveyID(question.getSurveyID())
                        .setQuestionID(question.getQuestionID())
+                       .setMandatory(question.isMandatory())
                        .addResponse(String.valueOf(selectedRating));
            }
            else {

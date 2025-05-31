@@ -9,18 +9,28 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.questionnairebuilder.R;
 
+import com.example.questionnairebuilder.listeners.OnCountListener;
 import com.example.questionnairebuilder.models.Survey;
+import com.example.questionnairebuilder.models.SurveyResponseStatus;
+import com.example.questionnairebuilder.utilities.AuthenticationManager;
+import com.example.questionnairebuilder.utilities.FirestoreManager;
 import com.google.android.material.textview.MaterialTextView;
 
 import android.view.LayoutInflater;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 public class SurveyAdapter extends RecyclerView.Adapter<SurveyAdapter.SurveyViewHolder> {
     private final Context context;
     private List<Survey> surveys;
     private OnSurveyClickListener listener;
+    private String currentUserId;
+    private final Map<SurveyResponseStatus.ResponseStatus, String> statusesMap = new LinkedHashMap<>();
+
 
     public interface OnSurveyClickListener {
         void onSurveyClick(Survey survey);
@@ -30,6 +40,11 @@ public class SurveyAdapter extends RecyclerView.Adapter<SurveyAdapter.SurveyView
         this.context = context;
         this.surveys = surveys;
         this.listener = listener;
+        currentUserId = AuthenticationManager.getInstance().getCurrentUser().getUid();
+
+        statusesMap.put(SurveyResponseStatus.ResponseStatus.PENDING,context.getString(R.string.pending));
+        statusesMap.put(SurveyResponseStatus.ResponseStatus.IN_PROGRESS,context.getString(R.string.in_progress));
+        statusesMap.put(SurveyResponseStatus.ResponseStatus.COMPLETED,context.getString(R.string.completed));
     }
 
     public void updateSurveys(List<Survey> newSurveys) {
@@ -53,8 +68,24 @@ public class SurveyAdapter extends RecyclerView.Adapter<SurveyAdapter.SurveyView
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
         String strDueDate = context.getString(R.string.due_date) + ": " + sdf.format(survey.getDueDate());
         holder.date.setText(strDueDate);
-        String strResponses =  context.getString(R.string.responses) + ": " + (survey.getSurveyViewers() != null ? survey.getSurveyViewers().size() : 0);
-        holder.responses.setText(strResponses);
+
+        FirestoreManager.getInstance().getSurveyResponseStatusCount(
+                survey.getID(),
+                Arrays.asList(SurveyResponseStatus.ResponseStatus.IN_PROGRESS, SurveyResponseStatus.ResponseStatus.COMPLETED),
+                new OnCountListener() {
+                    @Override
+                    public void onCountSuccess(int count) {
+                        String strResponses = context.getString(R.string.responses) + ": " + count;
+                        holder.responses.setText(strResponses);
+                    }
+
+                    @Override
+                    public void onCountFailure(Exception e) {
+                        // Handle the error - set to 0 as default
+                        String strResponses = context.getString(R.string.responses) + ": " + 0;
+                        holder.responses.setText(strResponses);
+                    }
+                });
 
         holder.itemView.setOnClickListener(v -> {
             if (listener != null) {

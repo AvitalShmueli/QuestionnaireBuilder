@@ -4,6 +4,8 @@ import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 
 import android.content.Context;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.os.Bundle;
 
 import androidx.core.content.ContextCompat;
@@ -16,6 +18,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.questionnairebuilder.QuestionResponseActivity;
+import com.example.questionnairebuilder.R;
 import com.example.questionnairebuilder.databinding.FragmentDateQuestionResponseBinding;
 import com.example.questionnairebuilder.interfaces.OneResponseCallback;
 import com.example.questionnairebuilder.models.DateQuestion;
@@ -54,6 +57,7 @@ public class DateQuestionResponseFragment extends Fragment {
     private MaterialButton responseDateQuestion_BTN_skip;
     private Question question;
     private Response response;
+    private boolean isSurveyCompleted;
 
     public DateQuestionResponseFragment() {
         // Required empty public constructor
@@ -84,6 +88,7 @@ public class DateQuestionResponseFragment extends Fragment {
                     .setSurveyID(args.getString("surveyID"))
                     .setOrder(args.getInt("order"));
         }
+        isSurveyCompleted = ((QuestionResponseActivity) requireActivity()).isSurveyCompleted();
     }
 
     @Override
@@ -110,20 +115,26 @@ public class DateQuestionResponseFragment extends Fragment {
 
         if(question != null){
             responseDateQuestion_LBL_question.setText(question.getQuestionTitle());
-            if(question.isMandatory()) {
-                responseDateQuestion_LBL_mandatory.setVisibility(VISIBLE);
+
+            if (isSurveyCompleted) {
                 responseDateQuestion_BTN_skip.setVisibility(GONE);
+                responseDateQuestion_BTN_save.setVisibility(GONE);
             }
             else {
-                responseDateQuestion_LBL_mandatory.setVisibility(GONE);
-                responseDateQuestion_BTN_skip.setVisibility(VISIBLE);
+                if (question.isMandatory()) {
+                    responseDateQuestion_LBL_mandatory.setVisibility(VISIBLE);
+                    responseDateQuestion_BTN_skip.setVisibility(GONE);
+                } else {
+                    responseDateQuestion_LBL_mandatory.setVisibility(GONE);
+                    responseDateQuestion_BTN_skip.setVisibility(VISIBLE);
+                }
+
+                // listeners
+                responseDateQuestion_BTN_save.setOnClickListener(v -> save());
+                responseDateQuestion_BTN_skip.setOnClickListener(v -> skipQuestion());
             }
 
             setupDateFieldBehavior();
-
-            // listeners
-            responseDateQuestion_BTN_save.setOnClickListener(v -> save());
-            responseDateQuestion_BTN_skip.setOnClickListener(v -> skipQuestion());
         }
     }
 
@@ -169,44 +180,54 @@ public class DateQuestionResponseFragment extends Fragment {
 
     private void setupDateField(TextInputLayout inputLayout, TextInputEditText editText) {
         inputLayout.setEndIconOnClickListener(v -> showMaterialDatePicker(editText));
+        inputLayout.setEnabled(!isSurveyCompleted);
 
-        editText.addTextChangedListener(new TextWatcher() {
-            boolean isEditing;
+        if(!isSurveyCompleted) {
+            editText.addTextChangedListener(new TextWatcher() {
+                boolean isEditing;
 
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {}
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                if (isEditing) return;
-                isEditing = true;
-
-                String input = s.toString().replaceAll("[^\\d]", "");
-                StringBuilder formatted = new StringBuilder();
-
-                for (int i = 0; i < input.length() && i < 8; i++) {
-                    if (i == 2 || i == 4) formatted.append("/");
-                    formatted.append(input.charAt(i));
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
                 }
 
-                editText.setText(formatted.toString());
-                editText.setSelection(formatted.length());
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+                }
 
-                if (formatted.length() == 10 && !isValidDate(formatted.toString()))
-                    inputLayout.setError("Invalid date");
-                else
-                    inputLayout.setError(null);
+                @Override
+                public void afterTextChanged(Editable s) {
+                    if (isEditing) return;
+                    isEditing = true;
 
-                isEditing = false;
-            }
-        });
+                    String input = s.toString().replaceAll("[^\\d]", "");
+                    StringBuilder formatted = new StringBuilder();
 
-        editText.setOnFocusChangeListener((v, hasFocus) ->
-                editText.setHint(hasFocus ? "DD/MM/YYYY" : "")
-        );
+                    for (int i = 0; i < input.length() && i < 8; i++) {
+                        if (i == 2 || i == 4) formatted.append("/");
+                        formatted.append(input.charAt(i));
+                    }
+
+                    editText.setText(formatted.toString());
+                    editText.setSelection(formatted.length());
+
+                    if (formatted.length() == 10 && !isValidDate(formatted.toString()))
+                        inputLayout.setError("Invalid date");
+                    else
+                        inputLayout.setError(null);
+
+                    isEditing = false;
+                }
+            });
+
+            editText.setOnFocusChangeListener((v, hasFocus) ->
+                    editText.setHint(hasFocus ? "DD/MM/YYYY" : "")
+            );
+
+            inputLayout.setEndIconTintList(ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.blue)));
+        }
+        else{
+            inputLayout.setEndIconTintList(ColorStateList.valueOf(Color.GRAY));
+        }
     }
 
     private boolean isValidDate(String date) {
@@ -262,6 +283,7 @@ public class DateQuestionResponseFragment extends Fragment {
                         .setResponseID(UUID.randomUUID().toString())
                         .setSurveyID(question.getSurveyID())
                         .setQuestionID(question.getQuestionID())
+                        .setMandatory(question.isMandatory())
                         .setResponseValues(selectedDates);
             }
             else {

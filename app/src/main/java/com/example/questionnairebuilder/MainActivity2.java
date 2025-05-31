@@ -11,7 +11,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.questionnairebuilder.adapters.QuestionsAdapter;
-import com.example.questionnairebuilder.interfaces.QuestionSelectedCallback;
 import com.example.questionnairebuilder.listeners.OnQuestionListChangedListener;
 import com.example.questionnairebuilder.listeners.OnStartDragListener;
 import com.example.questionnairebuilder.models.ChoiceQuestion;
@@ -42,7 +41,7 @@ public class MainActivity2 extends AppCompatActivity implements OnQuestionListCh
                 .setMandatory(true)
         );
         list.add(new RatingScaleQuestion("Q6? Rating question")
-                .setIconResourceId(R.drawable.ic_heart_filled)
+                .setIconResourceName("ic_heart_filled")
                 .setRatingScaleLevel(3)
                 .setMandatory(true)
         );
@@ -135,7 +134,7 @@ public class MainActivity2 extends AppCompatActivity implements OnQuestionListCh
             args.putString("dateSelectionMode",((DateQuestion)q).getDateMode().name());
         if(q instanceof RatingScaleQuestion) {
             args.putInt("ratingScaleLevel", ((RatingScaleQuestion) q).getRatingScaleLevel());
-            args.putInt("iconResourceId", ((RatingScaleQuestion) q).getIconResourceId());
+            args.putString("iconResourceId", ((RatingScaleQuestion) q).getIconResourceName());
         }
         return args;
     }

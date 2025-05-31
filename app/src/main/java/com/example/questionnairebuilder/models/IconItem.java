@@ -3,10 +3,10 @@ package com.example.questionnairebuilder.models;
 import androidx.annotation.NonNull;
 
 public class IconItem {
-    public final int iconResId;
+    public final String iconResName;
 
-    public IconItem(int iconResId) {
-        this.iconResId = iconResId;
+    public IconItem(String iconResName) {
+        this.iconResName = iconResName;
     }
 
     @NonNull

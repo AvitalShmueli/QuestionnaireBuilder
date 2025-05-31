@@ -8,7 +8,7 @@ import java.util.Map;
 
 public class RatingScaleQuestion extends Question implements AnalyzableQuestion {
     private int ratingScaleLevel;
-    private int iconResourceId;
+    private String iconResourceName;
     private final Map<String, Integer> ratingDistribution = new HashMap<>();
 
     public RatingScaleQuestion() {
@@ -19,9 +19,9 @@ public class RatingScaleQuestion extends Question implements AnalyzableQuestion 
         super(question, QuestionTypeEnum.RATING_SCALE);
     }
 
-    public RatingScaleQuestion(int ratingScaleLevel, int iconResourceId) {
+    public RatingScaleQuestion(int ratingScaleLevel, String iconResourceName) {
         this.ratingScaleLevel = ratingScaleLevel;
-        this.iconResourceId = iconResourceId;
+        this.iconResourceName = iconResourceName;
     }
 
     public int getRatingScaleLevel() {
@@ -33,12 +33,12 @@ public class RatingScaleQuestion extends Question implements AnalyzableQuestion 
         return this;
     }
 
-    public int getIconResourceId() {
-        return iconResourceId;
+    public String getIconResourceName() {
+        return iconResourceName;
     }
 
-    public RatingScaleQuestion setIconResourceId(int iconResourceId) {
-        this.iconResourceId = iconResourceId;
+    public RatingScaleQuestion setIconResourceName(String iconResourceName) {
+        this.iconResourceName = iconResourceName;
         return this;
     }
 

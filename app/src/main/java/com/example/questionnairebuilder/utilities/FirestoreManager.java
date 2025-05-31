@@ -7,6 +7,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 
+import com.example.questionnairebuilder.interfaces.SurveyResponsesStatusCallback;
 import com.example.questionnairebuilder.interfaces.UpdateSurveyDetailsCallback;
 import com.example.questionnairebuilder.listeners.OnCountListener;
 import com.example.questionnairebuilder.interfaces.AllResponsesCallback;
@@ -552,4 +553,21 @@ public class FirestoreManager {
                 .addOnFailureListener(callback::onError);
 
     }
+
+    public ListenerRegistration listenToSurveyResponseStatuses(String userId, SurveyResponsesStatusCallback callback) {
+        return surveyResponseStatusRef.whereEqualTo("userId", userId)
+                .addSnapshotListener((querySnapshot, e) -> {
+                    if (e != null) {
+                        callback.onError(e);
+                        return;
+                    }
+                    List<SurveyResponseStatus> list = new ArrayList<>();
+                    for (DocumentSnapshot doc : querySnapshot.getDocuments()) {
+                        SurveyResponseStatus srs = doc.toObject(SurveyResponseStatus.class);
+                        list.add(srs);
+                    }
+                    callback.onResponseStatusesLoaded(list);
+                });
+    }
+
 }

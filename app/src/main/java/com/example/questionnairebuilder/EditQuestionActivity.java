@@ -14,7 +14,7 @@ import com.example.questionnairebuilder.interfaces.SaveHandler;
 import com.example.questionnairebuilder.interfaces.UnsavedChangesHandler;
 import com.example.questionnairebuilder.models.Question;
 import com.example.questionnairebuilder.models.QuestionTypeEnum;
-import com.example.questionnairebuilder.models.QuestionTypeManager;
+import com.example.questionnairebuilder.utilities.QuestionTypeManager;
 import com.example.questionnairebuilder.ui.question_types.ChoiceQuestionFragment;
 import com.example.questionnairebuilder.ui.question_types.DateQuestionFragment;
 import com.example.questionnairebuilder.ui.question_types.OpenQuestionFragment;

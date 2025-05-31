@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 
 import com.example.questionnairebuilder.R;
 import com.example.questionnairebuilder.models.IconItem;
+import com.example.questionnairebuilder.utilities.RatingDrawableManager;
 
 public class IconsAdapter extends ArrayAdapter<IconItem> {
     private final Context context;
@@ -22,13 +23,14 @@ public class IconsAdapter extends ArrayAdapter<IconItem> {
 
     private View createIconView(int position, View convertView) {
         ImageView imageView;
+        RatingDrawableManager.init();
         if (convertView instanceof ImageView) {
             imageView = (ImageView) convertView;
         } else {
             imageView = new ImageView(context);
             imageView.setPadding(16, 16, 16, 16);
         }
-        imageView.setImageResource(getItem(position).iconResId);
+        imageView.setImageResource(RatingDrawableManager.getValueByKey(getItem(position).iconResName));
         return imageView;
     }
 

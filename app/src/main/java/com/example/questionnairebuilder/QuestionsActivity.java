@@ -38,7 +38,7 @@ import com.example.questionnairebuilder.models.MultipleChoiceQuestion;
 import com.example.questionnairebuilder.models.OpenEndedQuestion;
 import com.example.questionnairebuilder.models.Question;
 import com.example.questionnairebuilder.models.QuestionTypeEnum;
-import com.example.questionnairebuilder.models.QuestionTypeManager;
+import com.example.questionnairebuilder.utilities.QuestionTypeManager;
 import com.example.questionnairebuilder.models.RatingScaleQuestion;
 import com.example.questionnairebuilder.models.SurveyResponseStatus;
 import com.example.questionnairebuilder.utilities.AuthenticationManager;
@@ -368,7 +368,7 @@ public class QuestionsActivity extends AppCompatActivity {
             args.putString("dateSelectionMode",((DateQuestion)q).getDateMode().name());
         if(q instanceof RatingScaleQuestion) {
             args.putInt("ratingScaleLevel", ((RatingScaleQuestion) q).getRatingScaleLevel());
-            args.putInt("iconResourceId", ((RatingScaleQuestion) q).getIconResourceId());
+            args.putString("iconResourceName", ((RatingScaleQuestion) q).getIconResourceName());
         }
         return args;
     }

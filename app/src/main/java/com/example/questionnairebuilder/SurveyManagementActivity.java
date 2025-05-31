@@ -252,7 +252,7 @@ public class SurveyManagementActivity extends AppCompatActivity {
 
         statusAdapter = new ArrayAdapter<>(
                 this,
-                R.layout.spinner_item,
+                R.layout.item_spinner,
                 statusesMap.values().toArray(new String[0])
         );
         statusAdapter.setDropDownViewResource(R.layout.item_spinner);

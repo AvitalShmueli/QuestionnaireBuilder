@@ -18,6 +18,7 @@ import com.example.questionnairebuilder.interfaces.AnalyzableQuestion;
 import com.example.questionnairebuilder.models.OpenEndedQuestion;
 import com.example.questionnairebuilder.models.Question;
 import com.example.questionnairebuilder.models.QuestionTypeEnum;
+import com.example.questionnairebuilder.utilities.RatingDrawableManager;
 import com.example.questionnairebuilder.models.RatingScaleQuestion;
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.charts.PieChart;
@@ -248,9 +249,10 @@ public class AnalyzeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         container.removeAllViews();
         Context context = container.getContext();
         int level = question.getRatingScaleLevel();
-        int iconRes = question.getIconResourceId();
+        String iconRes = question.getIconResourceName();
 
         Map<String, Integer> distribution = question.getAnswerDistribution();
+        RatingDrawableManager.init();
 
         for (int i = 1; i <= level; i++) {
             LinearLayout row = new LinearLayout(context);
@@ -260,7 +262,7 @@ public class AnalyzeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             // Build icons row
             for (int j = 0; j < i; j++) {
                 ImageView icon = new ImageView(context);
-                icon.setImageResource(iconRes);
+                icon.setImageResource(RatingDrawableManager.getValueByKey(iconRes));
                 LinearLayout.LayoutParams iconParams = new LinearLayout.LayoutParams(60, 60);
                 iconParams.setMargins(4, 0, 4, 0);
                 icon.setLayoutParams(iconParams);

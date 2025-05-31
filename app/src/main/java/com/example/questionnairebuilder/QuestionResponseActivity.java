@@ -20,7 +20,7 @@ import com.example.questionnairebuilder.models.MultipleChoiceQuestion;
 import com.example.questionnairebuilder.models.OpenEndedQuestion;
 import com.example.questionnairebuilder.models.Question;
 import com.example.questionnairebuilder.models.QuestionTypeEnum;
-import com.example.questionnairebuilder.models.QuestionTypeManager;
+import com.example.questionnairebuilder.utilities.QuestionTypeManager;
 import com.example.questionnairebuilder.models.RatingScaleQuestion;
 import com.example.questionnairebuilder.models.Response;
 import com.example.questionnairebuilder.models.SingleChoiceQuestion;
@@ -211,7 +211,7 @@ public class QuestionResponseActivity extends AppCompatActivity {
             args.putString("dateSelectionMode",((DateQuestion)q).getDateMode().name());
         if(q instanceof RatingScaleQuestion) {
             args.putInt("ratingScaleLevel", ((RatingScaleQuestion) q).getRatingScaleLevel());
-            args.putInt("iconResourceId", ((RatingScaleQuestion) q).getIconResourceId());
+            args.putString("iconResourceName", ((RatingScaleQuestion) q).getIconResourceName());
         }
         return args;
     }
@@ -229,7 +229,7 @@ public class QuestionResponseActivity extends AppCompatActivity {
                 .setMandatory(true)
         );
         list.add(new RatingScaleQuestion("Q6? Rating question")
-                .setIconResourceId(R.drawable.ic_heart_filled)
+                .setIconResourceName("ic_heart_filled")
                 .setRatingScaleLevel(3)
                 .setMandatory(true)
         );

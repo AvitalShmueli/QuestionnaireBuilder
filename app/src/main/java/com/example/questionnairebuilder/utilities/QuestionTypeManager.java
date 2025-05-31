@@ -1,8 +1,9 @@
-package com.example.questionnairebuilder.models;
+package com.example.questionnairebuilder.utilities;
 
 import android.content.Context;
 
 import com.example.questionnairebuilder.R;
+import com.example.questionnairebuilder.models.QuestionTypeEnum;
 
 import java.util.LinkedHashMap;
 import java.util.Map;

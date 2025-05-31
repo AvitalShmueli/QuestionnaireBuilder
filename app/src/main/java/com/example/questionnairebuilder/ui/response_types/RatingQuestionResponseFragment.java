@@ -71,7 +71,7 @@ public class RatingQuestionResponseFragment extends Fragment {
         if (args != null) {
             question = new RatingScaleQuestion(args.getString("questionTitle"))
                     .setRatingScaleLevel(args.getInt("ratingScaleLevel"))
-                    .setIconResourceId(args.getInt("iconResourceId"))
+                    .setIconResourceName(args.getString("iconResourceName"))
                     .setMandatory(args.getBoolean("mandatory"))
                     .setQuestionID(args.getString("questionID"))
                     .setSurveyID(args.getString("surveyID"))
@@ -129,10 +129,10 @@ public class RatingQuestionResponseFragment extends Fragment {
                 });
             }
 
-            if (((RatingScaleQuestion)question).getIconResourceId() == R.drawable.ic_heart_filled){
+            if (((RatingScaleQuestion)question).getIconResourceName().equals("ic_heart_filled")) {
                 switchRatingBarStyle(customRatingBar, R.drawable.custom_ratingbar_heart_selector);
             }
-            else if (((RatingScaleQuestion)question).getIconResourceId() == R.drawable.ic_thumb_up_filled){
+            else if (((RatingScaleQuestion)question).getIconResourceName().equals("ic_thumb_up_filled")) {
                 switchRatingBarStyle(customRatingBar, R.drawable.custom_ratingbar_thumb_up_selector);
             } else
                 switchRatingBarStyle(customRatingBar, R.drawable.custom_ratingbar_star_selector);

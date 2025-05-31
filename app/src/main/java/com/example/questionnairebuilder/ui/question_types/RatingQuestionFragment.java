@@ -22,6 +22,7 @@ import com.example.questionnairebuilder.databinding.FragmentRatingQuestionBindin
 import com.example.questionnairebuilder.interfaces.SaveHandler;
 import com.example.questionnairebuilder.interfaces.UnsavedChangesHandler;
 import com.example.questionnairebuilder.models.IconItem;
+import com.example.questionnairebuilder.utilities.RatingDrawableManager;
 import com.example.questionnairebuilder.models.RatingScaleQuestion;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.imageview.ShapeableImageView;
@@ -46,7 +47,7 @@ public class RatingQuestionFragment extends Fragment implements UnsavedChangesHa
     private AutoCompleteTextView ratingQuestion_DD_RatingScaleIcon;
     private ShapeableImageView ratingQuestion_IMG_selectedIcon;
     private Integer selectedRatingScaleLevel = 5;
-    private Integer selectedRatingScaleIcon = null;
+    private String selectedRatingScaleIcon = null;
     private String surveyID;
     private RatingScaleQuestion question;
     private int currentQuestionOrder;
@@ -77,7 +78,7 @@ public class RatingQuestionFragment extends Fragment implements UnsavedChangesHa
             currentQuestionOrder = args.getInt("order");
             if (args.getString("questionID") != null) { // edit question
                 question = (RatingScaleQuestion) new RatingScaleQuestion(args.getString("questionTitle"))
-                        .setIconResourceId(args.getInt("iconResourceId"))
+                        .setIconResourceName(args.getString("iconResourceName"))
                         .setRatingScaleLevel(args.getInt("ratingScaleLevel"))
                         .setMandatory(args.getBoolean("mandatory"))
                         .setQuestionID(args.getString("questionID"))
@@ -152,23 +153,25 @@ public class RatingQuestionFragment extends Fragment implements UnsavedChangesHa
 
     private void initIconsDropDownValues() {
         IconItem[] iconItems = {
-                new IconItem(R.drawable.ic_heart_filled),
-                new IconItem(R.drawable.ic_star_filled),
-                new IconItem(R.drawable.ic_thumb_up_filled)
+                new IconItem("ic_heart_filled"),
+                new IconItem("ic_star_filled"),
+                new IconItem("ic_thumb_up_filled")
         };
 
         IconsAdapter adapter = new IconsAdapter(requireContext(), iconItems);
         ratingQuestion_DD_RatingScaleIcon.setAdapter(adapter);
 
         if(selectedRatingScaleIcon == null) {
-            selectedRatingScaleIcon = R.drawable.ic_star_filled;
+            selectedRatingScaleIcon = "ic_star_filled";
         }
-        ratingQuestion_IMG_selectedIcon.setImageResource(selectedRatingScaleIcon);
+
+        RatingDrawableManager.init();
+        ratingQuestion_IMG_selectedIcon.setImageResource(RatingDrawableManager.getValueByKey(selectedRatingScaleIcon));
 
         ratingQuestion_DD_RatingScaleIcon.setOnItemClickListener((parent, view, position, id) -> {
             IconItem selected = (IconItem) parent.getItemAtPosition(position);
-            selectedRatingScaleIcon = selected.iconResId;
-            ratingQuestion_IMG_selectedIcon.setImageResource(selectedRatingScaleIcon);
+            selectedRatingScaleIcon = selected.iconResName;
+            ratingQuestion_IMG_selectedIcon.setImageResource(RatingDrawableManager.getValueByKey(selectedRatingScaleIcon));
         });
 
     }
@@ -181,7 +184,7 @@ public class RatingQuestionFragment extends Fragment implements UnsavedChangesHa
         ratingQuestion_TXT_question.setText(q.getQuestionTitle());
         ratingQuestion_SW_mandatory.setChecked(q.isMandatory());
         selectedRatingScaleLevel = q.getRatingScaleLevel();
-        selectedRatingScaleIcon = q.getIconResourceId();
+        selectedRatingScaleIcon = q.getIconResourceName();
 
         initDropDownValues();// Rating Scale Level dropdown
         initIconsDropDownValues(); // Rating Scale Level dropdown
@@ -199,7 +202,7 @@ public class RatingQuestionFragment extends Fragment implements UnsavedChangesHa
             if(question == null) {
                 question = (RatingScaleQuestion) new RatingScaleQuestion(questionTitle)
                         .setRatingScaleLevel(selectedRatingScaleLevel)
-                        .setIconResourceId(selectedRatingScaleIcon)
+                        .setIconResourceName(selectedRatingScaleIcon)
                         .setQuestionID(UUID.randomUUID().toString())
                         .setSurveyID(surveyID)
                         .setMandatory(mandatory)
@@ -207,7 +210,7 @@ public class RatingQuestionFragment extends Fragment implements UnsavedChangesHa
             }
             else {
                 question.setRatingScaleLevel(selectedRatingScaleLevel)
-                        .setIconResourceId(selectedRatingScaleIcon)
+                        .setIconResourceName(selectedRatingScaleIcon)
                         .setQuestionTitle(questionTitle)
                         .setMandatory(mandatory);
             }
@@ -243,19 +246,19 @@ public class RatingQuestionFragment extends Fragment implements UnsavedChangesHa
                 : "";
         boolean currentMandatory = ratingQuestion_SW_mandatory.isChecked();
         Integer currentRatingScaleLevel = selectedRatingScaleLevel;
-        Integer currentIconResourceId = selectedRatingScaleIcon;
+        String currentIconResourceName = selectedRatingScaleIcon;
 
         String originalText = question != null ? question.getQuestionTitle() : "";
         boolean originalMandatory = question != null && question.isMandatory();
         Integer originalRatingScaleLevel = question != null ? question.getRatingScaleLevel() : null;
-        Integer originalIconResourceId = question != null ? question.getIconResourceId() : null;
+        String originalIconResourceName = question != null ? question.getIconResourceName() : null;
 
         boolean textChanged = !currentText.equals(originalText);
         boolean mandatoryChanged = currentMandatory != originalMandatory;
         boolean ratingScaleLevelChanged = !currentRatingScaleLevel.equals(originalRatingScaleLevel);
-        boolean iconResourceIdChanged = !currentIconResourceId.equals(originalIconResourceId);
+        boolean iconResourceChanged = !currentIconResourceName.equals(originalIconResourceName);
 
-        return textChanged || mandatoryChanged || ratingScaleLevelChanged || iconResourceIdChanged;
+        return textChanged || mandatoryChanged || ratingScaleLevelChanged || iconResourceChanged;
     }
 
     @Override

@@ -28,7 +28,7 @@ import com.example.questionnairebuilder.listeners.OnRowCountChangeListener;
 import com.example.questionnairebuilder.models.ChoiceQuestion;
 import com.example.questionnairebuilder.models.MultipleChoiceQuestion;
 import com.example.questionnairebuilder.models.QuestionTypeEnum;
-import com.example.questionnairebuilder.models.QuestionTypeManager;
+import com.example.questionnairebuilder.utilities.QuestionTypeManager;
 import com.example.questionnairebuilder.models.SingleChoiceQuestion;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.materialswitch.MaterialSwitch;

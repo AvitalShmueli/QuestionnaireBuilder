@@ -57,8 +57,6 @@ dependencies {
 
     // Firebase:
     implementation(platform(libs.firebase.bom)) // Import the Firebase BoM
-    // When using the BoM, don't specify versions in Firebase dependencies
-    // TODO: Add the dependencies for Firebase products you want to use
     implementation(libs.firebase.analytics)
     implementation(libs.firebase.auth)
     implementation(libs.firebase.ui.auth)
@@ -69,6 +67,7 @@ dependencies {
     implementation(libs.firebase.vertexai)
     implementation(libs.guava)
     implementation(libs.reactive.streams)
+    implementation(libs.firebase.appcheck.playintegrity)
 
     // analysis:
     implementation(libs.mpandroidchart)

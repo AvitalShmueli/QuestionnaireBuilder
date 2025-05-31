@@ -1,6 +1,7 @@
 package com.example.questionnairebuilder.adapters;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +12,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.questionnairebuilder.OpenResponsesActivity;
 import com.example.questionnairebuilder.R;
 import com.example.questionnairebuilder.interfaces.AnalyzableQuestion;
 import com.example.questionnairebuilder.models.OpenEndedQuestion;
@@ -28,6 +30,7 @@ import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
 import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.github.mikephil.charting.utils.ColorTemplate;
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textview.MaterialTextView;
 
 import java.util.ArrayList;
@@ -107,8 +110,15 @@ public class AnalyzeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         if (holder instanceof OpenEndedViewHolder) {
             OpenEndedQuestion openQ = (OpenEndedQuestion) q;
             OpenEndedViewHolder vh = (OpenEndedViewHolder) holder;
+
             vh.title.setText(openQ.getQuestionTitle());
             vh.summary.setText(openQ.getAnalysisResult() != null ? openQ.getAnalysisResult() : "Analysis not available.");
+            vh.viewAll.setOnClickListener(v -> {
+                Intent intent = new Intent(v.getContext(), OpenResponsesActivity.class);
+                intent.putExtra("questionTitle", openQ.getQuestionTitle());
+                intent.putStringArrayListExtra("responses", new ArrayList<>(openQ.getAllResponses()));
+                v.getContext().startActivity(intent);
+            });
         } else if (holder instanceof PieChartViewHolder && q instanceof AnalyzableQuestion) {
             PieChartViewHolder vh = (PieChartViewHolder) holder;
             vh.title.setText(q.getQuestionTitle());
@@ -122,22 +132,11 @@ public class AnalyzeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             vh.title.setText(q.getQuestionTitle());
             setupDateBarChart(vh.chart, (AnalyzableQuestion) q);
         }
-
     }
 
     @Override
     public int getItemCount() {
         return questionList.size();
-    }
-
-    static class OpenEndedViewHolder extends RecyclerView.ViewHolder {
-        MaterialTextView title, summary;
-
-        public OpenEndedViewHolder(@NonNull View itemView) {
-            super(itemView);
-            title = itemView.findViewById(R.id.itemAnalysis_LBL_title);
-            summary = itemView.findViewById(R.id.itemAnalysis_LBL_summary);
-        }
     }
 
     static class PieChartViewHolder extends RecyclerView.ViewHolder {
@@ -170,6 +169,18 @@ public class AnalyzeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             super(itemView);
             title = itemView.findViewById(R.id.itemAnalysis_LBL_title);
             chart = itemView.findViewById(R.id.itemAnalysis_chart_date);
+        }
+    }
+
+    static class OpenEndedViewHolder extends RecyclerView.ViewHolder {
+        MaterialTextView title, summary;
+        MaterialButton viewAll;
+
+        public OpenEndedViewHolder(@NonNull View itemView) {
+            super(itemView);
+            title = itemView.findViewById(R.id.itemAnalysis_LBL_title);
+            summary = itemView.findViewById(R.id.itemAnalysis_LBL_summary);
+            viewAll = itemView.findViewById(R.id.itemAnalysis_BTN_viewAll);
         }
     }
 

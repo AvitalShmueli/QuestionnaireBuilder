@@ -14,14 +14,13 @@ import java.util.concurrent.Executors;
 
 public class VertexAiManager {
     private static VertexAiManager instance;
-    //private GenerativeModel geminiModel;
-    //private GenerativeModelFutures model;
+    private GenerativeModel geminiModel;
+    private GenerativeModelFutures model;
 
     private VertexAiManager() {
-        /*
         geminiModel = FirebaseVertexAI.getInstance()
                 .generativeModel("gemini-2.0-flash");
-        model = GenerativeModelFutures.from(geminiModel);*/
+        model = GenerativeModelFutures.from(geminiModel);
     }
 
     public static synchronized VertexAiManager getInstance() {
@@ -31,14 +30,11 @@ public class VertexAiManager {
     }
 
     public void analyzeOpenAnswer(String userResponse, OnAnalysisCompleteListener listener) {
-        // Bypass AI logic for now to prevent crash
-        listener.onAnalysisComplete("AI analysis disabled for development.");
-        /*
-        //TODO: Dummy data for now — later this would fetch actual responses from Firestore.
-        String combinedText = "User response 1.\nUser response 2.\nUser response 3.";
+        String prompt = "As an AI survey analyst, analyze the following open-ended responses written by different users. " +
+                "Identify the most common themes, trends, and sentiments. " +
+                "Write one short paragraph summarizing the insights in natural English, up to 50 words. " +
+                "Do not use lists or quote the users directly.\n\nResponses:\n" + userResponse;
 
-        //String prompt = "Analyze the following survey response and summarize the user's sentiment and suggestions:\n\n" + userResponse;
-        String prompt = "Analyze the following survey responses:\n\n" + combinedText;
 
         Content content = new Content.Builder()
                 .addText(prompt)
@@ -57,6 +53,6 @@ public class VertexAiManager {
             public void onFailure(Throwable t) {
                 listener.onError(new Exception(t));
             }
-        }, Executors.newSingleThreadExecutor());*/
+        }, Executors.newSingleThreadExecutor());
     }
 }

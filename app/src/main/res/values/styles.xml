@@ -67,4 +67,11 @@
         <item name="android:textSize">14sp</item>
     </style>
 
+    <style name="ToolbarTitleMultiline" parent="TextAppearance.Widget.AppCompat.Toolbar.Title">
+        <item name="android:singleLine">false</item>
+        <item name="android:maxLines">3</item> <!-- You can increase if needed -->
+        <item name="android:ellipsize">none</item>
+        <item name="android:textSize">16sp</item> <!-- Optional: adjust text size -->
+    </style>
+
 </resources>

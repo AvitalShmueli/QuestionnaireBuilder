@@ -18,18 +18,36 @@
             android:id="@+id/itemAnalysis_LBL_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textStyle="bold"
+            android:layout_marginBottom="12dp"
             android:textColor="@color/black"
-            android:text="Question title"
-            android:textSize="16sp" />
+            android:textSize="16sp"
+            android:textStyle="bold"
+            tools:text="Question title" />
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/itemAnalysis_LBL_summary"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textColor="@color/black"
-            android:text="summery"
-            android:textSize="12sp" />
+            android:textSize="12sp"
+            android:lineSpacingExtra="4dp"
+            tools:text="summery" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/itemAnalysis_BTN_viewAll"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/view_all_responses"
+            android:textColor="@color/blue"
+            android:textSize="14sp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true"
+            app:iconTint="@color/blue"
+            android:layout_marginTop="8dp"
+            app:icon="@drawable/visibility_24px"
+            app:iconGravity="textStart"
+            app:iconPadding="8dp" />
 
     </LinearLayout>
 

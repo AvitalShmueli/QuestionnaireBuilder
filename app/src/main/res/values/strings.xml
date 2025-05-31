@@ -100,6 +100,8 @@
     <string name="start_survey">Start Survey</string>
     <string name="continue_survey">Continue Survey</string>
     <string name="survey_responses_subtitle">%1$d of %2$d answered</string>
+    <string name="view_all_responses">View all responses</string>
+    <string name="no_responses_to_display">No responses to display.</string>
     <string name="thank_you">Thank you! Your answers have been submitted successfully.</string>
     <string name="survey_submitted">Survey submitted on %1$s at %2$s</string>
     <string name="survey_updated_successfully">Survey details have been updated successfully.</string>

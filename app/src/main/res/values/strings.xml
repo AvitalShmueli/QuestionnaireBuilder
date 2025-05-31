@@ -108,4 +108,5 @@
     <string name="pending">Pending</string>
     <string name="in_progress">In progress</string>
     <string name="completed">Completed</string>
+    <string name="response_date">Response Date</string>
 </resources>

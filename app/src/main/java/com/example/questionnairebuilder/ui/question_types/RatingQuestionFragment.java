@@ -145,7 +145,7 @@ public class RatingQuestionFragment extends Fragment implements UnsavedChangesHa
 
         String strRatingScaleLevel = selectedRatingScaleLevel.toString();
         ratingQuestion_DD_RatingScaleLevel.setText(strRatingScaleLevel);
-        ArrayAdapter<Integer> adapterItems_RatingScaleLevel = new ArrayAdapter<>(requireActivity(), R.layout.dropdown_item, itemsRatingScaleLevel);
+        ArrayAdapter<Integer> adapterItems_RatingScaleLevel = new ArrayAdapter<>(requireActivity(), R.layout.item_dropdown, itemsRatingScaleLevel);
         ratingQuestion_DD_RatingScaleLevel.setAdapter(adapterItems_RatingScaleLevel);
         ratingQuestion_DD_RatingScaleLevel.setOnItemClickListener((adapterView, view, position, id) -> selectedRatingScaleLevel = adapterItems_RatingScaleLevel.getItem(position));
     }

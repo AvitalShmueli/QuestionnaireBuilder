@@ -15,7 +15,7 @@ public class IconsAdapter extends ArrayAdapter<IconItem> {
     private final Context context;
 
     public IconsAdapter(@NonNull Context context, IconItem[] items) {
-        super(context, R.layout.dropdown_item_icon, items);
+        super(context, R.layout.item_dropdown_icon, items);
         this.context = context;
     }
 

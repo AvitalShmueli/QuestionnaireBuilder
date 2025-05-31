@@ -51,6 +51,7 @@ public class SurveyManagementActivity extends AppCompatActivity {
     private LinearLayout management_LL_edit;
     //private MaterialTextView management_LBL_isOpen;
     //private MaterialSwitch management_SW_isOpen;
+    private LinearLayout management_LL_analyze;
     private MaterialTextView management_LBL_totalResponses;
     private MaterialTextView management_LBL_completedResponses;
     private MaterialTextView management_LBL_createdDate;
@@ -206,6 +207,7 @@ public class SurveyManagementActivity extends AppCompatActivity {
         });
         //initIsOpenSwitch();
         setupEditClick();
+        setupAnalyzeClick();
         initSpinner();
 
         management_SW_alert.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -229,6 +231,14 @@ public class SurveyManagementActivity extends AppCompatActivity {
         management_LL_description.setOnClickListener(v -> showDescriptionDialog());
     }
 
+    private void setupAnalyzeClick() {
+        management_LL_analyze.setOnClickListener(v -> {
+            Intent intent = new Intent(SurveyManagementActivity.this, AnalyzeResponsesActivity.class);
+            intent.putExtra("surveyID", survey.getID());
+            startActivity(intent);
+        });
+    }
+
     private void initSpinner() {
         /*String[] statuses = {
                 getString(R.string.draft),
@@ -245,7 +255,7 @@ public class SurveyManagementActivity extends AppCompatActivity {
                 R.layout.spinner_item,
                 statusesMap.values().toArray(new String[0])
         );
-        statusAdapter.setDropDownViewResource(R.layout.spinner_item);
+        statusAdapter.setDropDownViewResource(R.layout.item_spinner);
         management_SP_status.setAdapter(statusAdapter);
 
         management_SP_status.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -328,6 +338,7 @@ public class SurveyManagementActivity extends AppCompatActivity {
         management_LL_edit = findViewById(R.id.management_LL_edit);
         //management_LBL_isOpen = findViewById(R.id.management_LBL_isOpen);
         //management_SW_isOpen = findViewById(R.id.management_SW_isOpen);
+        management_LL_analyze = findViewById(R.id.management_LL_analyze);
         management_LBL_totalResponses = findViewById(R.id.management_LBL_totalResponses);
         management_LBL_completedResponses = findViewById(R.id.management_LBL_completedResponses);
         management_LBL_createdDate = findViewById(R.id.management_LBL_createdDate);

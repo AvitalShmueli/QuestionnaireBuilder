@@ -55,7 +55,7 @@ public class SurveyAdapter extends RecyclerView.Adapter<SurveyAdapter.SurveyView
     @NonNull
     @Override
     public SurveyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.survey_item, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_survey, parent, false);
         return new SurveyViewHolder(view);
     }
 

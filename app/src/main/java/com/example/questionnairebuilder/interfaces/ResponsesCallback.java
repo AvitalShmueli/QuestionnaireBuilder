@@ -1,8 +1,8 @@
 package com.example.questionnairebuilder.interfaces;
 
-import java.util.Set;
+import java.util.Map;
 
 public interface ResponsesCallback {
-    void onResponsesLoaded(Set<String> answeredQuestionIds);
+    void onResponsesLoaded(Map<String, Boolean> answeredQuestions);
     void onError(Exception e);
 }

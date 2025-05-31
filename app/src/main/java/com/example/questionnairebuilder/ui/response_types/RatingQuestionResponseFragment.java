@@ -178,6 +178,7 @@ public class RatingQuestionResponseFragment extends Fragment {
                        .setResponseID(UUID.randomUUID().toString())
                        .setSurveyID(question.getSurveyID())
                        .setQuestionID(question.getQuestionID())
+                       .setMandatory(question.isMandatory())
                        .addResponse(String.valueOf(selectedRating));
            }
            else {

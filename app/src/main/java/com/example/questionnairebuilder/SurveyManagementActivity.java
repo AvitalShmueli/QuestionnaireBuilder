@@ -31,6 +31,7 @@ import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.materialswitch.MaterialSwitch;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textview.MaterialTextView;
+import com.google.firebase.Timestamp;
 
 
 import java.text.ParseException;
@@ -62,7 +63,7 @@ public class SurveyManagementActivity extends AppCompatActivity {
     private MaterialSwitch management_SW_alert;
     private LinearLayout management_LL_description;
     private MaterialTextView management_LBL_description;
-    private Map<Survey.SurveyStatus, String> statusesMap = new LinkedHashMap<>();
+    private final Map<Survey.SurveyStatus, String> statusesMap = new LinkedHashMap<>();
     private ArrayAdapter<String> statusAdapter;
     private boolean isFirstSelection = true;
     private Survey survey;
@@ -397,6 +398,7 @@ public class SurveyManagementActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.action_save) {
             if(!updates.isEmpty()){
+                updates.put("modified",new Timestamp(new Date()));
                 FirestoreManager.getInstance().updateSurvey(survey.getID(), updates, new UpdateSurveyDetailsCallback() {
                     @Override
                     public void onSuccess(Survey updatedSurvey) {
@@ -454,7 +456,6 @@ public class SurveyManagementActivity extends AppCompatActivity {
                 .setView(dialogView)
                 .setPositiveButton("OK", (dialog, which) -> {
                     String enteredText = inputEditText.getText().toString().trim();
-                    Toast.makeText(this, "You entered: " + enteredText, Toast.LENGTH_SHORT).show();
                     if(!enteredText.equals(survey.getDescription())) {
                         management_LBL_description.setText(enteredText);
                         updates.put("description", enteredText);

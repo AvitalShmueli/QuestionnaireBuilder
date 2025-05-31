@@ -162,6 +162,7 @@ public class OpenQuestionResponseFragment extends Fragment {
                         .setResponseID(UUID.randomUUID().toString())
                         .setSurveyID(question.getSurveyID())
                         .setQuestionID(question.getQuestionID())
+                        .setMandatory(question.isMandatory())
                         .addResponse(responseOpenQuestion_TXT_answer.getText().toString());
             }
             else {

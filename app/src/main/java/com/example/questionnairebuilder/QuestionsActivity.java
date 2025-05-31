@@ -51,9 +51,12 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textview.MaterialTextView;
 import com.google.firebase.firestore.ListenerRegistration;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -75,12 +78,12 @@ public class QuestionsActivity extends AppCompatActivity {
     private String surveyID;
     private String surveyTitle;
     private String currentUserId;
-
     private QuestionsAdapter questionsAdapter;
     private List<Question> questionsList = new ArrayList<>();
     private ListenerRegistration questionsListener;
     private boolean canEdit;
     private int answeredCount = 0;
+    private int answeredMandatoryCount = 0;
     private int totalCount = 0;
     private int totalMandatoryCount = 0;
     private SurveyResponseStatus surveyResponseStatus = null;
@@ -510,23 +513,27 @@ public class QuestionsActivity extends AppCompatActivity {
     private void fetchUserResponses() {
         FirestoreManager.getInstance().getUserResponsesForSurvey(surveyID, currentUserId, new ResponsesCallback() {
             @Override
-            public void onResponsesLoaded(Set<String> answeredQuestionIds) {
-                answeredCount = answeredQuestionIds.size();
+            public void onResponsesLoaded(Map<String, Boolean> answeredQuestions) {
+                answeredCount = answeredQuestions.size();
+                answeredMandatoryCount = (int) answeredQuestions.values().stream()
+                        .filter(Boolean.TRUE::equals)
+                        .count();
                 String questionsProgress = getString(R.string.survey_responses_subtitle, Objects.requireNonNullElse(answeredCount,0), Objects.requireNonNullElse(totalCount,0));
                 runOnUiThread(() -> {
-                    questionsAdapter.setAnsweredQuestionIds(answeredQuestionIds);
+                    questionsAdapter.setAnsweredQuestionIds(answeredQuestions.keySet());
                     toolbar.setSubtitle(questionsProgress);
                     if (answeredCount == 0) {
                         questions_FAB_start.setText(getString(R.string.start_survey));
                         questions_FAB_start.setIconResource(R.drawable.ic_start);
                     } else {
-                        if(answeredCount == totalCount || answeredCount >= totalMandatoryCount) {
-                            if(surveyResponseStatus != null && surveyResponseStatus.getStatus() != SurveyResponseStatus.ResponseStatus.COMPLETED) {
+                        if(answeredMandatoryCount == totalMandatoryCount /*answeredCount == totalCount || (answeredCount >= totalMandatoryCount && answeredCount > 0)*/) {
+                            if(surveyResponseStatus == null || surveyResponseStatus.getStatus() != SurveyResponseStatus.ResponseStatus.COMPLETED) {
                                 questions_BTN_complete.setVisibility(VISIBLE);
                                 questions_LBL_completed.setVisibility(GONE);
                             }
                             else {
                                 questions_BTN_complete.setVisibility(GONE);
+                                questions_LBL_completed.setText(formatDateTime(surveyResponseStatus.getCompletedAt()));
                                 questions_LBL_completed.setVisibility(VISIBLE);
                             }
                             adjustRecyclerViewPadding();
@@ -538,7 +545,15 @@ public class QuestionsActivity extends AppCompatActivity {
                             questions_LBL_completed.setVisibility(GONE);
                         }
                     }
-                    questions_FAB_start.setVisibility(questionsList.isEmpty() || answeredCount == totalCount || answeredCount >= totalMandatoryCount? GONE : VISIBLE);
+                    int x = 1;
+                    // TODO: start / continue button
+                    if(questionsList.isEmpty() || answeredMandatoryCount == totalMandatoryCount/*answeredCount == totalCount*/)
+                        questions_FAB_start.setVisibility(GONE);
+                    //else if(answeredCount >= totalMandatoryCount && answeredCount > 0)
+                    //    questions_FAB_start.setVisibility(GONE);
+                    else
+                        questions_FAB_start.setVisibility(VISIBLE);
+                    //questions_FAB_start.setVisibility(questionsList.isEmpty() || answeredCount == totalCount || answeredCount >= totalMandatoryCount? GONE : VISIBLE);
                 });
             }
 
@@ -568,5 +583,13 @@ public class QuestionsActivity extends AppCompatActivity {
                     recyclerView.getPaddingRight(),
                     0);
         }
+    }
+
+    private String formatDateTime(Date date){
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+        SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
+        String datePart = dateFormat.format(date);
+        String timePart = timeFormat.format(date);
+        return getString(R.string.survey_submitted, Objects.requireNonNullElse(datePart, ""),Objects.requireNonNullElse(timePart, ""));
     }
 }

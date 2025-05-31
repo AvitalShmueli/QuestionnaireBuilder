@@ -315,6 +315,7 @@ public class ChoiceQuestionResponseFragment extends Fragment {
                         .setResponseID(UUID.randomUUID().toString())
                         .setSurveyID(question.getSurveyID())
                         .setQuestionID(question.getQuestionID())
+                        .setMandatory(question.isMandatory())
                         .setResponseValues(selectedChoices);
             }
             else {

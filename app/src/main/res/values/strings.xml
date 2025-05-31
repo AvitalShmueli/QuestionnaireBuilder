@@ -101,7 +101,7 @@
     <string name="continue_survey">Continue Survey</string>
     <string name="survey_responses_subtitle">%1$d of %2$d answered</string>
     <string name="thank_you">Thank you! Your answers have been submitted successfully.</string>
-    <string name="survey_submitted">Survey submitted</string>
+    <string name="survey_submitted">Survey submitted on %1$s at %2$s</string>
     <string name="survey_updated_successfully">Survey details have been updated successfully.</string>
     <string name="survey_update_failed">Failed. Try again later.</string>
     <string name="update_description">Update Description</string>

@@ -31,8 +31,10 @@ import com.example.questionnairebuilder.ui.response_types.RatingQuestionResponse
 import com.example.questionnairebuilder.utilities.AuthenticationManager;
 import com.example.questionnairebuilder.utilities.FirestoreManager;
 import com.google.android.material.appbar.MaterialToolbar;
+import com.google.firebase.Timestamp;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class QuestionResponseActivity extends AppCompatActivity {
@@ -185,6 +187,7 @@ public class QuestionResponseActivity extends AppCompatActivity {
     public void saveResponse(Response response){
         String userID = AuthenticationManager.getInstance().getCurrentUser().getUid();
         response.setUserID(userID);
+        response.setModified(new Timestamp(new Date()));
         response.save();
         skipQuestion();
     }

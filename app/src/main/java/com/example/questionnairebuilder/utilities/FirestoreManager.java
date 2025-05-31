@@ -54,12 +54,10 @@ import com.google.firebase.storage.StorageReference;
 
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 
 import java.util.ArrayList;
 import java.util.Map;
-import java.util.Set;
 
 public class FirestoreManager {
     private static FirestoreManager instance;
@@ -532,14 +530,15 @@ public class FirestoreManager {
                 .whereEqualTo("userID", userId)
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
-                    Set<String> answeredQuestionIds = new HashSet<>();
+                    Map<String, Boolean> answeredQuestions = new HashMap<>();
                     for (DocumentSnapshot doc : queryDocumentSnapshots) {
                         String questionID = doc.getString("questionID");
-                        if (questionID != null) {
-                            answeredQuestionIds.add(questionID);
+                        Boolean isMandatory = doc.getBoolean("mandatory");
+                        if (questionID != null && isMandatory != null) {
+                            answeredQuestions.put(questionID, isMandatory);
                         }
                     }
-                    callback.onResponsesLoaded(answeredQuestionIds);
+                    callback.onResponsesLoaded(answeredQuestions);
                 })
                 .addOnFailureListener(callback::onError);
     }

@@ -15,6 +15,7 @@ public class Response {
     private Timestamp created = new Timestamp(new Date());
     private Timestamp modified = new Timestamp(new Date());
     private List<String> responseValues;
+    private boolean mandatory;
 
     public Response() {
         responseValues = new ArrayList<>();
@@ -80,6 +81,15 @@ public class Response {
 
     public Response setResponseValues(List<String> responseValues) {
         this.responseValues = responseValues;
+        return this;
+    }
+
+    public boolean isMandatory() {
+        return mandatory;
+    }
+
+    public Response setMandatory(boolean mandatory) {
+        this.mandatory = mandatory;
         return this;
     }
 

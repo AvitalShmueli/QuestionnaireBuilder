@@ -14,7 +14,7 @@ import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.questionnairebuilder.R;
-import com.example.questionnairebuilder.interfaces.Callback_questionSelected;
+import com.example.questionnairebuilder.interfaces.QuestionSelectedCallback;
 import com.example.questionnairebuilder.listeners.OnStartDragListener;
 import com.example.questionnairebuilder.models.Question;
 import com.google.android.material.imageview.ShapeableImageView;
@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
 
 public class QuestionsAdapter extends RecyclerView.Adapter<QuestionsAdapter.ViewHolder> {
     private List<Question> questionsList;
-    private Callback_questionSelected callback_questionSelected;
+    private QuestionSelectedCallback callback_questionSelected;
     private boolean reorderEnabled = false;
     private OnStartDragListener startDragListener;
     private final Set<Question> questionsToUpdate = new HashSet<>();
@@ -39,7 +39,7 @@ public class QuestionsAdapter extends RecyclerView.Adapter<QuestionsAdapter.View
         this.questionsList = questionsList;
     }
 
-    public QuestionsAdapter setCallbackQuestionSelected(Callback_questionSelected callback_questionSelected) {
+    public QuestionsAdapter setCallbackQuestionSelected(QuestionSelectedCallback callback_questionSelected) {
         this.callback_questionSelected = callback_questionSelected;
         return this;
     }

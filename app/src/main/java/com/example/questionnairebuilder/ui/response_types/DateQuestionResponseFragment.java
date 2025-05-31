@@ -283,6 +283,7 @@ public class DateQuestionResponseFragment extends Fragment {
                         .setResponseID(UUID.randomUUID().toString())
                         .setSurveyID(question.getSurveyID())
                         .setQuestionID(question.getQuestionID())
+                        .setMandatory(question.isMandatory())
                         .setResponseValues(selectedDates);
             }
             else {

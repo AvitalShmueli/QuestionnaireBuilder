@@ -100,4 +100,6 @@
     <string name="start_survey">Start Survey</string>
     <string name="continue_survey">Continue Survey</string>
     <string name="survey_responses_subtitle">%1$d of %2$d answered</string>
+    <string name="view_all_responses">View all responses</string>
+    <string name="no_responses_to_display">No responses to display.</string>
 </resources>

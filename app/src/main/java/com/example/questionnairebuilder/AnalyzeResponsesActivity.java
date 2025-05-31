@@ -11,8 +11,11 @@ import com.example.questionnairebuilder.adapters.AnalyzeAdapter;
 import com.example.questionnairebuilder.interfaces.AllResponsesCallback;
 import com.example.questionnairebuilder.interfaces.AnalyzableQuestion;
 import com.example.questionnairebuilder.interfaces.QuestionsCallback;
+import com.example.questionnairebuilder.listeners.OnAnalysisCompleteListener;
+import com.example.questionnairebuilder.models.OpenEndedQuestion;
 import com.example.questionnairebuilder.models.Question;
 import com.example.questionnairebuilder.utilities.FirestoreManager;
+import com.example.questionnairebuilder.utilities.VertexAiManager;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.firebase.firestore.DocumentSnapshot;
 
@@ -52,10 +55,11 @@ public class AnalyzeResponsesActivity extends AppCompatActivity {
                 questions.clear();
                 questions.addAll(questionList);
 
-                // Now load responses after questions are ready
+                // Load responses after questions are ready
                 FirestoreManager.getInstance().getAllResponsesForSurvey(surveyID, new AllResponsesCallback() {
                     @Override
                     public void onResponsesLoaded(List<DocumentSnapshot> documents) {
+                        // Accumulate responses
                         for (DocumentSnapshot doc : documents) {
                             String questionID = doc.getString("questionID");
                             List<Object> rawValues = (List<Object>) doc.get("responseValues");
@@ -68,10 +72,44 @@ public class AnalyzeResponsesActivity extends AppCompatActivity {
                             }
 
                             for (Question question : questions) {
-                                if (question instanceof AnalyzableQuestion && question.getQuestionID().equals(questionID)) {
-                                    ((AnalyzableQuestion) question).accumulateAnswers(values);
+                                if (question.getQuestionID().equals(questionID)) {
+
+                                    if (question instanceof AnalyzableQuestion) {
+                                        ((AnalyzableQuestion) question).accumulateAnswers(values);
+                                    }
+
+                                    if (question instanceof OpenEndedQuestion) {
+                                        OpenEndedQuestion openQuestion = (OpenEndedQuestion) question;
+
+                                        // 👇 Append (not overwrite) responses!
+                                        openQuestion.getAllResponses().addAll(values);
+                                    }
+
                                     break;
                                 }
+                            }
+                        }
+
+                        // Now run AI summarization once per open-ended question
+                        for (Question question : questions) {
+                            if (question instanceof OpenEndedQuestion) {
+                                OpenEndedQuestion openQuestion = (OpenEndedQuestion) question;
+
+                                String combinedText = android.text.TextUtils.join("\n", openQuestion.getAllResponses());
+
+                                VertexAiManager.getInstance().analyzeOpenAnswer(combinedText, new OnAnalysisCompleteListener() {
+                                    @Override
+                                    public void onAnalysisComplete(String summary) {
+                                        openQuestion.setAnalysisResult(summary);
+                                        runOnUiThread(() -> adapter.notifyDataSetChanged());
+                                    }
+
+                                    @Override
+                                    public void onError(Exception e) {
+                                        openQuestion.setAnalysisResult("Error generating summary.");
+                                        runOnUiThread(() -> adapter.notifyDataSetChanged());
+                                    }
+                                });
                             }
                         }
 

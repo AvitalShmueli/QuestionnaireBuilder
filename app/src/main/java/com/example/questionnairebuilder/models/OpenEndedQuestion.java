@@ -1,8 +1,12 @@
 package com.example.questionnairebuilder.models;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class OpenEndedQuestion extends Question{
     boolean multipleLineAnswer;
     private String analysisResult;
+    private List<String> allResponses = new ArrayList<>();
 
     public OpenEndedQuestion(){
         super();
@@ -29,5 +33,12 @@ public class OpenEndedQuestion extends Question{
 
     public String getAnalysisResult() {
         return analysisResult;
+    }
+    public List<String> getAllResponses() {
+        return allResponses;
+    }
+
+    public void setAllResponses(List<String> allResponses) {
+        this.allResponses = allResponses;
     }
 }

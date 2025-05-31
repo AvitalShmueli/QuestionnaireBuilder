@@ -4,6 +4,6 @@ import java.util.List;
 import java.util.Map;
 
 public interface AnalyzableQuestion {
-    Map<String, Integer> getAnswerDistribution();
+    public Map<String, Integer> getAnswerDistribution();
     public void accumulateAnswers(List<String> values);
 }

@@ -563,7 +563,6 @@ public class QuestionsActivity extends AppCompatActivity {
                 Log.e("QuestionsActivity", "Failed to load user responses", e);
             }
         });
-
     }
 
     private void adjustRecyclerViewPadding(){

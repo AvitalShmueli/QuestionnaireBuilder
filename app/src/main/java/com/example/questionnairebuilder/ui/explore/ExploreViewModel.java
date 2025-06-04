@@ -14,6 +14,7 @@ import com.example.questionnairebuilder.utilities.FirestoreManager;
 import com.google.firebase.firestore.ListenerRegistration;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class ExploreViewModel extends ViewModel {
@@ -38,18 +39,6 @@ public class ExploreViewModel extends ViewModel {
 
     public void startListening() {
         String currentUserId = AuthenticationManager.getInstance().getCurrentUser().getUid();
-        /*listenerRegistration = FirestoreManager.getInstance().listenToAllActiveSurveys(new SurveysCallback() {
-            @Override
-            public void onSurveysLoaded(List<Survey> surveys) {
-                surveysWithResponsesLiveData.setValue(surveys);
-            }
-
-            @Override
-            public void onError(Exception e) {
-                // Optional: you can post an error LiveData too
-            }
-        });*/
-
         listenerRegistration = FirestoreManager.getInstance().listenToSurveyResponseStatuses(currentUserId, new SurveyResponsesStatusCallback() {
             @Override
             public void onResponseStatusesLoaded(List<SurveyResponseStatus> responseStatuses) {
@@ -59,31 +48,41 @@ public class ExploreViewModel extends ViewModel {
                     return;
                 }
 
-                List<SurveyWithResponseStatus> combinedList = new ArrayList<>();
+                List<SurveyWithResponseStatus> combinedList = new ArrayList<>(Collections.nCopies(responseStatuses.size(), null));
 
                 // Counter to check when all survey fetches are done
                 final int[] counter = {0};
-                for (SurveyResponseStatus responseStatus : responseStatuses) {
+                for (int i = 0; i < responseStatuses.size(); i++) {
+                    final int index = i;
+                    SurveyResponseStatus responseStatus = responseStatuses.get(i);
+
                     FirestoreManager.getInstance().getSurveyById(responseStatus.getSurveyId(), new OneSurveyCallback() {
                         @Override
                         public void onSurveyLoaded(Survey survey) {
                             if (survey != null) {
-                                combinedList.add(new SurveyWithResponseStatus(survey, responseStatus));
+                                combinedList.set(index, new SurveyWithResponseStatus(survey, responseStatus));
                             }
                             counter[0]++;
                             if (counter[0] == responseStatuses.size()) {
-                                // All done!
-                                surveysWithResponsesLiveData.setValue(combinedList);
+                                // Filter out any nulls (in case some surveys were not found)
+                                List<SurveyWithResponseStatus> finalList = new ArrayList<>();
+                                for (SurveyWithResponseStatus item : combinedList) {
+                                    if (item != null) finalList.add(item);
+                                }
+                                surveysWithResponsesLiveData.setValue(finalList);
                                 applyFilter();
                             }
                         }
 
                         @Override
                         public void onError(Exception e) {
-                            // Handle error gracefully
                             counter[0]++;
                             if (counter[0] == responseStatuses.size()) {
-                                surveysWithResponsesLiveData.setValue(combinedList);
+                                List<SurveyWithResponseStatus> finalList = new ArrayList<>();
+                                for (SurveyWithResponseStatus item : combinedList) {
+                                    if (item != null) finalList.add(item);
+                                }
+                                surveysWithResponsesLiveData.setValue(finalList);
                                 applyFilter();
                             }
                         }

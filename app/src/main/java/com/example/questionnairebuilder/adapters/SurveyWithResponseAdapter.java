@@ -52,7 +52,7 @@ public class SurveyWithResponseAdapter extends RecyclerView.Adapter<SurveyWithRe
     @NonNull
     @Override
     public SurveyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_survey, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_survey_with_response, parent, false);
         return new SurveyViewHolder(view);
     }
 
@@ -63,11 +63,20 @@ public class SurveyWithResponseAdapter extends RecyclerView.Adapter<SurveyWithRe
         holder.status.setText(statusesMap.get(item.getResponseStatus().getStatus()));
         if(item.getResponseStatus().getStartedAt() != null) {
             SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
-            String strDate = context.getString(R.string.response_date) + ": " + sdf.format(item.getResponseStatus().getStartedAt());
-            holder.date.setText(strDate);
+            String strDate = context.getString(R.string.sent) + ": " + sdf.format(item.getResponseStatus().getStartedAt());
+            holder.sentDate.setText(strDate);
         } else {
-            String strDate = context.getString(R.string.response_date) + ": ";
-            holder.date.setText(strDate);
+            String strDate = context.getString(R.string.sent) + ": ";
+            holder.sentDate.setText(strDate);
+        }
+
+        if(item.getResponseStatus().getCompletedAt() != null) {
+            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+            String strDate = context.getString(R.string.completed) + ": " + sdf.format(item.getResponseStatus().getCompletedAt());
+            holder.completedDate.setText(strDate);
+        } else {
+            String strDate = context.getString(R.string.completed) + ": ";
+            holder.completedDate.setText(strDate);
         }
 
         holder.itemView.setOnClickListener(v -> {
@@ -83,14 +92,14 @@ public class SurveyWithResponseAdapter extends RecyclerView.Adapter<SurveyWithRe
     }
 
     public static class SurveyViewHolder extends RecyclerView.ViewHolder {
-        MaterialTextView title, status, date, responses;
+        MaterialTextView title, status, sentDate, completedDate;
 
         public SurveyViewHolder(@NonNull View itemView) {
             super(itemView);
             title = itemView.findViewById(R.id.item_LBL_surveyTitle);
             status = itemView.findViewById(R.id.item_LBL_surveyStatus);
-            date = itemView.findViewById(R.id.item_LBL_surveyDate);
-            responses = itemView.findViewById(R.id.item_LBL_surveyResponses);
+            sentDate = itemView.findViewById(R.id.item_LBL_surveySent);
+            completedDate = itemView.findViewById(R.id.item_LBL_surveyCompleted);
         }
     }
 }

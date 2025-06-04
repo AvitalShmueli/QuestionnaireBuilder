@@ -12,20 +12,20 @@ import com.google.firebase.vertexai.type.GenerateContentResponse;
 
 import java.util.concurrent.Executors;
 
-public class VertexAiManager {
-    private static VertexAiManager instance;
+public class AILogicManager {
+    private static AILogicManager instance;
     private GenerativeModel geminiModel;
     private GenerativeModelFutures model;
 
-    private VertexAiManager() {
+    private AILogicManager() {
         geminiModel = FirebaseVertexAI.getInstance()
                 .generativeModel("gemini-2.0-flash");
         model = GenerativeModelFutures.from(geminiModel);
     }
 
-    public static synchronized VertexAiManager getInstance() {
+    public static synchronized AILogicManager getInstance() {
         if (instance == null)
-            instance = new VertexAiManager();
+            instance = new AILogicManager();
         return instance;
     }
 

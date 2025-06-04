@@ -20,6 +20,7 @@ import com.example.questionnairebuilder.models.MultipleChoiceQuestion;
 import com.example.questionnairebuilder.models.OpenEndedQuestion;
 import com.example.questionnairebuilder.models.Question;
 import com.example.questionnairebuilder.models.QuestionTypeEnum;
+import com.example.questionnairebuilder.models.SurveyResponseStatus;
 import com.example.questionnairebuilder.utilities.QuestionTypeManager;
 import com.example.questionnairebuilder.models.RatingScaleQuestion;
 import com.example.questionnairebuilder.models.Response;
@@ -30,6 +31,7 @@ import com.example.questionnairebuilder.ui.response_types.OpenQuestionResponseFr
 import com.example.questionnairebuilder.ui.response_types.RatingQuestionResponseFragment;
 import com.example.questionnairebuilder.utilities.AuthenticationManager;
 import com.example.questionnairebuilder.utilities.FirestoreManager;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.firebase.Timestamp;
 
@@ -40,7 +42,8 @@ import java.util.List;
 public class QuestionResponseActivity extends AppCompatActivity {
     public static final String KEY_QUESTION_HEADER = "KEY_QUESTION_HEADER";
     public static final String KEY_QUESTION_ARGS = "KEY_QUESTION_ARGS";
-    public static final String KEY_SURVEY_COMPLETED = "KEY_SURVEY_COMPLETED";
+    public static final String KEY_SURVEY_RESPONSE_STATUS = "KEY_SURVEY_RESPONSE_STATUS";
+
 
     private ActivityQuestionResponseBinding binding;
     private OpenQuestionResponseFragment openQuestionResponseFragment;
@@ -50,7 +53,7 @@ public class QuestionResponseActivity extends AppCompatActivity {
 
     private int currentQuestionOrder = -1;
     private String surveyID = null;
-    boolean surveyCompleted = false;
+    SurveyResponseStatus.ResponseStatus surveyResponseStatus;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,7 +67,7 @@ public class QuestionResponseActivity extends AppCompatActivity {
 
             Intent previousIntent = getIntent();
             String title = previousIntent.getStringExtra(KEY_QUESTION_HEADER);
-            surveyCompleted = previousIntent.getBooleanExtra(KEY_SURVEY_COMPLETED,false);
+            surveyResponseStatus = SurveyResponseStatus.ResponseStatus.valueOf(previousIntent.getStringExtra(KEY_SURVEY_RESPONSE_STATUS));
             Bundle args = previousIntent.getBundleExtra(KEY_QUESTION_ARGS);
             if (args != null) {
                 String type = args.getString("questionType");
@@ -189,6 +192,20 @@ public class QuestionResponseActivity extends AppCompatActivity {
         response.setUserID(userID);
         response.setModified(new Timestamp(new Date()));
         response.save();
+        if(surveyResponseStatus == null || surveyResponseStatus== SurveyResponseStatus.ResponseStatus.PENDING){
+            FirestoreManager.getInstance().updateSurveyResponseStatus(
+                    surveyID, userID, SurveyResponseStatus.ResponseStatus.IN_PROGRESS,
+                    new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void unused) {
+                            Log.d("Survey", "Status updated to in progress");
+                        }
+                    },e -> {
+                        //TODO
+                        Log.d("pttt Survey", "ERROR while updating status");
+                    }
+            );
+        }
         skipQuestion();
     }
 
@@ -255,7 +272,7 @@ public class QuestionResponseActivity extends AppCompatActivity {
         return list;
     }
 
-    public boolean isSurveyCompleted(){
-        return surveyCompleted;
+    public boolean isSurveyResponseCompleted(){
+        return surveyResponseStatus == SurveyResponseStatus.ResponseStatus.COMPLETED;
     }
 }

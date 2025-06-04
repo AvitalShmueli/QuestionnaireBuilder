@@ -15,7 +15,7 @@ import com.example.questionnairebuilder.listeners.OnAnalysisCompleteListener;
 import com.example.questionnairebuilder.models.OpenEndedQuestion;
 import com.example.questionnairebuilder.models.Question;
 import com.example.questionnairebuilder.utilities.FirestoreManager;
-import com.example.questionnairebuilder.utilities.VertexAiManager;
+import com.example.questionnairebuilder.utilities.AILogicManager;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.firebase.firestore.DocumentSnapshot;
 
@@ -97,7 +97,7 @@ public class AnalyzeResponsesActivity extends AppCompatActivity {
 
                                 String combinedText = android.text.TextUtils.join("\n", openQuestion.getAllResponses());
 
-                                VertexAiManager.getInstance().analyzeOpenAnswer(combinedText, new OnAnalysisCompleteListener() {
+                                AILogicManager.getInstance().analyzeOpenAnswer(combinedText, new OnAnalysisCompleteListener() {
                                     @Override
                                     public void onAnalysisComplete(String summary) {
                                         openQuestion.setAnalysisResult(summary);

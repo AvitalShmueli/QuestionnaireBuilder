@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="4dp">
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/item_CARD_data"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/card_elevation"
+        android:backgroundTint="@color/light_blue"
+        android:elevation="@dimen/card_elevation"
+        app:cardCornerRadius="20dp"
+        app:cardElevation="@dimen/card_elevation"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="8dp">
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/item_LBL_surveyTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                tools:text="Survey title #1"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:layout_marginVertical="4dp"
+                android:textColor="@android:color/black"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/item_LBL_surveyStatus"
+                app:layout_constraintBottom_toTopOf="@id/item_LBL_surveySent"
+                android:layout_marginEnd="8dp"/>
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/item_LBL_surveyStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:gravity="end"
+                android:textColor="@color/dark_blue"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="Pending"/>
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/item_LBL_surveySent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:text="Sent on: 31/01/2025"
+                android:textSize="14sp"
+                android:layout_marginVertical="4dp"
+                android:textColor="@color/blackish"
+                app:layout_constraintTop_toBottomOf="@id/item_LBL_surveyTitle"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/item_LBL_surveyCompleted"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:text="Modified on: 01/02/2025"
+                android:textSize="14sp"
+                android:textColor="@color/blackish"
+                app:layout_constraintTop_toBottomOf="@id/item_LBL_surveySent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:layout_marginVertical="4dp"/>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.cardview.widget.CardView>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -4,7 +4,7 @@ import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 import static android.widget.Toast.LENGTH_SHORT;
 
-import static com.example.questionnairebuilder.QuestionResponseActivity.KEY_SURVEY_COMPLETED;
+import static com.example.questionnairebuilder.QuestionResponseActivity.KEY_SURVEY_RESPONSE_STATUS;
 
 import android.app.AlertDialog;
 import android.content.Intent;
@@ -275,6 +275,7 @@ public class QuestionsActivity extends AppCompatActivity {
                                 }
                             },e -> {
                                 //TODO
+                                Log.d("pttt Survey", "ERROR while updating status");
                             }
                     );
                 }
@@ -337,8 +338,8 @@ public class QuestionsActivity extends AppCompatActivity {
 
         String questionOrder = "Q" + q.getOrder();
         intent.putExtra(QuestionResponseActivity.KEY_QUESTION_HEADER, questionOrder);
-        boolean surveyCompleted = surveyResponseStatus != null && surveyResponseStatus.getStatus()== SurveyResponseStatus.ResponseStatus.COMPLETED;
-        intent.putExtra(KEY_SURVEY_COMPLETED,surveyCompleted);
+        if (surveyResponseStatus != null)
+            intent.putExtra(KEY_SURVEY_RESPONSE_STATUS,surveyResponseStatus.getStatus().name());
 
         Bundle args = createQuestionArgsBundle(q);
         intent.putExtra(QuestionResponseActivity.KEY_QUESTION_ARGS,args);
@@ -355,18 +356,18 @@ public class QuestionsActivity extends AppCompatActivity {
         args.putBoolean("mandatory",q.isMandatory());
         args.putInt("order",q.getOrder());
         args.putString("image",q.getImage());
-        if(q instanceof OpenEndedQuestion) {
+        if (q instanceof OpenEndedQuestion) {
             args.putBoolean("multipleLineAnswer",((OpenEndedQuestion)q).isMultipleLineAnswer());
         }
-        if(q instanceof ChoiceQuestion) {
+        if (q instanceof ChoiceQuestion) {
             args.putStringArrayList("choices", ((ChoiceQuestion) q).getChoices());
             args.putBoolean("other",((ChoiceQuestion)q).isOther());
         }
-        if(q instanceof MultipleChoiceQuestion)
+        if (q instanceof MultipleChoiceQuestion)
             args.putInt("allowedSelectionNum",((MultipleChoiceQuestion)q).getAllowedSelectionNum());
-        if(q instanceof DateQuestion)
+        if (q instanceof DateQuestion)
             args.putString("dateSelectionMode",((DateQuestion)q).getDateMode().name());
-        if(q instanceof RatingScaleQuestion) {
+        if (q instanceof RatingScaleQuestion) {
             args.putInt("ratingScaleLevel", ((RatingScaleQuestion) q).getRatingScaleLevel());
             args.putString("iconResourceName", ((RatingScaleQuestion) q).getIconResourceName());
         }
@@ -376,7 +377,7 @@ public class QuestionsActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        if(cachedQuestionList != null){
+        if (cachedQuestionList != null) {
             FirestoreManager.getInstance().getSurveyQuestionsOnce(surveyID, new QuestionsCallback() {
                 @Override
                 public void onQuestionsLoaded(List<Question> questions) {
@@ -547,10 +548,10 @@ public class QuestionsActivity extends AppCompatActivity {
                     }
                     int x = 1;
                     // TODO: start / continue button
-                    if(questionsList.isEmpty() || answeredMandatoryCount == totalMandatoryCount/*answeredCount == totalCount*/)
+                    if(questionsList.isEmpty() || (answeredMandatoryCount == totalMandatoryCount && answeredCount > 0)/*answeredCount == totalCount*/)
                         questions_FAB_start.setVisibility(GONE);
-                    //else if(answeredCount >= totalMandatoryCount && answeredCount > 0)
-                    //    questions_FAB_start.setVisibility(GONE);
+                        //else if(answeredCount >= totalMandatoryCount && answeredCount > 0)
+                        //    questions_FAB_start.setVisibility(GONE);
                     else
                         questions_FAB_start.setVisibility(VISIBLE);
                     //questions_FAB_start.setVisibility(questionsList.isEmpty() || answeredCount == totalCount || answeredCount >= totalMandatoryCount? GONE : VISIBLE);
@@ -562,7 +563,6 @@ public class QuestionsActivity extends AppCompatActivity {
                 Log.e("QuestionsActivity", "Failed to load user responses", e);
             }
         });
-
     }
 
     private void adjustRecyclerViewPadding(){

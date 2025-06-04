@@ -88,7 +88,7 @@ public class DateQuestionResponseFragment extends Fragment {
                     .setSurveyID(args.getString("surveyID"))
                     .setOrder(args.getInt("order"));
         }
-        isSurveyCompleted = ((QuestionResponseActivity) requireActivity()).isSurveyCompleted();
+        isSurveyCompleted = ((QuestionResponseActivity) requireActivity()).isSurveyResponseCompleted();
     }
 
     @Override

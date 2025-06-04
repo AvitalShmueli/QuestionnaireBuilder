@@ -27,6 +27,7 @@ public class ExploreFragment extends Fragment {
     private FragmentExploreBinding binding;
     private RecyclerView recyclerView;
     private TabLayout tabLayout;
+    private int selectedTabPosition = 0;
     private String currentStatusFilter = SurveyResponseStatus.ResponseStatus.PENDING.name();
     private SurveyWithResponseAdapter surveyAdapter;
 
@@ -42,11 +43,34 @@ public class ExploreFragment extends Fragment {
 
         binding = FragmentExploreBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
+        if (savedInstanceState != null) {
+            selectedTabPosition = savedInstanceState.getInt("selected_tab", 0);
+        }
 
         tabLayout = binding.tabLayout;
         // Add tabs
         tabLayout.addTab(tabLayout.newTab().setText(getString(R.string.pending)));
         tabLayout.addTab(tabLayout.newTab().setText(getString(R.string.completed)));
+
+        // Select the correct tab immediately after adding them
+        TabLayout.Tab initialTab = tabLayout.getTabAt(selectedTabPosition);
+        if (initialTab != null) {
+            initialTab.select(); // This triggers onTabSelected
+        }
+
+        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                selectedTabPosition = tab.getPosition();
+                getStatusFromTab(selectedTabPosition);
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {}
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {}
+        });
 
         // Setup RecyclerView
         recyclerView = binding.exploreSurveysRecyclerView;
@@ -68,36 +92,22 @@ public class ExploreFragment extends Fragment {
 
         recyclerView.setAdapter(surveyAdapter);
 
-        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
-            @Override
-            public void onTabSelected(TabLayout.Tab tab) {
-                String selectedTab = tab.getText().toString();
-
-                // Determine status filter based on tab
-                if (selectedTab.equals(getString(R.string.pending))) {
-                    currentStatusFilter = SurveyResponseStatus.ResponseStatus.PENDING.toString();
-                } else if (selectedTab.equals(getString(R.string.in_progress))) {
-                    currentStatusFilter = SurveyResponseStatus.ResponseStatus.IN_PROGRESS.toString();
-                } else if (selectedTab.equals(getString(R.string.completed))) {
-                    currentStatusFilter = SurveyResponseStatus.ResponseStatus.COMPLETED.toString();
-                }
-
-                // Trigger filtering in ViewModel
-                viewModel.setStatusFilter(currentStatusFilter);
-            }
-
-            @Override
-            public void onTabUnselected(TabLayout.Tab tab) {}
-
-            @Override
-            public void onTabReselected(TabLayout.Tab tab) {}
-        });
-
         viewModel.getFilteredSurveys().observe(getViewLifecycleOwner(), surveysWithResponses  -> {
             surveyAdapter.updateSurveys(surveysWithResponses); // Update UI automatically when LiveData changes
         });
 
         return root;
+    }
+
+    private void getStatusFromTab(int selectedTabPosition){
+        // Determine status filter based on tab
+        if (selectedTabPosition == 0) {
+            currentStatusFilter = SurveyResponseStatus.ResponseStatus.PENDING.toString();
+        } else if (selectedTabPosition == 1) {
+            currentStatusFilter = SurveyResponseStatus.ResponseStatus.COMPLETED.toString();
+        }
+
+        viewModel.setStatusFilter(currentStatusFilter); // Trigger filtering in ViewModel
     }
 
     @Override
@@ -117,4 +127,18 @@ public class ExploreFragment extends Fragment {
         super.onStop();
         viewModel.stopListening();
     }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        // Re-apply filter in case data didn't refresh
+        getStatusFromTab(selectedTabPosition);
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt("selected_tab", selectedTabPosition);
+    }
+
 }

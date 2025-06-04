@@ -556,6 +556,7 @@ public class FirestoreManager {
 
     public ListenerRegistration listenToSurveyResponseStatuses(String userId, SurveyResponsesStatusCallback callback) {
         return surveyResponseStatusRef.whereEqualTo("userId", userId)
+                .orderBy("startedAt", Query.Direction.DESCENDING)
                 .addSnapshotListener((querySnapshot, e) -> {
                     if (e != null) {
                         callback.onError(e);

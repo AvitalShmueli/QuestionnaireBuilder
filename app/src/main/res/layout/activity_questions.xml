@@ -52,9 +52,23 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:clipToPadding="false"
-        android:paddingBottom="72dp"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+
+    <View
+        android:id="@+id/scrollHintTop"
+        android:layout_width="match_parent"
+        android:layout_height="8dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        />
+        android:background="@drawable/top_fade"
+        android:visibility="gone"/>
+
+    <View
+        android:id="@+id/scrollHintBottom"
+        android:layout_width="match_parent"
+        android:layout_height="8dp"
+        android:layout_gravity="bottom"
+        android:background="@drawable/bottom_fade"
+        android:visibility="gone"/>
 
     <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
         android:id="@+id/questions_FAB_start"
@@ -152,5 +166,7 @@
         android:textColor="@android:color/white"
         android:textStyle="bold"
         android:visibility="gone" />
+
+
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

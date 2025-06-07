@@ -7,6 +7,7 @@ import android.os.Bundle;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
+import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
@@ -41,6 +42,9 @@ public class OpenQuestionFragment extends Fragment implements UnsavedChangesHand
     private MaterialButton openQuestion_BTN_save;
     private MaterialButton openQuestion_BTN_cancel;
     private MaterialButton openQuestion_BTN_delete;
+    private NestedScrollView scrollView;
+    private View scrollHintBottom;
+    private View scrollHintTop;
     private String surveyID;
     private OpenEndedQuestion question;
     private int currentQuestionOrder;
@@ -107,6 +111,9 @@ public class OpenQuestionFragment extends Fragment implements UnsavedChangesHand
     }
 
     private void createBinding() {
+        scrollView = binding.scrollView;
+        scrollHintBottom = binding.scrollHintBottom;
+        scrollHintTop = binding.scrollHintTop;
         openQuestion_BTN_save = binding.openQuestionBTNSave;
         openQuestion_BTN_cancel = binding.openQuestionBTNCancel;
         openQuestion_BTN_delete = binding.openQuestionBTNDelete;
@@ -123,6 +130,37 @@ public class OpenQuestionFragment extends Fragment implements UnsavedChangesHand
             openQuestion_BTN_delete.setOnClickListener(v -> delete());
         }
         else  openQuestion_BTN_delete.setVisibility(GONE);
+
+        initScrollHint();
+    }
+
+    private void initScrollHint(){
+        // Hide the gradient when scrolled to bottom
+        scrollView.setOnScrollChangeListener(new View.OnScrollChangeListener() {
+            @Override
+            public void onScrollChange(View v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
+                View child = scrollView.getChildAt(0);
+
+                if (child != null) {
+                    int scrollViewHeight = scrollView.getHeight();
+                    int contentHeight = child.getHeight();
+
+                    boolean atTop = scrollView.getScrollY() == 0;
+                    boolean atBottom = (scrollView.getScrollY() + scrollViewHeight) >= (contentHeight - 1); // tolerance
+
+                    scrollHintTop.setVisibility(atTop ? View.GONE : View.VISIBLE);
+                    scrollHintBottom.setVisibility(atBottom ? View.GONE : View.VISIBLE);
+                }
+            }
+        });
+
+        scrollView.getViewTreeObserver().addOnGlobalLayoutListener(() -> {
+            View child = scrollView.getChildAt(0);
+            if (child != null) {
+                boolean canScroll = (scrollView.getScrollY() + scrollView.getHeight()) < (child.getHeight() - 1);
+                scrollHintBottom.setVisibility(canScroll ? View.VISIBLE : View.GONE);
+            }
+        });
     }
 
     private void loadQuestionDetails(Question q){

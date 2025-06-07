@@ -19,14 +19,29 @@
             app:tabSelectedTextColor="?attr/colorPrimary"
             app:tabTextColor="@android:color/black" />
 
+        <View
+            android:id="@+id/scrollHintTop"
+            android:layout_width="match_parent"
+            android:layout_height="8dp"
+            android:background="@drawable/top_fade"
+            android:visibility="gone"/>
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/exploreSurveysRecyclerView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:clipToPadding="false"
-            android:padding="8dp"
+            android:paddingHorizontal="8dp"
             tools:listitem="@layout/item_survey" />
 
     </LinearLayout>
+
+    <View
+        android:id="@+id/scrollHintBottom"
+        android:layout_width="match_parent"
+        android:layout_height="8dp"
+        android:layout_gravity="bottom"
+        android:background="@drawable/bottom_fade"
+        android:visibility="gone"/>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -31,6 +31,8 @@ public class HomeFragment extends Fragment {
     private HomeViewModel viewModel;
     private FragmentHomeBinding binding;
     private RecyclerView recyclerView;
+    private View scrollHintBottom;
+    private View scrollHintTop;
 
     private SurveyAdapter surveyAdapter;
 
@@ -48,20 +50,32 @@ public class HomeFragment extends Fragment {
         binding = FragmentHomeBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-        SharedPreferencesManager.init(requireContext());
-        String prefUsername = SharedPreferencesManager.getInstance().getString(USERNAME,"<username>");
-        final TextView home_LBL_greeting = binding.homeLBLGreeting;
-        viewModel.getUsername().observe(getViewLifecycleOwner(), username -> {
-            home_LBL_greeting.setText(getString(R.string.hello_user, Objects.requireNonNullElse(username, prefUsername)));
-        });
+        initUserGreeting();
+        initSurveysList();
+        initScrollHint();
 
         binding.homeBTNCreateSurvey.setOnClickListener(v -> {
             Intent intent = new Intent(getActivity(), NewSurveyActivity.class);
             startActivity(intent);
         });
 
-        // Setup RecyclerView
+        return root;
+    }
+
+    private void initUserGreeting() {
+        SharedPreferencesManager.init(requireContext());
+        String prefUsername = SharedPreferencesManager.getInstance().getString(USERNAME,"<username>");
+
+        final TextView home_LBL_greeting = binding.homeLBLGreeting;
+        viewModel.getUsername().observe(getViewLifecycleOwner(), username -> {
+            home_LBL_greeting.setText(getString(R.string.hello_user, Objects.requireNonNullElse(username, prefUsername)));
+        });
+    }
+
+    private void initSurveysList(){
         recyclerView = binding.homeLSTSurveys;
+        scrollHintBottom = binding.scrollHintBottom;
+        scrollHintTop = binding.scrollHintTop;
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
         surveyAdapter = new SurveyAdapter(requireContext(), new ArrayList<>(), survey -> {
@@ -88,8 +102,25 @@ public class HomeFragment extends Fragment {
                 surveyAdapter.updateSurveys(surveys); // Update UI automatically when LiveData changes
             });
         }
+    }
 
-        return root;
+    private void initScrollHint() {
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                updateScrollHints();
+            }
+        });
+
+        recyclerView.getViewTreeObserver().addOnGlobalLayoutListener(this::updateScrollHints);
+    }
+
+    private void updateScrollHints() {
+        boolean canScrollUp = recyclerView.canScrollVertically(-1); // up
+        boolean canScrollDown = recyclerView.canScrollVertically(1); // down
+
+        //scrollHintTop.setVisibility(canScrollUp ? View.VISIBLE : View.GONE);
+        scrollHintBottom.setVisibility(canScrollDown ? View.VISIBLE : View.GONE);
     }
 
     @Override

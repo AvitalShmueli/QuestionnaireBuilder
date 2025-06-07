@@ -25,4 +25,21 @@
         app:backgroundTint="@color/blue"
         app:maxImageSize="32dp"
         app:tint="@android:color/white" />
+
+    <View
+        android:id="@+id/scrollHintTop"
+        android:layout_width="match_parent"
+        android:layout_height="8dp"
+        android:layout_gravity="top"
+        android:background="@drawable/top_fade"
+        android:visibility="gone"/>
+
+    <View
+        android:id="@+id/scrollHintBottom"
+        android:layout_width="match_parent"
+        android:layout_height="8dp"
+        android:layout_gravity="bottom"
+        android:background="@drawable/bottom_fade"
+        android:visibility="gone"/>
+
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

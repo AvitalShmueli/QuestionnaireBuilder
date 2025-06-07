@@ -25,6 +25,8 @@ public class MySurveysFragment extends Fragment {
     private MySurveysViewModel viewModel;
     private FragmentMySurveysBinding binding;
     private RecyclerView recyclerView;
+    private View scrollHintBottom;
+    private View scrollHintTop;
 
     private SurveyAdapter surveyAdapter;
 
@@ -41,14 +43,26 @@ public class MySurveysFragment extends Fragment {
         binding = FragmentMySurveysBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-        // Setup RecyclerView
+        createBinding();
+        initSurveysList();
+        initScrollHint();
+
+        return root;
+    }
+
+    private void createBinding(){
         recyclerView = binding.mySurveysRecyclerView;
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        scrollHintBottom = binding.scrollHintBottom;
+        scrollHintTop = binding.scrollHintTop;
 
         binding.mySurveysFABAdd.setOnClickListener(v -> {
             Intent intent = new Intent(getActivity(), NewSurveyActivity.class);
             startActivity(intent);
         });
+    }
+
+    private void initSurveysList(){
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
         surveyAdapter = new SurveyAdapter(requireContext(), new ArrayList<>(), survey -> {
             // OnSurveyClickListener
@@ -74,8 +88,25 @@ public class MySurveysFragment extends Fragment {
                 surveyAdapter.updateSurveys(surveys); // Update UI automatically when LiveData changes
             });
         }
+    }
 
-        return root;
+    private void initScrollHint() {
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                updateScrollHints();
+            }
+        });
+
+        recyclerView.getViewTreeObserver().addOnGlobalLayoutListener(this::updateScrollHints);
+    }
+
+    private void updateScrollHints() {
+        boolean canScrollUp = recyclerView.canScrollVertically(-1); // up
+        boolean canScrollDown = recyclerView.canScrollVertically(1); // down
+
+        scrollHintTop.setVisibility(canScrollUp ? View.VISIBLE : View.GONE);
+        scrollHintBottom.setVisibility(canScrollDown ? View.VISIBLE : View.GONE);
     }
 
     @Override

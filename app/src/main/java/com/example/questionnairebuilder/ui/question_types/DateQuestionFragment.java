@@ -7,6 +7,7 @@ import android.os.Bundle;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
+import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
@@ -43,6 +44,9 @@ public class DateQuestionFragment extends Fragment implements UnsavedChangesHand
     private MaterialButton dateQuestion_BTN_delete;
     private AutoCompleteTextView dateQuestion_DD_DateSelectionMode;
     private DateSelectionModeEnum selectedMode;
+    private NestedScrollView scrollView;
+    private View scrollHintBottom;
+    private View scrollHintTop;
     private String surveyID;
     private DateQuestion question;
     private int currentQuestionOrder;
@@ -110,6 +114,9 @@ public class DateQuestionFragment extends Fragment implements UnsavedChangesHand
     }
 
     private void createBinding() {
+        scrollView = binding.scrollView;
+        scrollHintBottom = binding.scrollHintBottom;
+        scrollHintTop = binding.scrollHintTop;
         dateQuestion_BTN_save = binding.dateQuestionBTNSave;
         dateQuestion_BTN_cancel = binding.dateQuestionBTNCancel;
         dateQuestion_BTN_delete = binding.dateQuestionBTNDelete;
@@ -128,6 +135,37 @@ public class DateQuestionFragment extends Fragment implements UnsavedChangesHand
             dateQuestion_BTN_delete.setOnClickListener(v -> delete());
         }
         else dateQuestion_BTN_delete.setVisibility(GONE);
+
+        initScrollHint();
+    }
+
+    private void initScrollHint(){
+        // Hide the gradient when scrolled to bottom
+        scrollView.setOnScrollChangeListener(new View.OnScrollChangeListener() {
+            @Override
+            public void onScrollChange(View v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
+                View child = scrollView.getChildAt(0);
+
+                if (child != null) {
+                    int scrollViewHeight = scrollView.getHeight();
+                    int contentHeight = child.getHeight();
+
+                    boolean atTop = scrollView.getScrollY() == 0;
+                    boolean atBottom = (scrollView.getScrollY() + scrollViewHeight) >= (contentHeight - 1); // tolerance
+
+                    scrollHintTop.setVisibility(atTop ? View.GONE : View.VISIBLE);
+                    scrollHintBottom.setVisibility(atBottom ? View.GONE : View.VISIBLE);
+                }
+            }
+        });
+
+        scrollView.getViewTreeObserver().addOnGlobalLayoutListener(() -> {
+            View child = scrollView.getChildAt(0);
+            if (child != null) {
+                boolean canScroll = (scrollView.getScrollY() + scrollView.getHeight()) < (child.getHeight() - 1);
+                scrollHintBottom.setVisibility(canScroll ? View.VISIBLE : View.GONE);
+            }
+        });
     }
 
     private void initDropDownValues() {

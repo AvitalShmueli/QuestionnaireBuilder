@@ -1,6 +1,5 @@
 package com.example.questionnairebuilder.ui.explore;
 
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -26,6 +25,8 @@ public class ExploreFragment extends Fragment {
     private ExploreViewModel viewModel;
     private FragmentExploreBinding binding;
     private RecyclerView recyclerView;
+    private View scrollHintBottom;
+    private View scrollHintTop;
     private TabLayout tabLayout;
     private int selectedTabPosition = 0;
     private String currentStatusFilter = SurveyResponseStatus.ResponseStatus.PENDING.name();
@@ -47,7 +48,22 @@ public class ExploreFragment extends Fragment {
             selectedTabPosition = savedInstanceState.getInt("selected_tab", 0);
         }
 
+        createBinding();
+        initTabs();
+        initSurveysList();
+        initScrollHint();
+
+        return root;
+    }
+
+    private void createBinding() {
         tabLayout = binding.tabLayout;
+        recyclerView = binding.exploreSurveysRecyclerView;
+        scrollHintBottom = binding.scrollHintBottom;
+        scrollHintTop = binding.scrollHintTop;
+    }
+
+    private void initTabs() {
         // Add tabs
         tabLayout.addTab(tabLayout.newTab().setText(getString(R.string.pending)));
         tabLayout.addTab(tabLayout.newTab().setText(getString(R.string.completed)));
@@ -71,9 +87,9 @@ public class ExploreFragment extends Fragment {
             @Override
             public void onTabReselected(TabLayout.Tab tab) {}
         });
+    }
 
-        // Setup RecyclerView
-        recyclerView = binding.exploreSurveysRecyclerView;
+    private void initSurveysList() {
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
         surveyAdapter = new SurveyWithResponseAdapter(requireContext(), new ArrayList<>(), survey -> {
@@ -95,8 +111,25 @@ public class ExploreFragment extends Fragment {
         viewModel.getFilteredSurveys().observe(getViewLifecycleOwner(), surveysWithResponses  -> {
             surveyAdapter.updateSurveys(surveysWithResponses); // Update UI automatically when LiveData changes
         });
+    }
 
-        return root;
+    private void initScrollHint() {
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                updateScrollHints();
+            }
+        });
+
+        recyclerView.getViewTreeObserver().addOnGlobalLayoutListener(this::updateScrollHints);
+    }
+
+    private void updateScrollHints() {
+        boolean canScrollUp = recyclerView.canScrollVertically(-1); // up
+        boolean canScrollDown = recyclerView.canScrollVertically(1); // down
+
+        scrollHintTop.setVisibility(canScrollUp ? View.VISIBLE : View.GONE);
+        scrollHintBottom.setVisibility(canScrollDown ? View.VISIBLE : View.GONE);
     }
 
     private void getStatusFromTab(int selectedTabPosition){

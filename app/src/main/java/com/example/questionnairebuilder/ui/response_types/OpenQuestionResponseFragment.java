@@ -5,6 +5,7 @@ import static android.view.View.VISIBLE;
 
 import android.os.Bundle;
 
+import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
@@ -40,6 +41,9 @@ public class OpenQuestionResponseFragment extends Fragment {
     private MaterialButton responseOpenQuestion_BTN_skip;
     private TextInputLayout responseOpenQuestion_TIL_answer;
     private TextInputEditText responseOpenQuestion_TXT_answer;
+    private NestedScrollView scrollView;
+    private View scrollHintBottom;
+    private View scrollHintTop;
     private Question question;
     private Response response;
     private boolean isSurveyCompleted;
@@ -89,6 +93,9 @@ public class OpenQuestionResponseFragment extends Fragment {
     }
 
     private void createBinding() {
+        scrollView = binding.scrollView;
+        scrollHintBottom = binding.scrollHintBottom;
+        scrollHintTop = binding.scrollHintTop;
         responseOpenQuestion_LBL_question = binding.responseOpenQuestionLBLQuestion;
         responseOpenQuestion_LBL_mandatory = binding.responseOpenQuestionLBLMandatory;
         responseOpenQuestion_BTN_save = binding.responseOpenQuestionBTNSave;
@@ -118,6 +125,8 @@ public class OpenQuestionResponseFragment extends Fragment {
                 responseOpenQuestion_BTN_skip.setOnClickListener(v -> skipQuestion());
             }
 
+            initScrollHint();
+
             /*
             if(((OpenEndedQuestion)question).isMultipleLineAnswer()) {
                 responseOpenQuestion_TXT_answer.setMinLines(5);
@@ -129,6 +138,35 @@ public class OpenQuestionResponseFragment extends Fragment {
             }
             */
         }
+    }
+
+    private void initScrollHint(){
+        // Hide the gradient when scrolled to bottom
+        scrollView.setOnScrollChangeListener(new View.OnScrollChangeListener() {
+            @Override
+            public void onScrollChange(View v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
+                View child = scrollView.getChildAt(0);
+
+                if (child != null) {
+                    int scrollViewHeight = scrollView.getHeight();
+                    int contentHeight = child.getHeight();
+
+                    boolean atTop = scrollView.getScrollY() == 0;
+                    boolean atBottom = (scrollView.getScrollY() + scrollViewHeight) >= (contentHeight - 1); // tolerance
+
+                    scrollHintTop.setVisibility(atTop ? View.GONE : View.VISIBLE);
+                    scrollHintBottom.setVisibility(atBottom ? View.GONE : View.VISIBLE);
+                }
+            }
+        });
+
+        scrollView.getViewTreeObserver().addOnGlobalLayoutListener(() -> {
+            View child = scrollView.getChildAt(0);
+            if (child != null) {
+                boolean canScroll = (scrollView.getScrollY() + scrollView.getHeight()) < (child.getHeight() - 1);
+                scrollHintBottom.setVisibility(canScroll ? View.VISIBLE : View.GONE);
+            }
+        });
     }
 
     private void loadResponse(Question question) {

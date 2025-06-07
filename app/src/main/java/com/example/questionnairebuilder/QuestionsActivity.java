@@ -71,6 +71,8 @@ public class QuestionsActivity extends AppCompatActivity {
     private ExtendedFloatingActionButton question_FAB_add_bottom;
     private Map<QuestionTypeEnum, String> menu;
     private RecyclerView recyclerView;
+    private View scrollHintBottom;
+    private View scrollHintTop;
     private MaterialButton questions_BTN_skip;
     private ExtendedFloatingActionButton questions_FAB_start;
     private MaterialButton questions_BTN_complete;
@@ -139,6 +141,8 @@ public class QuestionsActivity extends AppCompatActivity {
         questions_BTN_complete = binding.questionsBTNComplete;
         questions_LBL_completed = binding.questionsLBLCompleted;
         recyclerView = binding.recyclerView;
+        scrollHintBottom = binding.scrollHintBottom;
+        scrollHintTop = binding.scrollHintTop;
     }
 
     @Override
@@ -281,6 +285,27 @@ public class QuestionsActivity extends AppCompatActivity {
                 }
             });
         }
+
+        initScrollHint();
+    }
+
+    private void initScrollHint() {
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                updateScrollHints();
+            }
+        });
+
+        recyclerView.getViewTreeObserver().addOnGlobalLayoutListener(this::updateScrollHints);
+    }
+
+    private void updateScrollHints() {
+        boolean canScrollUp = recyclerView.canScrollVertically(-1); // up
+        boolean canScrollDown = recyclerView.canScrollVertically(1); // down
+
+        scrollHintTop.setVisibility(canScrollUp ? View.VISIBLE : View.GONE);
+        scrollHintBottom.setVisibility(canScrollDown ? View.VISIBLE : View.GONE);
     }
 
     private void onBack() {

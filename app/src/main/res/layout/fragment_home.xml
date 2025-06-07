@@ -39,6 +39,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/home_BTN_createSurvey"
             android:layout_marginTop="80dp"
+            android:layout_marginBottom="8dp"
             android:layout_marginStart="16dp"
             android:text="@string/active_surveys"
             android:textColor="@color/dark_blue"
@@ -46,13 +47,30 @@
             android:textStyle="bold"
             android:paddingHorizontal="8dp"/>
 
+        <View
+            android:id="@+id/scrollHintTop"
+            android:layout_width="match_parent"
+            android:layout_height="8dp"
+            android:layout_below="@id/home_LBL_activeTitle"
+            android:background="@drawable/top_fade"
+            android:visibility="gone"/>
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/home_LST_surveys"
-            android:layout_below="@id/home_LBL_activeTitle"
+            android:layout_below="@id/scrollHintTop"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:clipToPadding="false"
-            android:padding="8dp"
+            android:paddingHorizontal="8dp"
             tools:listitem="@layout/item_survey" />
+
+        <View
+            android:id="@+id/scrollHintBottom"
+            android:layout_width="match_parent"
+            android:layout_height="8dp"
+            android:layout_alignParentBottom="true"
+            android:background="@drawable/bottom_fade"
+            android:visibility="gone"/>
+
     </RelativeLayout>
 </FrameLayout>

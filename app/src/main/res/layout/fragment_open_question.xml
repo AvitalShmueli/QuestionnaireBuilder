@@ -4,99 +4,137 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.question_types.OpenQuestionFragment"
-    android:layout_margin="@dimen/activity_vertical_margin">
+    tools:context=".ui.question_types.OpenQuestionFragment">
 
-    <LinearLayout
+    <View
+        android:id="@+id/scrollHintTop"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:layout_height="8dp"
+        android:layout_gravity="top"
+        android:background="@drawable/top_fade"
+        android:visibility="gone"/>
 
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/openQuestion_TIL_question"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/scrollView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="@dimen/activity_vertical_margin"
+        android:layout_marginHorizontal="@dimen/activity_vertical_margin"
+        android:fillViewport="true">
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/input_vertical_margin"
-            android:layout_weight="1"
-            android:hint="@string/question_title"
-            app:boxBackgroundMode="outline"
-            app:boxCornerRadiusBottomEnd="@dimen/corner_radius"
-            app:boxCornerRadiusBottomStart="@dimen/corner_radius"
-            app:boxCornerRadiusTopEnd="@dimen/corner_radius"
-            app:boxCornerRadiusTopStart="@dimen/corner_radius"
-            app:boxStrokeColor="?attr/colorPrimary"
-            app:hintTextColor="?attr/colorSecondaryVariant">
+            android:orientation="vertical">
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/openQuestion_TXT_question"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="textMultiLine|textCapSentences"
-                android:gravity="top|start"
-                android:minLines="5"
-                android:maxLines="5"
-                tools:text="Enter text"
-                android:textSize="@dimen/input_text_size"/>
+                android:orientation="vertical">
 
-        </com.google.android.material.textfield.TextInputLayout>
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/openQuestion_TIL_question"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/input_vertical_margin"
+                    android:layout_weight="1"
+                    android:hint="@string/question_title"
+                    app:boxBackgroundMode="outline"
+                    app:boxCornerRadiusBottomEnd="@dimen/corner_radius"
+                    app:boxCornerRadiusBottomStart="@dimen/corner_radius"
+                    app:boxCornerRadiusTopEnd="@dimen/corner_radius"
+                    app:boxCornerRadiusTopStart="@dimen/corner_radius"
+                    app:boxStrokeColor="?attr/colorPrimary"
+                    app:hintTextColor="?attr/colorSecondaryVariant">
 
-        <com.google.android.material.materialswitch.MaterialSwitch
-            android:id="@+id/openQuestion_SW_mandatory"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginTop="@dimen/input_vertical_margin"
-            android:checked="true"
-            android:text="@string/mandatory"/>
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/openQuestion_TXT_question"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="textMultiLine|textCapSentences"
+                        android:gravity="top|start"
+                        android:minLines="5"
+                        android:maxLines="5"
+                        tools:text="Enter text"
+                        android:textSize="@dimen/input_text_size"/>
 
-    </LinearLayout>
+                </com.google.android.material.textfield.TextInputLayout>
 
-    <LinearLayout
-        android:id="@+id/openQuestion_LLC_buttons"
+                <com.google.android.material.materialswitch.MaterialSwitch
+                    android:id="@+id/openQuestion_SW_mandatory"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginTop="@dimen/input_vertical_margin"
+                    android:checked="true"
+                    android:text="@string/mandatory"/>
+
+            </LinearLayout>
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:minHeight="40dp"/>
+
+            <LinearLayout
+                android:id="@+id/openQuestion_LLC_buttons"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:layout_marginHorizontal="@dimen/activity_horizontal_margin"
+                android:layout_marginBottom="@dimen/activity_vertical_margin"
+                android:orientation="vertical">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/openQuestion_BTN_save"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:text="@string/save"
+                    android:textAllCaps="false"
+                    app:cornerRadius="20dp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/openQuestion_BTN_cancel"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_marginTop="@dimen/input_vertical_margin"
+                    android:layout_weight="1"
+                    android:text="@string/cancel"
+                    android:textSize="@dimen/button_text_size"
+                    android:textStyle="bold"
+                    app:strokeColor="?attr/colorPrimary"
+                    app:strokeWidth="3dp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/openQuestion_BTN_delete"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:layout_marginTop="@dimen/input_vertical_margin"
+                    android:text="@string/delete"
+                    app:strokeWidth="3dp"
+                    android:textColor="@color/red"
+                    app:strokeColor="@color/red"
+                    android:textSize="@dimen/button_text_size"
+                    android:textStyle="bold"/>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+    <View
+        android:id="@+id/scrollHintBottom"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="8dp"
         android:layout_gravity="bottom"
-        android:layout_marginHorizontal="@dimen/activity_horizontal_margin"
-        android:layout_marginBottom="@dimen/activity_vertical_margin"
-        android:orientation="vertical">
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/openQuestion_BTN_save"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:text="@string/save"
-            android:textAllCaps="false"
-            app:cornerRadius="20dp" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/openQuestion_BTN_cancel"
-            style="@style/Widget.Material3.Button.OutlinedButton"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_marginTop="@dimen/input_vertical_margin"
-            android:layout_weight="1"
-            android:text="@string/cancel"
-            android:textSize="@dimen/button_text_size"
-            android:textStyle="bold"
-            app:strokeColor="?attr/colorPrimary"
-            app:strokeWidth="3dp" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/openQuestion_BTN_delete"
-            style="@style/Widget.Material3.Button.OutlinedButton"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:layout_marginTop="@dimen/input_vertical_margin"
-            android:text="@string/delete"
-            app:strokeWidth="3dp"
-            android:textColor="@color/red"
-            app:strokeColor="@color/red"
-            android:textSize="@dimen/button_text_size"
-            android:textStyle="bold"/>
-
-    </LinearLayout>
+        android:background="@drawable/bottom_fade"
+        android:visibility="gone"/>
 
 </FrameLayout>

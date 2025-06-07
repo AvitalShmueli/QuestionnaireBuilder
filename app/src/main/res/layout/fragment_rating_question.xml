@@ -4,183 +4,221 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".ui.question_types.RatingQuestionFragment"
-    android:layout_margin="@dimen/activity_vertical_margin">
+    tools:context=".ui.question_types.RatingQuestionFragment">
 
-    <LinearLayout
+    <View
+        android:id="@+id/scrollHintTop"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:layout_height="8dp"
+        android:layout_gravity="top"
+        android:background="@drawable/top_fade"
+        android:visibility="gone"/>
 
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/ratingQuestion_TIL_question"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/scrollView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="@dimen/activity_vertical_margin"
+        android:layout_marginHorizontal="@dimen/activity_vertical_margin"
+        android:fillViewport="true">
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/input_vertical_margin"
-            android:layout_weight="1"
-            android:hint="@string/question_title"
-            app:boxBackgroundMode="outline"
-            app:boxCornerRadiusBottomEnd="@dimen/corner_radius"
-            app:boxCornerRadiusBottomStart="@dimen/corner_radius"
-            app:boxCornerRadiusTopEnd="@dimen/corner_radius"
-            app:boxCornerRadiusTopStart="@dimen/corner_radius"
-            app:boxStrokeColor="?attr/colorPrimary"
-            app:hintTextColor="?attr/colorSecondaryVariant">
+            android:orientation="vertical">
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/ratingQuestion_TXT_question"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="textMultiLine|textCapSentences"
-                android:gravity="top|start"
-                android:minLines="5"
-                android:maxLines="5"
-                tools:text="Enter text"
-                android:textSize="@dimen/input_text_size"/>
-
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <com.google.android.material.materialswitch.MaterialSwitch
-            android:id="@+id/ratingQuestion_SW_mandatory"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginTop="@dimen/input_vertical_margin"
-            android:checked="true"
-            android:text="@string/mandatory"/>
-
-        <LinearLayout
-            android:id="@+id/ratingQuestion_LL_RatingScaleLevel"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/input_vertical_margin"
-            android:orientation="horizontal">
-
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/ratingQuestion_LBL_RatingScaleLevel"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="3"
-                android:text="@string/rating_scale_level"/>
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/ratingQuestion_DD_layout_RatingScaleLevel"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1">
-
-                <AutoCompleteTextView
-                    android:id="@+id/ratingQuestion_DD_RatingScaleLevel"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="none"
-                    android:textColor="?attr/colorControlNormal"
-                    android:textSize="@dimen/input_text_size"
-                    tools:ignore="LabelFor,SpeakableTextPresentCheck" />
-
-            </com.google.android.material.textfield.TextInputLayout>
-
-        </LinearLayout>
-
-
-        <LinearLayout
-            android:id="@+id/ratingQuestion_LL_RatingScaleIcon"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/input_vertical_margin"
-            android:orientation="horizontal">
-
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/ratingQuestion_LBL_RatingScaleIcon"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="3"
-                android:text="@string/icon"/>
-
-            <RelativeLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1">
+                android:orientation="vertical">
 
                 <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/ratingQuestion_DD_layout_RatingScaleIcon"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                    android:id="@+id/ratingQuestion_TIL_question"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/input_vertical_margin"
+                    android:layout_weight="1"
+                    android:hint="@string/question_title"
+                    app:boxBackgroundMode="outline"
+                    app:boxCornerRadiusBottomEnd="@dimen/corner_radius"
+                    app:boxCornerRadiusBottomStart="@dimen/corner_radius"
+                    app:boxCornerRadiusTopEnd="@dimen/corner_radius"
+                    app:boxCornerRadiusTopStart="@dimen/corner_radius"
+                    app:boxStrokeColor="?attr/colorPrimary"
+                    app:hintTextColor="?attr/colorSecondaryVariant">
 
-                    <AutoCompleteTextView
-                        android:id="@+id/ratingQuestion_DD_RatingScaleIcon"
-                        android:layout_marginTop="0dp"
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/ratingQuestion_TXT_question"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:inputType="none"
-                        android:textColor="?attr/colorControlNormal"
-                        android:textSize="@dimen/input_text_size"
-                        tools:ignore="LabelFor,SpeakableTextPresentCheck" />
+                        android:inputType="textMultiLine|textCapSentences"
+                        android:gravity="top|start"
+                        android:minLines="5"
+                        android:maxLines="5"
+                        tools:text="Enter text"
+                        android:textSize="@dimen/input_text_size"/>
 
                 </com.google.android.material.textfield.TextInputLayout>
 
-                <com.google.android.material.imageview.ShapeableImageView
-                    android:id="@+id/ratingQuestion_IMG_selectedIcon"
-                    android:layout_width="wrap_content"
-                    android:layout_height="@dimen/icon_size"
-                    android:layout_marginStart="@dimen/input_horizontal_margin"
-                    android:layout_centerVertical="true"
-                    android:layout_marginVertical="16dp"
-                    android:src="@drawable/ic_heart_filled"/>
-            </RelativeLayout>
+                <com.google.android.material.materialswitch.MaterialSwitch
+                    android:id="@+id/ratingQuestion_SW_mandatory"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginTop="@dimen/input_vertical_margin"
+                    android:checked="true"
+                    android:text="@string/mandatory"/>
+
+                <LinearLayout
+                    android:id="@+id/ratingQuestion_LL_RatingScaleLevel"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/input_vertical_margin"
+                    android:orientation="horizontal">
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/ratingQuestion_LBL_RatingScaleLevel"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="3"
+                        android:text="@string/rating_scale_level"/>
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/ratingQuestion_DD_layout_RatingScaleLevel"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1">
+
+                        <AutoCompleteTextView
+                            android:id="@+id/ratingQuestion_DD_RatingScaleLevel"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="none"
+                            android:textColor="?attr/colorControlNormal"
+                            android:textSize="@dimen/input_text_size"
+                            tools:ignore="LabelFor,SpeakableTextPresentCheck" />
+
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                </LinearLayout>
+
+
+                <LinearLayout
+                    android:id="@+id/ratingQuestion_LL_RatingScaleIcon"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/input_vertical_margin"
+                    android:orientation="horizontal">
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/ratingQuestion_LBL_RatingScaleIcon"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="3"
+                        android:text="@string/icon"/>
+
+                    <RelativeLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1">
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/ratingQuestion_DD_layout_RatingScaleIcon"
+                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+
+                            <AutoCompleteTextView
+                                android:id="@+id/ratingQuestion_DD_RatingScaleIcon"
+                                android:layout_marginTop="0dp"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:inputType="none"
+                                android:textColor="?attr/colorControlNormal"
+                                android:textSize="@dimen/input_text_size"
+                                tools:ignore="LabelFor,SpeakableTextPresentCheck" />
+
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                        <com.google.android.material.imageview.ShapeableImageView
+                            android:id="@+id/ratingQuestion_IMG_selectedIcon"
+                            android:layout_width="wrap_content"
+                            android:layout_height="@dimen/icon_size"
+                            android:layout_marginStart="@dimen/input_horizontal_margin"
+                            android:layout_centerVertical="true"
+                            android:layout_marginVertical="16dp"
+                            android:src="@drawable/ic_heart_filled"/>
+                    </RelativeLayout>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:minHeight="40dp"/>
+
+            <LinearLayout
+                android:id="@+id/ratingQuestion_LLC_buttons"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:layout_marginHorizontal="@dimen/activity_horizontal_margin"
+                android:layout_marginBottom="@dimen/activity_vertical_margin"
+                android:orientation="vertical">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/ratingQuestion_BTN_save"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:text="@string/save"
+                    app:cornerRadius="20dp"
+                    android:textAllCaps="false"/>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/ratingQuestion_BTN_cancel"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_marginTop="@dimen/input_vertical_margin"
+                    android:layout_weight="1"
+                    android:text="@string/cancel"
+                    android:textSize="@dimen/button_text_size"
+                    android:textStyle="bold"
+                    app:strokeColor="?attr/colorPrimary"
+                    app:strokeWidth="3dp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/ratingQuestion_BTN_delete"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:layout_marginTop="@dimen/input_vertical_margin"
+                    android:text="@string/delete"
+                    app:strokeWidth="3dp"
+                    android:textColor="@color/red"
+                    app:strokeColor="@color/red"
+                    android:textSize="@dimen/button_text_size"
+                    android:textStyle="bold"/>
+
+            </LinearLayout>
 
         </LinearLayout>
 
-    </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
 
-    <LinearLayout
-        android:id="@+id/ratingQuestion_LLC_buttons"
+    <View
+        android:id="@+id/scrollHintBottom"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="8dp"
         android:layout_gravity="bottom"
-        android:layout_marginHorizontal="@dimen/activity_horizontal_margin"
-        android:layout_marginBottom="@dimen/activity_vertical_margin"
-        android:orientation="vertical">
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/ratingQuestion_BTN_save"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:text="@string/save"
-            app:cornerRadius="20dp"
-            android:textAllCaps="false"/>
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/ratingQuestion_BTN_cancel"
-            style="@style/Widget.Material3.Button.OutlinedButton"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_marginTop="@dimen/input_vertical_margin"
-            android:layout_weight="1"
-            android:text="@string/cancel"
-            android:textSize="@dimen/button_text_size"
-            android:textStyle="bold"
-            app:strokeColor="?attr/colorPrimary"
-            app:strokeWidth="3dp" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/ratingQuestion_BTN_delete"
-            style="@style/Widget.Material3.Button.OutlinedButton"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:layout_marginTop="@dimen/input_vertical_margin"
-            android:text="@string/delete"
-            app:strokeWidth="3dp"
-            android:textColor="@color/red"
-            app:strokeColor="@color/red"
-            android:textSize="@dimen/button_text_size"
-            android:textStyle="bold"/>
-
-    </LinearLayout>
+        android:background="@drawable/bottom_fade"
+        android:visibility="gone"/>
 
 </FrameLayout>

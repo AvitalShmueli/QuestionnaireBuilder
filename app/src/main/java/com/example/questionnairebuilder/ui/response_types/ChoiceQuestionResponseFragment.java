@@ -6,6 +6,7 @@ import static android.view.View.VISIBLE;
 import android.content.res.ColorStateList;
 import android.os.Bundle;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
@@ -26,6 +27,7 @@ import com.example.questionnairebuilder.QuestionResponseActivity;
 import com.example.questionnairebuilder.R;
 import com.example.questionnairebuilder.databinding.FragmentChoiceQuestionResponseBinding;
 import com.example.questionnairebuilder.interfaces.OneResponseCallback;
+import com.example.questionnairebuilder.interfaces.UnsavedChangesHandler;
 import com.example.questionnairebuilder.models.ChoiceQuestion;
 import com.example.questionnairebuilder.models.MultipleChoiceQuestion;
 import com.example.questionnairebuilder.models.Question;
@@ -39,6 +41,8 @@ import com.google.android.material.textfield.TextInputLayout;
 import com.google.android.material.textview.MaterialTextView;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
 
@@ -47,7 +51,7 @@ import java.util.UUID;
  * Use the {@link ChoiceQuestionResponseFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class ChoiceQuestionResponseFragment extends Fragment {
+public class ChoiceQuestionResponseFragment extends Fragment implements UnsavedChangesHandler {
     private FragmentChoiceQuestionResponseBinding binding;
     private MaterialTextView responseChoiceQuestion_LBL_question;
     private MaterialTextView responseChoiceQuestion_LBL_mandatory;
@@ -102,6 +106,19 @@ public class ChoiceQuestionResponseFragment extends Fragment {
                     .setOrder(args.getInt("order"));
         }
         isSurveyCompleted = ((QuestionResponseActivity) requireActivity()).isSurveyResponseCompleted();
+
+        requireActivity().getOnBackPressedDispatcher().addCallback(this,
+                new OnBackPressedCallback(true) {
+                    @Override
+                    public void handleOnBackPressed() {
+                        if (hasUnsavedChanges()) {
+                            // Call the dialog from the activity
+                            ((QuestionResponseActivity) requireActivity()).showCancelConfirmationDialog();
+                        } else {
+                            requireActivity().finish();
+                        }
+                    }
+                });
     }
 
     @Override
@@ -331,5 +348,11 @@ public class ChoiceQuestionResponseFragment extends Fragment {
 
     private boolean isValidResponse() {
         return !question.isMandatory() || !selectedChoices.isEmpty();
+    }
+
+    public boolean hasUnsavedChanges() {
+        List<String> originalResponse =  response != null ? response.getResponseValues() : Collections.emptyList();
+        boolean responseChanged =  !new HashSet<>(selectedChoices).equals(new HashSet<>(originalResponse));
+        return responseChanged;
     }
 }

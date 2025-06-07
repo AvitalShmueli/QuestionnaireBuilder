@@ -5,6 +5,7 @@ import static android.view.View.VISIBLE;
 
 import android.os.Bundle;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.Fragment;
 
@@ -16,6 +17,7 @@ import com.example.questionnairebuilder.QuestionResponseActivity;
 import com.example.questionnairebuilder.R;
 import com.example.questionnairebuilder.databinding.FragmentOpenQuestionResponseBinding;
 import com.example.questionnairebuilder.interfaces.OneResponseCallback;
+import com.example.questionnairebuilder.interfaces.UnsavedChangesHandler;
 import com.example.questionnairebuilder.models.OpenEndedQuestion;
 import com.example.questionnairebuilder.models.Question;
 import com.example.questionnairebuilder.models.Response;
@@ -33,7 +35,7 @@ import java.util.UUID;
  * Use the {@link OpenQuestionResponseFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class OpenQuestionResponseFragment extends Fragment {
+public class OpenQuestionResponseFragment extends Fragment implements UnsavedChangesHandler {
     private FragmentOpenQuestionResponseBinding binding;
     private MaterialTextView responseOpenQuestion_LBL_question;
     private MaterialTextView responseOpenQuestion_LBL_mandatory;
@@ -78,6 +80,18 @@ public class OpenQuestionResponseFragment extends Fragment {
         }
         isSurveyCompleted = ((QuestionResponseActivity) requireActivity()).isSurveyResponseCompleted();
 
+        requireActivity().getOnBackPressedDispatcher().addCallback(this,
+                new OnBackPressedCallback(true) {
+                    @Override
+                    public void handleOnBackPressed() {
+                        if (hasUnsavedChanges()) {
+                            // Call the dialog from the activity
+                            ((QuestionResponseActivity) requireActivity()).showCancelConfirmationDialog();
+                        } else {
+                            requireActivity().finish();
+                        }
+                    }
+                });
     }
 
     @Override
@@ -217,5 +231,13 @@ public class OpenQuestionResponseFragment extends Fragment {
     private boolean isValidResponse() {
         return !question.isMandatory() ||
                 (responseOpenQuestion_TXT_answer.getText() != null && !responseOpenQuestion_TXT_answer.getText().toString().isEmpty());
+    }
+
+    public boolean hasUnsavedChanges() {
+        String currentResponse = responseOpenQuestion_TXT_answer.getText() != null
+                ? responseOpenQuestion_TXT_answer.getText().toString().trim()
+                : "";
+        String originalResponse = response != null ? response.getResponseValues().get(0) : "";
+        return !currentResponse.equals(originalResponse);
     }
 }

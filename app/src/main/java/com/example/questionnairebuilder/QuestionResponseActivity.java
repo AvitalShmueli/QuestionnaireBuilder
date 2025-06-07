@@ -139,7 +139,7 @@ public class QuestionResponseActivity extends AppCompatActivity {
 
 
     private void onBack(){
-        Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.editQuestion_FRAME_question);
+        Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.questionResponse_FRAME_question);
         if (fragment instanceof UnsavedChangesHandler) {
             if (((UnsavedChangesHandler) fragment).hasUnsavedChanges()) {
                 showCancelConfirmationDialog();

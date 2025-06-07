@@ -220,8 +220,10 @@ public class QuestionResponseActivity extends AppCompatActivity {
         args.putString("image",q.getImage());
         if(q instanceof OpenEndedQuestion)
             args.putBoolean("multipleLineAnswer",((OpenEndedQuestion)q).isMultipleLineAnswer());
-        if(q instanceof ChoiceQuestion)
-            args.putStringArrayList("choices",((ChoiceQuestion)q).getChoices());
+        if(q instanceof ChoiceQuestion) {
+            args.putStringArrayList("choices", ((ChoiceQuestion) q).getChoices());
+            args.putBoolean("other", ((ChoiceQuestion) q).isOther());
+        }
         if(q instanceof MultipleChoiceQuestion)
             args.putInt("allowedSelectionNum",((MultipleChoiceQuestion)q).getAllowedSelectionNum());
         if(q instanceof DateQuestion)

@@ -8,6 +8,7 @@ import android.os.Bundle;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.core.content.ContextCompat;
+import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.Fragment;
 
 import android.util.Log;
@@ -37,6 +38,7 @@ import com.example.questionnairebuilder.models.SingleChoiceQuestion;
 import com.example.questionnairebuilder.utilities.AuthenticationManager;
 import com.example.questionnairebuilder.utilities.FirestoreManager;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.android.material.textview.MaterialTextView;
 
@@ -62,6 +64,11 @@ public class ChoiceQuestionResponseFragment extends Fragment implements UnsavedC
     private MaterialTextView responseChoiceQuestion_LBL_error;
     private TextInputLayout choiceQuestion_DD_layout_dropdown;
     private AutoCompleteTextView responseChoiceQuestion_DD_dropdown;
+    private TextInputLayout responseChoiceQuestion_TIL_other;
+    private TextInputEditText responseChoiceQuestion_TXT_other;
+    private NestedScrollView scrollView;
+    private View scrollHintBottom;
+    private View scrollHintTop;
     private Question question;
     private Response response;
     private int currentSelectionCount = 0;
@@ -93,12 +100,14 @@ public class ChoiceQuestionResponseFragment extends Fragment implements UnsavedC
             QuestionTypeEnum type = QuestionTypeEnum.valueOf(args.getString("questionType"));
             if(type.isSingleSelection()) {
                 question = new SingleChoiceQuestion(args.getString("questionTitle"),type)
-                        .setChoices(args.getStringArrayList("choices"));
+                        .setChoices(args.getStringArrayList("choices"))
+                        .setOther(args.getBoolean("other"));
             }
             else {
                 question = new MultipleChoiceQuestion(args.getString("questionTitle"))
                         .setAllowedSelectionNum(args.getInt("allowedSelectionNum"))
-                        .setChoices(args.getStringArrayList("choices"));
+                        .setChoices(args.getStringArrayList("choices"))
+                        .setOther(args.getBoolean("other"));
             }
             question.setMandatory(args.getBoolean("mandatory"))
                     .setQuestionID(args.getString("questionID"))
@@ -133,6 +142,9 @@ public class ChoiceQuestionResponseFragment extends Fragment implements UnsavedC
     }
 
     private void createBinding() {
+        scrollView = binding.scrollView;
+        scrollHintBottom = binding.scrollHintBottom;
+        scrollHintTop = binding.scrollHintTop;
         responseChoiceQuestion_LBL_question = binding.responseChoiceQuestionLBLQuestion;
         responseChoiceQuestion_LBL_mandatory = binding.responseChoiceQuestionLBLMandatory;
         responseChoiceQuestion_BTN_save = binding.responseChoiceQuestionBTNSave;
@@ -142,6 +154,8 @@ public class ChoiceQuestionResponseFragment extends Fragment implements UnsavedC
         responseChoiceQuestion_LBL_error = binding.responseChoiceQuestionLBLError;
         choiceQuestion_DD_layout_dropdown = binding.choiceQuestionDDLayoutDropdown;
         responseChoiceQuestion_DD_dropdown = binding.responseChoiceQuestionDDDropdown;
+        responseChoiceQuestion_TIL_other = binding.responseChoiceQuestionTILOther;
+        responseChoiceQuestion_TXT_other = binding.responseChoiceQuestionTXTOther;
 
         if (question != null) {
             responseChoiceQuestion_LBL_question.setText(question.getQuestionTitle());
@@ -159,6 +173,8 @@ public class ChoiceQuestionResponseFragment extends Fragment implements UnsavedC
                     responseChoiceQuestion_BTN_skip.setVisibility(VISIBLE);
                 }
 
+                responseChoiceQuestion_TIL_other.setVisibility(GONE);
+
                 // listeners
                 responseChoiceQuestion_BTN_save.setOnClickListener(v -> save());
                 responseChoiceQuestion_BTN_skip.setOnClickListener(v -> skipQuestion());
@@ -167,21 +183,73 @@ public class ChoiceQuestionResponseFragment extends Fragment implements UnsavedC
             selectedChoices.clear();
             loadResponse(question);
         }
+
+        initScrollHint();
+    }
+
+    private void initScrollHint(){
+        // Hide the gradient when scrolled to bottom
+        scrollView.setOnScrollChangeListener(new View.OnScrollChangeListener() {
+            @Override
+            public void onScrollChange(View v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
+                View child = scrollView.getChildAt(0);
+
+                if (child != null) {
+                    int scrollViewHeight = scrollView.getHeight();
+                    int contentHeight = child.getHeight();
+
+                    boolean atTop = scrollView.getScrollY() == 0;
+                    boolean atBottom = (scrollView.getScrollY() + scrollViewHeight) >= (contentHeight - 1); // tolerance
+
+                    scrollHintTop.setVisibility(atTop ? View.GONE : View.VISIBLE);
+                    scrollHintBottom.setVisibility(atBottom ? View.GONE : View.VISIBLE);
+                }
+            }
+        });
+
+        scrollView.getViewTreeObserver().addOnGlobalLayoutListener(() -> {
+            View child = scrollView.getChildAt(0);
+            if (child != null) {
+                boolean canScroll = (scrollView.getScrollY() + scrollView.getHeight()) < (child.getHeight() - 1);
+                scrollHintBottom.setVisibility(canScroll ? View.VISIBLE : View.GONE);
+            }
+        });
     }
 
     private void initChoices(){
         ArrayList<String> options = ((ChoiceQuestion)question).getChoices();
+        if (((ChoiceQuestion)question).isOther()) {
+            String otherOption = getOtherOption(options, (ArrayList<String>) selectedChoices);
+            if(otherOption != null){
+                responseChoiceQuestion_TXT_other.setText(otherOption);
+                responseChoiceQuestion_TIL_other.setVisibility(VISIBLE);
+                selectedChoices.add(getString(R.string.other));
+            }
+            options.add(getString(R.string.other));
+        }
         responseChoiceQuestion_RadioGroup.removeAllViews();
         responseChoiceQuestion_LL_checkBoxContainer.removeAllViews();
-        if(question.getType() == QuestionTypeEnum.DROPDOWN){
+        if (question.getType() == QuestionTypeEnum.DROPDOWN) {
             initDropdownValues(options);
         }
-        else if(question.getType().isSingleSelection()) {
+        else if (question.getType().isSingleSelection()) {
             initRadioButtons(options);
         }
         else {
             initCheckboxes(options, ((MultipleChoiceQuestion)question).getAllowedSelectionNum());
         }
+    }
+
+    private String getOtherOption( ArrayList<String> allChoices, ArrayList<String> selected){
+        ArrayList<String> validChoices = new ArrayList<>(allChoices);
+        validChoices.remove(getString(R.string.other));
+
+        for (String item : selected) {
+            if (!validChoices.contains(item)) {
+                return item;
+            }
+        }
+        return null;
     }
 
     private void initRadioButtons(List<String> options){
@@ -212,10 +280,16 @@ public class ChoiceQuestionResponseFragment extends Fragment implements UnsavedC
                 @Override
                 public void onCheckedChanged(RadioGroup group, int checkedId) {
                     RadioButton selectedButton = group.findViewById(checkedId);
+                    selectedChoices.clear();
                     if (selectedButton != null) {
                         String selectedText = selectedButton.getText().toString();
-                        selectedChoices.clear();
-                        selectedChoices.add(selectedText);
+                        if (((ChoiceQuestion)question).isOther() && selectedText.equals(getString(R.string.other))) {
+                            responseChoiceQuestion_TIL_other.setVisibility(VISIBLE);
+                        }
+                        else {
+                            responseChoiceQuestion_TIL_other.setVisibility(GONE);
+                            selectedChoices.add(selectedText);
+                        }
                         Log.d("RadioGroup", "Selected: " + selectedText);
                     }
                 }
@@ -224,7 +298,7 @@ public class ChoiceQuestionResponseFragment extends Fragment implements UnsavedC
     }
 
     private void initCheckboxes(List<String> options, int maxSelections){
-        currentSelectionCount = 0;
+        //currentSelectionCount = 0;
         for (String option : options) {
             CheckBox checkBox = new CheckBox(getContext());
             checkBox.setText(option);
@@ -253,11 +327,22 @@ public class ChoiceQuestionResponseFragment extends Fragment implements UnsavedC
                             Toast.makeText(getContext(), "You can select up to " + maxSelections + " options.", Toast.LENGTH_SHORT).show();
                         } else {
                             currentSelectionCount++;
-                            selectedChoices.add(option);
+                            if (((ChoiceQuestion)question).isOther() && option.equals(getString(R.string.other))) {
+                                responseChoiceQuestion_TIL_other.setVisibility(VISIBLE);
+                            }
+                            else {
+                                responseChoiceQuestion_TIL_other.setVisibility(GONE);
+                                selectedChoices.add(option);
+                            }
                             Log.d("CheckBox", checkBox.getText() + " selected");
                         }
                     } else {
                         currentSelectionCount--;
+                        if (((ChoiceQuestion)question).isOther() && option.equals(getString(R.string.other))) {
+                            selectedChoices.remove(getOtherOption((ArrayList<String>) options,(ArrayList<String>) selectedChoices));
+                            responseChoiceQuestion_TIL_other.setVisibility(GONE);
+                            responseChoiceQuestion_TXT_other.setText(null);
+                        }
                         selectedChoices.remove(option);
                         Log.d("CheckBox", checkBox.getText() + " unselected");
                     }
@@ -281,7 +366,13 @@ public class ChoiceQuestionResponseFragment extends Fragment implements UnsavedC
             String selectedItem = adapterItems_dropdownOptions.getItem(position);
             if (selectedItem != null) {
                 selectedChoices.clear();
-                selectedChoices.add(selectedItem);
+                if (((ChoiceQuestion)question).isOther() && selectedItem.equals(getString(R.string.other))) {
+                    responseChoiceQuestion_TIL_other.setVisibility(VISIBLE);
+                }
+                else {
+                    responseChoiceQuestion_TIL_other.setVisibility(GONE);
+                    selectedChoices.add(selectedItem);
+                }
                 Log.d("RadioGroup", "Selected: " + selectedItem);
             }
         });
@@ -327,6 +418,10 @@ public class ChoiceQuestionResponseFragment extends Fragment implements UnsavedC
     private void save() {
         if (isValidResponse()) {
             responseChoiceQuestion_LBL_error.setVisibility(GONE);
+            if (((ChoiceQuestion)question).isOther() && responseChoiceQuestion_TIL_other.getVisibility() == VISIBLE) {
+                if(responseChoiceQuestion_TXT_other.getText() != null)
+                    selectedChoices.add(responseChoiceQuestion_TXT_other.getText().toString());
+            }
             if(response == null) {
                 response = new Response()
                         .setResponseID(UUID.randomUUID().toString())
@@ -347,7 +442,11 @@ public class ChoiceQuestionResponseFragment extends Fragment implements UnsavedC
     }
 
     private boolean isValidResponse() {
-        return !question.isMandatory() || !selectedChoices.isEmpty();
+        boolean otherOptionValid = true;
+        if (((ChoiceQuestion)question).isOther() && responseChoiceQuestion_TIL_other.getVisibility() == VISIBLE) {
+            otherOptionValid = responseChoiceQuestion_TXT_other.getText() != null && !responseChoiceQuestion_TXT_other.getText().toString().isEmpty();
+        }
+        return (!question.isMandatory() || !selectedChoices.isEmpty()) && otherOptionValid;
     }
 
     public boolean hasUnsavedChanges() {

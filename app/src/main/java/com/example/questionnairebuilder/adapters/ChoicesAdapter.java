@@ -4,6 +4,8 @@ import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 
 import android.content.Context;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,6 +29,11 @@ public class ChoicesAdapter extends RecyclerView.Adapter<ChoicesAdapter.ViewHold
     private final ArrayList<String> dataList;
     private OnRowCountChangeListener rowCountListener;
     private final boolean isFixedMode;
+    private RecyclerView recyclerView;
+
+    public void setRecyclerView(RecyclerView recyclerView) {
+        this.recyclerView = recyclerView;
+    }
 
     public ChoicesAdapter(OnRowCountChangeListener listener) {
         this.dataList = new ArrayList<>();
@@ -37,14 +44,12 @@ public class ChoicesAdapter extends RecyclerView.Adapter<ChoicesAdapter.ViewHold
 
     public ChoicesAdapter(OnRowCountChangeListener listener, @NonNull List<String> choices, boolean isFixedMode) {
         this.dataList = new ArrayList<>(choices);
-        //this.dataList.add(""); // Initial empty row
         this.rowCountListener = listener;
         this.isFixedMode = isFixedMode;
         if (!isFixedMode) {
             dataList.add(""); // Add initial empty row if no predefined choices
         }
     }
-
 
     @NonNull
     @Override
@@ -55,8 +60,10 @@ public class ChoicesAdapter extends RecyclerView.Adapter<ChoicesAdapter.ViewHold
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+
         holder.rowItemEditText.setText(dataList.get(position));
         holder.rowItemEditText.setEnabled(!isFixedMode);
+        holder.rowItemEditText.setError(null);
 
         // Update IME options: last row should have "Done", others should have "Next"
         if (position == dataList.size() - 1) {
@@ -65,12 +72,47 @@ public class ChoicesAdapter extends RecyclerView.Adapter<ChoicesAdapter.ViewHold
             holder.rowItemEditText.setImeOptions(EditorInfo.IME_ACTION_NEXT);
         }
 
+        holder.rowItemEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) { }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                int position = holder.getAdapterPosition();
+                if (position == RecyclerView.NO_POSITION) return;
+
+                String text = s.toString();
+
+                // If text is empty and this is NOT the last row (empty input row),
+                // remove this item from the list
+                if (text.isEmpty() && position != dataList.size() - 1) {
+                    dataList.remove(position);
+                    notifyItemRemoved(position);
+                    notifyItemRangeChanged(position, dataList.size());
+
+                    // Notify listener about row count change
+                    if (rowCountListener != null) {
+                        rowCountListener.onRowCountChanged(getValidChoiceCount());
+                    }
+                }
+            }
+        });
+
         holder.rowItemEditText.setOnEditorActionListener((v, actionId, event) -> {
             if (actionId == android.view.inputmethod.EditorInfo.IME_ACTION_DONE) {
                 int currentPosition = holder.getAdapterPosition();
                 if (currentPosition == RecyclerView.NO_POSITION) return false;
 
                 String text = holder.rowItemEditText.getText().toString();
+                if (isDuplicate(text, currentPosition)) {
+                    holder.rowItemEditText.setError("Duplicate choice");
+                    return true;
+                } else {
+                    holder.rowItemEditText.setError(null);
+                }
                 dataList.set(currentPosition, text);
 
                 // Add a new row only if it's the last row and has content
@@ -86,8 +128,34 @@ public class ChoicesAdapter extends RecyclerView.Adapter<ChoicesAdapter.ViewHold
                 }
 
                 // Move focus to the next row
-                int nextPosition = currentPosition + 1;
-                if (nextPosition < dataList.size()) {
+//                int nextPosition = currentPosition + 1;
+//                if (nextPosition < dataList.size()) {
+//                    holder.itemView.post(() -> {
+//                        RecyclerView recyclerView = (RecyclerView) holder.itemView.getParent();
+//                        RecyclerView.ViewHolder nextHolder = recyclerView.findViewHolderForAdapterPosition(nextPosition);
+//                        if (nextHolder instanceof ViewHolder) {
+//                            ViewHolder nextViewHolder = (ViewHolder) nextHolder;
+//                            nextViewHolder.rowItemEditText.requestFocus();
+//
+//                            // Show keyboard
+//                            InputMethodManager imm = (InputMethodManager) v.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+//                            if (imm != null) {
+//                                imm.showSoftInput(nextViewHolder.rowItemEditText, InputMethodManager.SHOW_IMPLICIT);
+//                            }
+//                        }
+//                    });
+//                }
+
+                if (currentPosition == dataList.size() - 1) {
+                    // If it's the last item, hide the keyboard and clear focus
+                    InputMethodManager imm = (InputMethodManager) v.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+                    if (imm != null) {
+                        imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+                    }
+                    v.clearFocus();
+                } else {
+                    // Move focus to the next row
+                    int nextPosition = currentPosition + 1;
                     holder.itemView.post(() -> {
                         RecyclerView recyclerView = (RecyclerView) holder.itemView.getParent();
                         RecyclerView.ViewHolder nextHolder = recyclerView.findViewHolderForAdapterPosition(nextPosition);
@@ -110,11 +178,24 @@ public class ChoicesAdapter extends RecyclerView.Adapter<ChoicesAdapter.ViewHold
         });
 
         holder.rowItemEditText.setOnFocusChangeListener((v, hasFocus) -> {
-            if (!hasFocus) { // When EditText loses focus
-                int currentPosition = holder.getAdapterPosition();
-                if (currentPosition == RecyclerView.NO_POSITION) return;
+            int currentPosition = holder.getAdapterPosition();
+            if (currentPosition == RecyclerView.NO_POSITION) return;
 
+            if(hasFocus){
+                // If this is the last row and it's not empty, add a new row
+                if (currentPosition == dataList.size() - 1 && !dataList.get(currentPosition).isEmpty()) {
+                    dataList.add("");
+                    notifyItemInserted(dataList.size() - 1);
+                }
+            }
+            else{
                 String text = holder.rowItemEditText.getText().toString();
+                if (isDuplicate(text, currentPosition)) {
+                    holder.rowItemEditText.setError("Duplicate choice");
+                    return;
+                } else {
+                    holder.rowItemEditText.setError(null);
+                }
                 dataList.set(currentPosition, text);
 
                 // Add a new row only if it's the last row and has content
@@ -154,27 +235,41 @@ public class ChoicesAdapter extends RecyclerView.Adapter<ChoicesAdapter.ViewHold
 
     }
 
+    private boolean isDuplicate(String text, int currentIndex) {
+        String normalized = text.trim().toLowerCase();
+        for (int i = 0; i < dataList.size(); i++) {
+            if (i == currentIndex) continue;
+            if (dataList.get(i).trim().equalsIgnoreCase(normalized)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean hasValidationError() {
+        for (int i = 0; i < dataList.size(); i++) {
+            RecyclerView.ViewHolder holder = recyclerView.findViewHolderForAdapterPosition(i);
+            if (holder instanceof ViewHolder) {
+                ViewHolder viewHolder = (ViewHolder) holder;
+                CharSequence error = viewHolder.rowItemEditText.getError();
+                if (error != null && error.length() > 0) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 
     @Override
     public int getItemCount() {
         return dataList.size();
     }
 
-
     private int getValidChoiceCount(){
         return (int) dataList.stream().filter(s -> !s.isEmpty()).count();
     }
 
-
     public ArrayList<String> getDataList() {
-        //return dataList;
-        /*
-        ArrayList<String> tmpList = new ArrayList<>();
-        for(String s : dataList)
-            if(!s.isEmpty())
-                tmpList.add(s);
-        return tmpList;
-        */
         return dataList.stream()
                 .filter(s -> !s.isEmpty())
                 .collect(Collectors.toCollection(ArrayList::new));

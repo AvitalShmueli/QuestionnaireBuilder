@@ -70,9 +70,7 @@ public class NewSurveyActivity extends AppCompatActivity {
 
         if (authenticationManager.getCurrentUser() != null) {
             String currentUserId = authenticationManager.getCurrentUser().getUid();
-            firebaseManager.getUserData(currentUserId, user -> {
-                author = user;
-            });
+            firebaseManager.getUserData(currentUserId, user -> author = user);
         }
 
         myToolBar.setNavigationOnClickListener(v -> showCancelConfirmationDialog());
@@ -312,5 +310,25 @@ public class NewSurveyActivity extends AppCompatActivity {
                         .setDuration(100)
                         .start())
                 .start();
+    }
+
+    @Override
+    public boolean dispatchTouchEvent(android.view.MotionEvent ev) {
+        if (ev.getAction() == android.view.MotionEvent.ACTION_DOWN) {
+            android.view.View v = getCurrentFocus();
+            if (v instanceof android.widget.EditText) {
+                android.graphics.Rect outRect = new android.graphics.Rect();
+                v.getGlobalVisibleRect(outRect);
+                if (!outRect.contains((int) ev.getRawX(), (int) ev.getRawY())) {
+                    v.clearFocus();
+                    android.view.inputmethod.InputMethodManager imm =
+                            (android.view.inputmethod.InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+                    if (imm != null) {
+                        imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+                    }
+                }
+            }
+        }
+        return super.dispatchTouchEvent(ev);
     }
 }

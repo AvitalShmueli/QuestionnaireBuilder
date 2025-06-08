@@ -139,7 +139,7 @@ public class QuestionResponseActivity extends AppCompatActivity {
 
 
     private void onBack(){
-        Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.editQuestion_FRAME_question);
+        Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.questionResponse_FRAME_question);
         if (fragment instanceof UnsavedChangesHandler) {
             if (((UnsavedChangesHandler) fragment).hasUnsavedChanges()) {
                 showCancelConfirmationDialog();
@@ -220,8 +220,10 @@ public class QuestionResponseActivity extends AppCompatActivity {
         args.putString("image",q.getImage());
         if(q instanceof OpenEndedQuestion)
             args.putBoolean("multipleLineAnswer",((OpenEndedQuestion)q).isMultipleLineAnswer());
-        if(q instanceof ChoiceQuestion)
-            args.putStringArrayList("choices",((ChoiceQuestion)q).getChoices());
+        if(q instanceof ChoiceQuestion) {
+            args.putStringArrayList("choices", ((ChoiceQuestion) q).getChoices());
+            args.putBoolean("other", ((ChoiceQuestion) q).isOther());
+        }
         if(q instanceof MultipleChoiceQuestion)
             args.putInt("allowedSelectionNum",((MultipleChoiceQuestion)q).getAllowedSelectionNum());
         if(q instanceof DateQuestion)
@@ -274,5 +276,25 @@ public class QuestionResponseActivity extends AppCompatActivity {
 
     public boolean isSurveyResponseCompleted(){
         return surveyResponseStatus == SurveyResponseStatus.ResponseStatus.COMPLETED;
+    }
+
+    @Override
+    public boolean dispatchTouchEvent(android.view.MotionEvent ev) {
+        if (ev.getAction() == android.view.MotionEvent.ACTION_DOWN) {
+            android.view.View v = getCurrentFocus();
+            if (v instanceof android.widget.EditText) {
+                android.graphics.Rect outRect = new android.graphics.Rect();
+                v.getGlobalVisibleRect(outRect);
+                if (!outRect.contains((int) ev.getRawX(), (int) ev.getRawY())) {
+                    v.clearFocus();
+                    android.view.inputmethod.InputMethodManager imm =
+                            (android.view.inputmethod.InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+                    if (imm != null) {
+                        imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+                    }
+                }
+            }
+        }
+        return super.dispatchTouchEvent(ev);
     }
 }

@@ -6,6 +6,7 @@ import static android.view.View.VISIBLE;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
@@ -18,6 +19,7 @@ import com.example.questionnairebuilder.QuestionResponseActivity;
 import com.example.questionnairebuilder.R;
 import com.example.questionnairebuilder.databinding.FragmentRatingQuestionResponseBinding;
 import com.example.questionnairebuilder.interfaces.OneResponseCallback;
+import com.example.questionnairebuilder.interfaces.UnsavedChangesHandler;
 import com.example.questionnairebuilder.models.Question;
 import com.example.questionnairebuilder.models.RatingScaleQuestion;
 import com.example.questionnairebuilder.models.Response;
@@ -33,7 +35,7 @@ import java.util.UUID;
  * Use the {@link RatingQuestionResponseFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class RatingQuestionResponseFragment extends Fragment {
+public class RatingQuestionResponseFragment extends Fragment implements UnsavedChangesHandler {
     private FragmentRatingQuestionResponseBinding binding;
     private MaterialTextView responseRatingQuestion_LBL_question;
     private MaterialTextView responseRatingQuestion_LBL_mandatory;
@@ -78,6 +80,19 @@ public class RatingQuestionResponseFragment extends Fragment {
                     .setOrder(args.getInt("order"));
         }
         isSurveyCompleted = ((QuestionResponseActivity) requireActivity()).isSurveyResponseCompleted();
+
+        requireActivity().getOnBackPressedDispatcher().addCallback(this,
+                new OnBackPressedCallback(true) {
+                    @Override
+                    public void handleOnBackPressed() {
+                        if (hasUnsavedChanges()) {
+                            // Call the dialog from the activity
+                            ((QuestionResponseActivity) requireActivity()).showCancelConfirmationDialog();
+                        } else {
+                            requireActivity().finish();
+                        }
+                    }
+                });
     }
 
     @Override
@@ -193,5 +208,11 @@ public class RatingQuestionResponseFragment extends Fragment {
 
     private boolean isValidResponse() {
         return !question.isMandatory() || selectedRating > 0;
+    }
+
+    public boolean hasUnsavedChanges() {
+        String currentResponse = String.valueOf(selectedRating);
+        String originalResponse = response != null ? response.getResponseValues().get(0) : "";
+        return !currentResponse.equals(originalResponse);
     }
 }

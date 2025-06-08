@@ -6,7 +6,9 @@ import static android.view.View.VISIBLE;
 import android.content.res.ColorStateList;
 import android.os.Bundle;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.core.content.ContextCompat;
+import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.Fragment;
 
 import android.util.Log;
@@ -26,6 +28,7 @@ import com.example.questionnairebuilder.QuestionResponseActivity;
 import com.example.questionnairebuilder.R;
 import com.example.questionnairebuilder.databinding.FragmentChoiceQuestionResponseBinding;
 import com.example.questionnairebuilder.interfaces.OneResponseCallback;
+import com.example.questionnairebuilder.interfaces.UnsavedChangesHandler;
 import com.example.questionnairebuilder.models.ChoiceQuestion;
 import com.example.questionnairebuilder.models.MultipleChoiceQuestion;
 import com.example.questionnairebuilder.models.Question;
@@ -35,10 +38,14 @@ import com.example.questionnairebuilder.models.SingleChoiceQuestion;
 import com.example.questionnairebuilder.utilities.AuthenticationManager;
 import com.example.questionnairebuilder.utilities.FirestoreManager;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.android.material.textview.MaterialTextView;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.UUID;
 
@@ -47,7 +54,7 @@ import java.util.UUID;
  * Use the {@link ChoiceQuestionResponseFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class ChoiceQuestionResponseFragment extends Fragment {
+public class ChoiceQuestionResponseFragment extends Fragment implements UnsavedChangesHandler {
     private FragmentChoiceQuestionResponseBinding binding;
     private MaterialTextView responseChoiceQuestion_LBL_question;
     private MaterialTextView responseChoiceQuestion_LBL_mandatory;
@@ -58,11 +65,18 @@ public class ChoiceQuestionResponseFragment extends Fragment {
     private MaterialTextView responseChoiceQuestion_LBL_error;
     private TextInputLayout choiceQuestion_DD_layout_dropdown;
     private AutoCompleteTextView responseChoiceQuestion_DD_dropdown;
+    private TextInputLayout responseChoiceQuestion_TIL_other;
+    private TextInputEditText responseChoiceQuestion_TXT_other;
+    private NestedScrollView scrollView;
+    private View scrollHintBottom;
+    private View scrollHintTop;
     private Question question;
     private Response response;
     private int currentSelectionCount = 0;
     private final List<String> selectedChoices = new ArrayList<>();
     private boolean isSurveyCompleted;
+    private String otherLabel;
+    private String otherValue = null, originalOtherValue = null;
 
     public ChoiceQuestionResponseFragment() {
         // Required empty public constructor
@@ -89,12 +103,14 @@ public class ChoiceQuestionResponseFragment extends Fragment {
             QuestionTypeEnum type = QuestionTypeEnum.valueOf(args.getString("questionType"));
             if(type.isSingleSelection()) {
                 question = new SingleChoiceQuestion(args.getString("questionTitle"),type)
-                        .setChoices(args.getStringArrayList("choices"));
+                        .setChoices(args.getStringArrayList("choices"))
+                        .setOther(args.getBoolean("other"));
             }
             else {
                 question = new MultipleChoiceQuestion(args.getString("questionTitle"))
                         .setAllowedSelectionNum(args.getInt("allowedSelectionNum"))
-                        .setChoices(args.getStringArrayList("choices"));
+                        .setChoices(args.getStringArrayList("choices"))
+                        .setOther(args.getBoolean("other"));
             }
             question.setMandatory(args.getBoolean("mandatory"))
                     .setQuestionID(args.getString("questionID"))
@@ -102,6 +118,20 @@ public class ChoiceQuestionResponseFragment extends Fragment {
                     .setOrder(args.getInt("order"));
         }
         isSurveyCompleted = ((QuestionResponseActivity) requireActivity()).isSurveyResponseCompleted();
+        otherLabel = requireContext().getString(R.string.other);
+
+        requireActivity().getOnBackPressedDispatcher().addCallback(this,
+                new OnBackPressedCallback(true) {
+                    @Override
+                    public void handleOnBackPressed() {
+                        if (hasUnsavedChanges()) {
+                            // Call the dialog from the activity
+                            ((QuestionResponseActivity) requireActivity()).showCancelConfirmationDialog();
+                        } else {
+                            requireActivity().finish();
+                        }
+                    }
+                });
     }
 
     @Override
@@ -116,6 +146,9 @@ public class ChoiceQuestionResponseFragment extends Fragment {
     }
 
     private void createBinding() {
+        scrollView = binding.scrollView;
+        scrollHintBottom = binding.scrollHintBottom;
+        scrollHintTop = binding.scrollHintTop;
         responseChoiceQuestion_LBL_question = binding.responseChoiceQuestionLBLQuestion;
         responseChoiceQuestion_LBL_mandatory = binding.responseChoiceQuestionLBLMandatory;
         responseChoiceQuestion_BTN_save = binding.responseChoiceQuestionBTNSave;
@@ -125,6 +158,8 @@ public class ChoiceQuestionResponseFragment extends Fragment {
         responseChoiceQuestion_LBL_error = binding.responseChoiceQuestionLBLError;
         choiceQuestion_DD_layout_dropdown = binding.choiceQuestionDDLayoutDropdown;
         responseChoiceQuestion_DD_dropdown = binding.responseChoiceQuestionDDDropdown;
+        responseChoiceQuestion_TIL_other = binding.responseChoiceQuestionTILOther;
+        responseChoiceQuestion_TXT_other = binding.responseChoiceQuestionTXTOther;
 
         if (question != null) {
             responseChoiceQuestion_LBL_question.setText(question.getQuestionTitle());
@@ -142,6 +177,8 @@ public class ChoiceQuestionResponseFragment extends Fragment {
                     responseChoiceQuestion_BTN_skip.setVisibility(VISIBLE);
                 }
 
+                responseChoiceQuestion_TIL_other.setVisibility(GONE);
+
                 // listeners
                 responseChoiceQuestion_BTN_save.setOnClickListener(v -> save());
                 responseChoiceQuestion_BTN_skip.setOnClickListener(v -> skipQuestion());
@@ -150,21 +187,77 @@ public class ChoiceQuestionResponseFragment extends Fragment {
             selectedChoices.clear();
             loadResponse(question);
         }
+
+        initScrollHint();
+    }
+
+    private void initScrollHint(){
+        // Hide the gradient when scrolled to bottom
+        scrollView.setOnScrollChangeListener(new View.OnScrollChangeListener() {
+            @Override
+            public void onScrollChange(View v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
+                View child = scrollView.getChildAt(0);
+
+                if (child != null) {
+                    int scrollViewHeight = scrollView.getHeight();
+                    int contentHeight = child.getHeight();
+
+                    boolean atTop = scrollView.getScrollY() == 0;
+                    boolean atBottom = (scrollView.getScrollY() + scrollViewHeight) >= (contentHeight - 1); // tolerance
+
+                    scrollHintTop.setVisibility(atTop ? View.GONE : View.VISIBLE);
+                    scrollHintBottom.setVisibility(atBottom ? View.GONE : View.VISIBLE);
+                }
+            }
+        });
+
+        scrollView.getViewTreeObserver().addOnGlobalLayoutListener(() -> {
+            View child = scrollView.getChildAt(0);
+            if (child != null) {
+                boolean canScroll = (scrollView.getScrollY() + scrollView.getHeight()) < (child.getHeight() - 1);
+                scrollHintBottom.setVisibility(canScroll ? View.VISIBLE : View.GONE);
+            }
+        });
     }
 
     private void initChoices(){
         ArrayList<String> options = ((ChoiceQuestion)question).getChoices();
+
+        if (((ChoiceQuestion)question).isOther()) {
+            for (String selected : new ArrayList<>(selectedChoices)) {
+                if (!options.contains(selected)) {
+                    otherValue = selected;
+                    originalOtherValue = selected;
+                    selectedChoices.remove(selected);
+                    selectedChoices.add(otherLabel); // Treat it as if "Other" was selected
+                    break;
+                }
+            }
+            options.add(otherLabel);
+        }
         responseChoiceQuestion_RadioGroup.removeAllViews();
         responseChoiceQuestion_LL_checkBoxContainer.removeAllViews();
-        if(question.getType() == QuestionTypeEnum.DROPDOWN){
+        if (question.getType() == QuestionTypeEnum.DROPDOWN) {
             initDropdownValues(options);
         }
-        else if(question.getType().isSingleSelection()) {
+        else if (question.getType().isSingleSelection()) {
             initRadioButtons(options);
         }
         else {
             initCheckboxes(options, ((MultipleChoiceQuestion)question).getAllowedSelectionNum());
         }
+    }
+
+    private String getOtherOption( ArrayList<String> allChoices, ArrayList<String> selected){
+        ArrayList<String> validChoices = new ArrayList<>(allChoices);
+        validChoices.remove(getString(R.string.other));
+
+        for (String item : selected) {
+            if (!validChoices.contains(item)) {
+                return item;
+            }
+        }
+        return null;
     }
 
     private void initRadioButtons(List<String> options){
@@ -173,6 +266,7 @@ public class ChoiceQuestionResponseFragment extends Fragment {
             radioButton.setText(option);
             radioButton.setButtonTintList(ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.blue)));
             radioButton.setId(View.generateViewId()); // Assign a unique ID
+
             RadioGroup.LayoutParams params = new RadioGroup.LayoutParams(
                     ViewGroup.LayoutParams.WRAP_CONTENT,
                     ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -181,6 +275,13 @@ public class ChoiceQuestionResponseFragment extends Fragment {
 
             if (selectedChoices.contains(option)) {
                 radioButton.setChecked(true);
+                if (((ChoiceQuestion) question).isOther() && option.equals(otherLabel)) {
+                    if (otherValue != null) {
+                        radioButton.setChecked(true);
+                        responseChoiceQuestion_TXT_other.setText(otherValue);
+                        responseChoiceQuestion_TIL_other.setVisibility(VISIBLE);
+                    }
+                }
             }
             radioButton.setEnabled(!isSurveyCompleted);
             responseChoiceQuestion_RadioGroup.addView(radioButton);
@@ -191,30 +292,32 @@ public class ChoiceQuestionResponseFragment extends Fragment {
         responseChoiceQuestion_RadioGroup.setEnabled(!isSurveyCompleted);
 
         if (!isSurveyCompleted) {
-            responseChoiceQuestion_RadioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-                @Override
-                public void onCheckedChanged(RadioGroup group, int checkedId) {
-                    RadioButton selectedButton = group.findViewById(checkedId);
-                    if (selectedButton != null) {
-                        String selectedText = selectedButton.getText().toString();
-                        selectedChoices.clear();
-                        selectedChoices.add(selectedText);
-                        Log.d("RadioGroup", "Selected: " + selectedText);
+            responseChoiceQuestion_RadioGroup.setOnCheckedChangeListener((group, checkedId) -> {
+                RadioButton selectedButton = group.findViewById(checkedId);
+                selectedChoices.clear();
+                if (selectedButton != null) {
+                    String selectedText = selectedButton.getText().toString();
+                    if (((ChoiceQuestion) question).isOther() && selectedText.equals(otherLabel)) {
+                        responseChoiceQuestion_TIL_other.setVisibility(VISIBLE);
+                    } else {
+                        responseChoiceQuestion_TIL_other.setVisibility(GONE);
+                        responseChoiceQuestion_TXT_other.setText(null);
                     }
+                    selectedChoices.add(selectedText);
+                    Log.d("RadioGroup", "Selected: " + selectedText);
                 }
             });
         }
     }
 
     private void initCheckboxes(List<String> options, int maxSelections){
-        currentSelectionCount = 0;
         for (String option : options) {
             CheckBox checkBox = new CheckBox(getContext());
             checkBox.setText(option);
             checkBox.setId(View.generateViewId());
             checkBox.setButtonTintList(ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.blue)));
 
-            // Optional spacing
+            // Spacing
             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                     ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
             params.setMargins(0, 0, 0, dpToPx(8));
@@ -222,12 +325,16 @@ public class ChoiceQuestionResponseFragment extends Fragment {
 
             if (selectedChoices.contains(option)) {
                 checkBox.setChecked(true);
+                if(((ChoiceQuestion) question).isOther() && option.equals(otherLabel)){
+                    if (otherValue != null) {
+                        checkBox.setChecked(true);
+                        responseChoiceQuestion_TXT_other.setText(otherValue);
+                        responseChoiceQuestion_TIL_other.setVisibility(VISIBLE);
+                    }
+                }
             }
-            if(isSurveyCompleted){
-                checkBox.setEnabled(false);
-            }
-            else {
-                checkBox.setEnabled(true);
+            checkBox.setEnabled(!isSurveyCompleted);
+            if (!isSurveyCompleted) {
                 checkBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
                     if (isChecked) {
                         if (currentSelectionCount >= maxSelections) {
@@ -236,12 +343,22 @@ public class ChoiceQuestionResponseFragment extends Fragment {
                             Toast.makeText(getContext(), "You can select up to " + maxSelections + " options.", Toast.LENGTH_SHORT).show();
                         } else {
                             currentSelectionCount++;
+                            if (option.equals(otherLabel)) {
+                                responseChoiceQuestion_TIL_other.setVisibility(VISIBLE);
+                            }
                             selectedChoices.add(option);
                             Log.d("CheckBox", checkBox.getText() + " selected");
                         }
                     } else {
                         currentSelectionCount--;
-                        selectedChoices.remove(option);
+                        if (option.equals(otherLabel)) {
+                            otherValue = getOtherOption(((ChoiceQuestion) question).getChoices(), (ArrayList<String>) selectedChoices);
+                            selectedChoices.remove(otherValue);
+                            responseChoiceQuestion_TIL_other.setVisibility(GONE);
+                            responseChoiceQuestion_TXT_other.setText(null);
+                        } else {
+                            selectedChoices.remove(option);
+                        }
                         Log.d("CheckBox", checkBox.getText() + " unselected");
                     }
                 });
@@ -255,18 +372,30 @@ public class ChoiceQuestionResponseFragment extends Fragment {
 
     private void initDropdownValues(List<String> options) {
         ArrayAdapter<String> adapterItems_dropdownOptions = new ArrayAdapter<>(requireActivity(), R.layout.item_dropdown, options);
-        if(!selectedChoices.isEmpty())
-            responseChoiceQuestion_DD_dropdown.setText(selectedChoices.get(0));
-
         responseChoiceQuestion_DD_dropdown.setAdapter(adapterItems_dropdownOptions);
+        String selected = selectedChoices.isEmpty() ? null : selectedChoices.get(0);
+
+        if (selected != null) {
+            if (options.contains(selected)) {
+                responseChoiceQuestion_DD_dropdown.setText(selected, false);
+                if(selected.equals(otherLabel)){
+                    responseChoiceQuestion_DD_dropdown.setText(otherLabel, false);
+                    responseChoiceQuestion_TXT_other.setText(otherValue);
+                    responseChoiceQuestion_TIL_other.setVisibility(VISIBLE);
+                }
+            }
+        }
 
         responseChoiceQuestion_DD_dropdown.setOnItemClickListener((adapterView, view, position, id) -> {
             String selectedItem = adapterItems_dropdownOptions.getItem(position);
-            if (selectedItem != null) {
-                selectedChoices.clear();
-                selectedChoices.add(selectedItem);
-                Log.d("RadioGroup", "Selected: " + selectedItem);
+            selectedChoices.clear();
+            if (selectedItem != null && selectedItem.equals(otherLabel)) {
+                responseChoiceQuestion_TIL_other.setVisibility(VISIBLE);
+            } else {
+                responseChoiceQuestion_TIL_other.setVisibility(GONE);
+                responseChoiceQuestion_TXT_other.setText(null);
             }
+            selectedChoices.add(selectedItem);
         });
 
         responseChoiceQuestion_RadioGroup.setVisibility(GONE);
@@ -310,17 +439,27 @@ public class ChoiceQuestionResponseFragment extends Fragment {
     private void save() {
         if (isValidResponse()) {
             responseChoiceQuestion_LBL_error.setVisibility(GONE);
+            otherValue = responseChoiceQuestion_TXT_other.getText() != null ? responseChoiceQuestion_TXT_other.getText().toString().trim() : "";
+
+            LinkedHashSet<String> finalAnswers = new LinkedHashSet<>(selectedChoices);
+            if (selectedChoices.contains(otherLabel)) {
+                if (!otherValue.isEmpty()) {
+                    finalAnswers.remove(otherLabel);
+                    finalAnswers.add(otherValue);
+                }
+            }
+
             if(response == null) {
                 response = new Response()
                         .setResponseID(UUID.randomUUID().toString())
                         .setSurveyID(question.getSurveyID())
                         .setQuestionID(question.getQuestionID())
                         .setMandatory(question.isMandatory())
-                        .setResponseValues(selectedChoices);
+                        .setResponseValues(new ArrayList<>(finalAnswers));
             }
             else {
                 response.getResponseValues().clear();
-                response.setResponseValues(selectedChoices);
+                response.setResponseValues(new ArrayList<>(finalAnswers));
             }
             ((QuestionResponseActivity)requireActivity()).saveResponse(response);
         }
@@ -330,6 +469,39 @@ public class ChoiceQuestionResponseFragment extends Fragment {
     }
 
     private boolean isValidResponse() {
-        return !question.isMandatory() || !selectedChoices.isEmpty();
+        boolean otherOptionValid = true;
+        if (((ChoiceQuestion)question).isOther() && responseChoiceQuestion_TIL_other.getVisibility() == VISIBLE) {
+            otherOptionValid = responseChoiceQuestion_TXT_other.getText() != null && !responseChoiceQuestion_TXT_other.getText().toString().isEmpty();
+        }
+        return (!question.isMandatory() || !selectedChoices.isEmpty()) && otherOptionValid;
+    }
+
+    public boolean hasUnsavedChanges() {
+        List<String> originalResponse =  response != null ? response.getResponseValues() : Collections.emptyList();
+        otherValue = responseChoiceQuestion_TXT_other.getText() != null ? responseChoiceQuestion_TXT_other.getText().toString().trim() : "";
+
+        List<String> normalizedCurrentResponse = new ArrayList<>();
+        for (String choice : selectedChoices) {
+            if (otherLabel.equals(choice)) {
+                if (otherValue != null && !otherValue.isEmpty()) {
+                    normalizedCurrentResponse.add(otherValue);
+                }
+            } else {
+                normalizedCurrentResponse.add(choice);
+            }
+        }
+        boolean choicesChanged = !new HashSet<>(normalizedCurrentResponse).equals(new HashSet<>(originalResponse));
+
+        boolean otherChanged = false;
+        boolean hasOtherOption = ((ChoiceQuestion) question).isOther();
+        boolean otherVisible = responseChoiceQuestion_TIL_other.getVisibility() == VISIBLE;
+        if (hasOtherOption) {
+            if (otherVisible) {
+                otherChanged = !otherValue.equals(originalOtherValue);
+            } else if (originalOtherValue != null && !originalOtherValue.isEmpty()) {
+                otherChanged = true;
+            }
+        }
+        return choicesChanged || otherChanged;
     }
 }

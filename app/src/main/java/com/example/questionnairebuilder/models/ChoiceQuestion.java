@@ -1,12 +1,10 @@
 package com.example.questionnairebuilder.models;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public abstract class ChoiceQuestion extends Question{
     private ArrayList<String> choices;
     private boolean other;
-    private List<String> responses = new ArrayList<>();
 
     public ChoiceQuestion() {
         super();
@@ -44,20 +42,6 @@ public abstract class ChoiceQuestion extends Question{
 
     public ChoiceQuestion setOther(boolean other) {
         this.other = other;
-        return this;
-    }
-
-    public List<String> getResponses() {
-        return responses;
-    }
-
-    public ChoiceQuestion setResponses(List<String> responses) {
-        this.responses = responses;
-        return this;
-    }
-
-    public ChoiceQuestion addResponse(String response) {
-        this.responses.add(response);
         return this;
     }
 }

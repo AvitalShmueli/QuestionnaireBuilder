@@ -8,6 +8,7 @@ import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.os.Bundle;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
@@ -21,6 +22,7 @@ import com.example.questionnairebuilder.QuestionResponseActivity;
 import com.example.questionnairebuilder.R;
 import com.example.questionnairebuilder.databinding.FragmentDateQuestionResponseBinding;
 import com.example.questionnairebuilder.interfaces.OneResponseCallback;
+import com.example.questionnairebuilder.interfaces.UnsavedChangesHandler;
 import com.example.questionnairebuilder.models.DateQuestion;
 import com.example.questionnairebuilder.models.DateSelectionModeEnum;
 import com.example.questionnairebuilder.models.Question;
@@ -37,6 +39,9 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 
@@ -45,7 +50,7 @@ import java.util.UUID;
  * Use the {@link DateQuestionResponseFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class DateQuestionResponseFragment extends Fragment {
+public class DateQuestionResponseFragment extends Fragment implements UnsavedChangesHandler {
     private FragmentDateQuestionResponseBinding binding;
     private MaterialTextView responseDateQuestion_LBL_question;
     private MaterialTextView responseDateQuestion_LBL_mandatory;
@@ -89,6 +94,19 @@ public class DateQuestionResponseFragment extends Fragment {
                     .setOrder(args.getInt("order"));
         }
         isSurveyCompleted = ((QuestionResponseActivity) requireActivity()).isSurveyResponseCompleted();
+
+        requireActivity().getOnBackPressedDispatcher().addCallback(this,
+                new OnBackPressedCallback(true) {
+                    @Override
+                    public void handleOnBackPressed() {
+                        if (hasUnsavedChanges()) {
+                            // Call the dialog from the activity
+                            ((QuestionResponseActivity) requireActivity()).showCancelConfirmationDialog();
+                        } else {
+                            requireActivity().finish();
+                        }
+                    }
+                });
     }
 
     @Override
@@ -324,5 +342,20 @@ public class DateQuestionResponseFragment extends Fragment {
             inputLayout.setError(null);
             return true;
         }
+    }
+
+    public boolean hasUnsavedChanges() {
+        ArrayList<String> selectedDates = new ArrayList<>();
+        String date1 = responseDateQuestion_TXT_date.getText().toString();
+        if(!date1.isEmpty())
+            selectedDates.add(date1);
+        if(((DateQuestion)question).getDateMode() == DateSelectionModeEnum.DATE_RANGE) {
+            String date2 = responseDateQuestion_TXT_date2.getText().toString();
+            if(!date2.isEmpty())
+                selectedDates.add(date2);
+        }
+
+        List<String> originalResponse =  response != null ? response.getResponseValues() : Collections.emptyList();
+        return !new HashSet<>(selectedDates).equals(new HashSet<>(originalResponse));
     }
 }

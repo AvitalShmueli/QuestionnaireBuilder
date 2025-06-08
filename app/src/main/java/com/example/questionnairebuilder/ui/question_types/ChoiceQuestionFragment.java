@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
@@ -242,6 +243,7 @@ public class ChoiceQuestionFragment extends Fragment implements OnRowCountChange
 
         choicesAdapter = new ChoicesAdapter(this,choices,isYesNo);
         choiceQuestion_RV_choices.setAdapter(choicesAdapter);
+        choicesAdapter.setRecyclerView(choiceQuestion_RV_choices);
     }
 
     @Override
@@ -321,11 +323,16 @@ public class ChoiceQuestionFragment extends Fragment implements OnRowCountChange
         else{
             choiceQuestion_TIL_question.setError(!isQuestionTitleValid() ? getString(R.string.error_required) : null);
             choiceQuestion_LBL_ErrorRV.setVisibility(choicesAdapter.getDataList().isEmpty() ? VISIBLE : GONE);
+            if (choicesAdapter.hasValidationError()) {
+                Toast.makeText(requireContext(), "Please resolve all duplicate choices.", Toast.LENGTH_SHORT).show();
+            }
         }
     }
 
     private boolean isValid(){
-        return isQuestionTitleValid() && !choicesAdapter.getDataList().isEmpty();
+        return isQuestionTitleValid()
+                && !choicesAdapter.getDataList().isEmpty()
+                && !choicesAdapter.hasValidationError();
     }
 
     private boolean isQuestionTitleValid(){

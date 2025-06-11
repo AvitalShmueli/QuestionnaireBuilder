@@ -1,10 +1,12 @@
 package com.example.questionnairebuilder.adapters;
 
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.questionnairebuilder.R;
@@ -14,6 +16,8 @@ import com.example.questionnairebuilder.models.Survey;
 import com.example.questionnairebuilder.models.SurveyResponseStatus;
 import com.example.questionnairebuilder.utilities.AuthenticationManager;
 import com.example.questionnairebuilder.utilities.FirestoreManager;
+import com.google.android.material.chip.Chip;
+import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.textview.MaterialTextView;
 
 import android.view.LayoutInflater;
@@ -69,6 +73,8 @@ public class SurveyAdapter extends RecyclerView.Adapter<SurveyAdapter.SurveyView
         String strDueDate = context.getString(R.string.due_date) + ": " + sdf.format(survey.getDueDate());
         holder.date.setText(strDueDate);
 
+        bindTagsToChipGroup(survey.getTags(), holder.tagChipGroup);
+
         FirestoreManager.getInstance().getSurveyResponseStatusCount(
                 survey.getID(),
                 Arrays.asList(SurveyResponseStatus.ResponseStatus.IN_PROGRESS, SurveyResponseStatus.ResponseStatus.COMPLETED),
@@ -99,8 +105,44 @@ public class SurveyAdapter extends RecyclerView.Adapter<SurveyAdapter.SurveyView
         return surveys.size();
     }
 
+    private void bindTagsToChipGroup(List<Survey.SurveyTag> tags, ChipGroup chipGroup) {
+        chipGroup.removeAllViews();
+        for (Survey.SurveyTag tag : tags) {
+            Chip chip = new Chip(chipGroup.getContext());
+            chip.setText(tag.name().charAt(0) + tag.name().substring(1).toLowerCase());
+            chip.setChipBackgroundColorResource(R.color.light_blue);
+            chip.setTextColor(ContextCompat.getColor(chipGroup.getContext(), R.color.dark_blue));
+            chip.setElevation(4f);
+            chip.setChipStrokeColor(ColorStateList.valueOf(ContextCompat.getColor(chipGroup.getContext(), R.color.light_blue)));
+            chip.setChipCornerRadius(24f);
+            chip.setTextSize(10);
+            chip.setMinHeight(0);
+            chip.setMinimumHeight(0);
+            chip.setEnsureMinTouchTargetSize(false);
+            chip.setChipStartPadding(4f);
+            chip.setChipEndPadding(4f);
+            chip.setTextStartPadding(6f);
+            chip.setTextEndPadding(6f);
+            chip.setClickable(false);
+            chip.setCheckable(false);
+            ChipGroup.LayoutParams layoutParams = new ChipGroup.LayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+            );
+            chip.setLayoutParams(layoutParams);
+            chipGroup.addView(chip);
+
+            chip.setChipIconResource(tag.getIconResId());
+            chip.setChipIconTintResource(R.color.dark_blue); // Optional tint
+            chip.setChipIconSize(36f); // Adjust size if needed
+            chip.setChipIconVisible(true);
+        }
+    }
+
+
     public static class SurveyViewHolder extends RecyclerView.ViewHolder {
         MaterialTextView title, status, date, responses;
+        ChipGroup tagChipGroup;
 
         public SurveyViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -108,6 +150,7 @@ public class SurveyAdapter extends RecyclerView.Adapter<SurveyAdapter.SurveyView
             status = itemView.findViewById(R.id.item_LBL_surveyStatus);
             date = itemView.findViewById(R.id.item_LBL_surveyDate);
             responses = itemView.findViewById(R.id.item_LBL_surveyResponses);
+            tagChipGroup = itemView.findViewById(R.id.item_CHIPGROUP_tags);
         }
     }
 }

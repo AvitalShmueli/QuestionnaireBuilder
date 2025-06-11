@@ -8,47 +8,63 @@
     app:cardCornerRadius="12dp"
     app:cardElevation="4dp">
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
         android:padding="16dp">
 
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/itemAnalysis_LBL_title"
+        <com.airbnb.lottie.LottieAnimationView
+            android:id="@+id/itemAnalysis_Lottie_icon"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentTop="true"
+            app:lottie_autoPlay="true"
+            app:lottie_loop="true"
+            app:lottie_rawRes="@raw/ai" />
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="12dp"
-            android:textColor="@color/black"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            tools:text="Question title" />
+            android:orientation="vertical"
+            android:padding="16dp">
 
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/itemAnalysis_LBL_summary"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textColor="@color/black"
-            android:textSize="12sp"
-            android:lineSpacingExtra="4dp"
-            tools:text="summery" />
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/itemAnalysis_LBL_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                tools:text="Question title" />
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/itemAnalysis_BTN_viewAll"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/view_all_responses"
-            android:textColor="@color/blue"
-            android:textSize="14sp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:clickable="true"
-            android:focusable="true"
-            app:iconTint="@color/blue"
-            android:layout_marginTop="8dp"
-            app:icon="@drawable/visibility_24px"
-            app:iconGravity="textStart"
-            app:iconPadding="8dp" />
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/itemAnalysis_LBL_summary"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:lineSpacingExtra="4dp"
+                android:textColor="@color/black"
+                android:textSize="12sp"
+                tools:text="summery" />
 
-    </LinearLayout>
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/itemAnalysis_BTN_viewAll"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:clickable="true"
+                android:focusable="true"
+                android:text="@string/view_all_responses"
+                android:textColor="@color/blue"
+                android:textSize="14sp"
+                app:icon="@drawable/visibility_24px"
+                app:iconGravity="textStart"
+                app:iconPadding="8dp"
+                app:iconTint="@color/blue" />
+
+        </LinearLayout>
+    </RelativeLayout>
 
 </androidx.cardview.widget.CardView>

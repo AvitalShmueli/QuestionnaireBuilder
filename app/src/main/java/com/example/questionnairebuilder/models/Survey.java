@@ -1,5 +1,6 @@
 package com.example.questionnairebuilder.models;
 
+import com.example.questionnairebuilder.R;
 import com.example.questionnairebuilder.utilities.FirestoreManager;
 
 import java.util.ArrayList;
@@ -11,10 +12,29 @@ public class Survey {
         Draft, Published, Close
     }
 
-    public enum Theme {
-        Blue, Red, Green, Purple
-    }
+    public enum SurveyTag {
+        SURVEY(R.drawable.ic_survey),
+        QUIZ(R.drawable.ic_quiz),
+        QUESTIONNAIRE(R.drawable.ic_questionnaire),
+        FEEDBACK(R.drawable.ic_feedback),
+        POLL(R.drawable.ic_poll),
+        EVALUATION(R.drawable.ic_evaluation),
+        APPLICATION(R.drawable.ic_application),
+        TEST(R.drawable.ic_test),
+        REGISTRATION(R.drawable.ic_registration),
+        REVIEW(R.drawable.ic_review),
+        RESEARCH(R.drawable.ic_research);
 
+        private final int iconResId;
+
+        SurveyTag(int iconResId) {
+            this.iconResId = iconResId;
+        }
+
+        public int getIconResId() {
+            return iconResId;
+        }
+    }
     private String ID;
     private String surveyTitle;
     private String description;
@@ -23,18 +43,13 @@ public class Survey {
     private User author;
     private Date created;
     private Date modified;
-    private Theme theme;
     private boolean newResponseAlert = false;
-
-    //private List<Question> questions;
-    //private AnalyticsManager analytics;
-    //private ErrorHandler errorHandler;
     private List<User> surveyViewers;
+    private List<SurveyTag> tags = new ArrayList<>();
 
     // Constructors
 
     public Survey() {
-        //this.questions = new ArrayList<>();
         this.surveyViewers = new ArrayList<>();
     }
 
@@ -111,15 +126,6 @@ public class Survey {
         return this;
     }
 
-    public Theme getTheme() {
-        return theme;
-    }
-
-    public Survey setTheme(Theme theme) {
-        this.theme = theme;
-        return this;
-    }
-
     public boolean isNewResponseAlert() {
         return newResponseAlert;
     }
@@ -129,34 +135,18 @@ public class Survey {
         return this;
     }
 
-    /*public List<Question> getQuestions() {
-        return questions;
-    }*/
-
-    /*
-    public Survey setQuestions(List<Question> questions) {
-        this.questions = questions;
-        return this;
-    }*/
-
-    /*public AnalyticsManager getAnalyticsManager() {
-        return analytics;
-    }*/
-
-    /*public void setAnalyticsManager(AnalyticsManager analytics) {
-        this.analytics = analytics;
-    }*/
-
-    /*public ErrorHandler getErrorHandler() {
-        return errorHandler;
-    }*/
-
-    /*public void setErrorHandler(ErrorHandler errorHandler) {
-        this.errorHandler = errorHandler;
-    }*/
-
     public List<User> getSurveyViewers() {
         return surveyViewers;
+    }
+
+
+    public List<SurveyTag> getTags() {
+        return tags;
+    }
+
+    public Survey setTags(List<SurveyTag> tags) {
+        this.tags = tags;
+        return this;
     }
 
     public Survey setSurveyViewers(List<User> surveyViewers) {
@@ -164,30 +154,7 @@ public class Survey {
         return this;
     }
 
-    // Methods from UML
-
-    /*
-    public List<Question> getSurveyQuestions() {
-        return questions;
-    }*/
-
-    /*public Map<String, String> getAnalytics() {
-        if (analytics != null) {
-            return analytics.generateReport();
-        }
-        return null;
-    }*/
-
     public void save() {
         FirestoreManager.getInstance().addSurvey(this);
     }
-
-    /*public void deleteQuestion(int questionID) {
-        questions.removeIf(q -> q.getQuestionId() == questionID);
-    }*/
-
-    public void share() {
-        // TODO: Implement share logic (e.g., email, link generation)
-    }
-
 }

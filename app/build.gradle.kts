@@ -72,4 +72,6 @@ dependencies {
     // analysis:
     implementation(libs.mpandroidchart)
 
+    implementation (libs.lottie)
+
 }

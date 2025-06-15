@@ -362,7 +362,9 @@ public class QuestionsActivity extends AppCompatActivity {
         Intent intent = new Intent(this, QuestionResponseActivity.class);
 
         String questionOrder = "Q" + q.getOrder();
+        intent.putExtra(QuestionResponseActivity.KEY_TOTAL_QUESTIONS,totalCount);
         intent.putExtra(QuestionResponseActivity.KEY_QUESTION_HEADER, questionOrder);
+
         if (surveyResponseStatus != null)
             intent.putExtra(KEY_SURVEY_RESPONSE_STATUS,surveyResponseStatus.getStatus().name());
 
@@ -571,15 +573,10 @@ public class QuestionsActivity extends AppCompatActivity {
                             questions_LBL_completed.setVisibility(GONE);
                         }
                     }
-                    int x = 1;
-                    // TODO: start / continue button
                     if(questionsList.isEmpty() || (answeredMandatoryCount == totalMandatoryCount && answeredCount > 0)/*answeredCount == totalCount*/)
                         questions_FAB_start.setVisibility(GONE);
-                        //else if(answeredCount >= totalMandatoryCount && answeredCount > 0)
-                        //    questions_FAB_start.setVisibility(GONE);
                     else
                         questions_FAB_start.setVisibility(VISIBLE);
-                    //questions_FAB_start.setVisibility(questionsList.isEmpty() || answeredCount == totalCount || answeredCount >= totalMandatoryCount? GONE : VISIBLE);
                 });
             }
 

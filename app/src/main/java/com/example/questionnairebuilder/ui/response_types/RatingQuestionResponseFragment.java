@@ -13,6 +13,7 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.RatingBar;
 
 import com.example.questionnairebuilder.QuestionResponseActivity;
@@ -26,6 +27,7 @@ import com.example.questionnairebuilder.models.Response;
 import com.example.questionnairebuilder.utilities.AuthenticationManager;
 import com.example.questionnairebuilder.utilities.FirestoreManager;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.android.material.textview.MaterialTextView;
 
 import java.util.UUID;
@@ -41,8 +43,12 @@ public class RatingQuestionResponseFragment extends Fragment implements UnsavedC
     private MaterialTextView responseRatingQuestion_LBL_mandatory;
     private RatingBar customRatingBar;
     private MaterialTextView responseRatingQuestion_LBL_error;
+    private LinearLayout responseRatingQuestion_LL_buttons;
     private MaterialButton responseRatingQuestion_BTN_save;
     private MaterialButton responseRatingQuestion_BTN_skip;
+    private LinearLayout response_LL_navigationButtons;
+    private ExtendedFloatingActionButton response_BTN_previous;
+    private ExtendedFloatingActionButton response_BTN_next;
     private Question question;
     private Response response;
     private float selectedRating = 0;
@@ -112,18 +118,31 @@ public class RatingQuestionResponseFragment extends Fragment implements UnsavedC
         responseRatingQuestion_LBL_mandatory = binding.responseRatingQuestionLBLMandatory;
         customRatingBar = binding.customRatingBar;
         responseRatingQuestion_LBL_error = binding.responseRatingQuestionLBLError;
+        responseRatingQuestion_LL_buttons = binding.responseRatingQuestionLLButtons;
         responseRatingQuestion_BTN_save = binding.responseRatingQuestionBTNSave;
         responseRatingQuestion_BTN_skip = binding.responseRatingQuestionBTNSkip;
+        response_LL_navigationButtons = binding.responseLLNavigationButtons;
+        response_BTN_previous = binding.responseBTNPrevious;
+        response_BTN_next = binding.responseBTNNext;
 
         if(question != null){
             responseRatingQuestion_LBL_question.setText(question.getQuestionTitle());
             customRatingBar.setEnabled(!isSurveyCompleted);
 
             if (isSurveyCompleted) {
-                responseRatingQuestion_BTN_skip.setVisibility(GONE);
-                responseRatingQuestion_BTN_save.setVisibility(GONE);
+                responseRatingQuestion_LL_buttons.setVisibility(GONE);
+                response_LL_navigationButtons.setVisibility(VISIBLE);
+                boolean hasNext = ((QuestionResponseActivity) requireActivity()).hasNext();
+                boolean hasPrevious = ((QuestionResponseActivity) requireActivity()).hasPrevious();
+                response_BTN_next.setVisibility(hasNext ? VISIBLE : GONE);
+                response_BTN_previous.setVisibility(hasPrevious ? VISIBLE : GONE);
+                response_BTN_next.setOnClickListener(v -> skipQuestion());
+                response_BTN_previous.setOnClickListener(v -> previousQuestion());
             }
             else {
+                responseRatingQuestion_LL_buttons.setVisibility(VISIBLE);
+                response_LL_navigationButtons.setVisibility(GONE);
+
                 if (question.isMandatory()) {
                     responseRatingQuestion_LBL_mandatory.setVisibility(VISIBLE);
                     responseRatingQuestion_BTN_skip.setVisibility(GONE);
@@ -132,7 +151,6 @@ public class RatingQuestionResponseFragment extends Fragment implements UnsavedC
                     responseRatingQuestion_BTN_skip.setVisibility(VISIBLE);
                 }
 
-                // listeners
                 responseRatingQuestion_BTN_save.setOnClickListener(v -> save());
                 responseRatingQuestion_BTN_skip.setOnClickListener(v -> skipQuestion());
 
@@ -183,6 +201,10 @@ public class RatingQuestionResponseFragment extends Fragment implements UnsavedC
 
     private void skipQuestion() {
         ((QuestionResponseActivity) requireActivity()).skipQuestion();
+    }
+
+    private void previousQuestion() {
+        ((QuestionResponseActivity) requireActivity()).previousQuestion();
     }
 
     private void save() {

@@ -43,7 +43,7 @@ public class QuestionResponseActivity extends AppCompatActivity {
     public static final String KEY_QUESTION_HEADER = "KEY_QUESTION_HEADER";
     public static final String KEY_QUESTION_ARGS = "KEY_QUESTION_ARGS";
     public static final String KEY_SURVEY_RESPONSE_STATUS = "KEY_SURVEY_RESPONSE_STATUS";
-
+    public static final String KEY_TOTAL_QUESTIONS = "KEY_TOTAL_QUESTIONS";
 
     private ActivityQuestionResponseBinding binding;
     private OpenQuestionResponseFragment openQuestionResponseFragment;
@@ -54,6 +54,7 @@ public class QuestionResponseActivity extends AppCompatActivity {
     private int currentQuestionOrder = -1;
     private String surveyID = null;
     SurveyResponseStatus.ResponseStatus surveyResponseStatus;
+    private int totalQuestionsCount = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,6 +69,8 @@ public class QuestionResponseActivity extends AppCompatActivity {
             Intent previousIntent = getIntent();
             String title = previousIntent.getStringExtra(KEY_QUESTION_HEADER);
             surveyResponseStatus = SurveyResponseStatus.ResponseStatus.valueOf(previousIntent.getStringExtra(KEY_SURVEY_RESPONSE_STATUS));
+            totalQuestionsCount = previousIntent.getIntExtra(KEY_TOTAL_QUESTIONS,-1);
+
             Bundle args = previousIntent.getBundleExtra(KEY_QUESTION_ARGS);
             if (args != null) {
                 String type = args.getString("questionType");
@@ -85,7 +88,6 @@ public class QuestionResponseActivity extends AppCompatActivity {
             }
         }
     }
-
 
     private void initView(String title){
         MaterialToolbar myToolbar = binding.topAppBar;
@@ -137,7 +139,6 @@ public class QuestionResponseActivity extends AppCompatActivity {
         }
     }
 
-
     private void onBack(){
         Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.questionResponse_FRAME_question);
         if (fragment instanceof UnsavedChangesHandler) {
@@ -150,7 +151,6 @@ public class QuestionResponseActivity extends AppCompatActivity {
             finish(); // If the fragment doesn't care about unsaved changes
         }
     }
-
 
     public void showCancelConfirmationDialog() {
         new AlertDialog.Builder(this)
@@ -165,13 +165,41 @@ public class QuestionResponseActivity extends AppCompatActivity {
                 .show();
     }
 
+    public boolean hasNext(){
+        return currentQuestionOrder + 1 <= totalQuestionsCount;
+    }
+
+    public boolean hasPrevious(){
+        return currentQuestionOrder > 1;
+    }
 
     public void skipQuestion(){
         FirestoreManager.getInstance().listenToSurveyQuestions(surveyID, new QuestionsCallback() {
             @Override
             public void onQuestionsLoaded(List<Question> questions) {
-                if (currentQuestionOrder < questions.size() - 1) {
+                if (currentQuestionOrder < questions.size()) {
                     Question q = questions.get(currentQuestionOrder++);
+                    String questionOrder = "Q" + currentQuestionOrder;
+                    setTitle(questionOrder);
+                    loadQuestionFragment(q.getType(),createQuestionArgsBundle(q));
+                } else {
+                    finish(); // or show a "done" screen
+                }
+            }
+
+            @Override
+            public void onError(Exception e) {
+                Log.e(TAG,e.getMessage());
+            }
+        });
+    }
+
+    public void previousQuestion(){
+        FirestoreManager.getInstance().listenToSurveyQuestions(surveyID, new QuestionsCallback() {
+            @Override
+            public void onQuestionsLoaded(List<Question> questions) {
+                if (currentQuestionOrder-- > 0) {
+                    Question q = questions.get(currentQuestionOrder);
                     String questionOrder = "Q" + currentQuestionOrder;
                     setTitle(questionOrder);
                     loadQuestionFragment(q.getType(),createQuestionArgsBundle(q));

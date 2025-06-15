@@ -38,6 +38,7 @@ import com.example.questionnairebuilder.models.SingleChoiceQuestion;
 import com.example.questionnairebuilder.utilities.AuthenticationManager;
 import com.example.questionnairebuilder.utilities.FirestoreManager;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.android.material.textview.MaterialTextView;
@@ -58,6 +59,7 @@ public class ChoiceQuestionResponseFragment extends Fragment implements UnsavedC
     private FragmentChoiceQuestionResponseBinding binding;
     private MaterialTextView responseChoiceQuestion_LBL_question;
     private MaterialTextView responseChoiceQuestion_LBL_mandatory;
+    private LinearLayout responseChoiceQuestion_LL_buttons;
     private MaterialButton responseChoiceQuestion_BTN_save;
     private MaterialButton responseChoiceQuestion_BTN_skip;
     private RadioGroup responseChoiceQuestion_RadioGroup;
@@ -70,6 +72,9 @@ public class ChoiceQuestionResponseFragment extends Fragment implements UnsavedC
     private NestedScrollView scrollView;
     private View scrollHintBottom;
     private View scrollHintTop;
+    private LinearLayout response_LL_navigationButtons;
+    private ExtendedFloatingActionButton response_BTN_previous;
+    private ExtendedFloatingActionButton response_BTN_next;
     private Question question;
     private Response response;
     private int currentSelectionCount = 0;
@@ -151,6 +156,7 @@ public class ChoiceQuestionResponseFragment extends Fragment implements UnsavedC
         scrollHintTop = binding.scrollHintTop;
         responseChoiceQuestion_LBL_question = binding.responseChoiceQuestionLBLQuestion;
         responseChoiceQuestion_LBL_mandatory = binding.responseChoiceQuestionLBLMandatory;
+        responseChoiceQuestion_LL_buttons = binding.responseChoiceQuestionLLButtons;
         responseChoiceQuestion_BTN_save = binding.responseChoiceQuestionBTNSave;
         responseChoiceQuestion_BTN_skip = binding.responseChoiceQuestionBTNSkip;
         responseChoiceQuestion_RadioGroup = binding.responseChoiceQuestionRadioGroup;
@@ -160,15 +166,27 @@ public class ChoiceQuestionResponseFragment extends Fragment implements UnsavedC
         responseChoiceQuestion_DD_dropdown = binding.responseChoiceQuestionDDDropdown;
         responseChoiceQuestion_TIL_other = binding.responseChoiceQuestionTILOther;
         responseChoiceQuestion_TXT_other = binding.responseChoiceQuestionTXTOther;
+        response_LL_navigationButtons = binding.responseLLNavigationButtons;
+        response_BTN_previous = binding.responseBTNPrevious;
+        response_BTN_next = binding.responseBTNNext;
 
         if (question != null) {
             responseChoiceQuestion_LBL_question.setText(question.getQuestionTitle());
 
             if (isSurveyCompleted) {
-                responseChoiceQuestion_BTN_skip.setVisibility(GONE);
-                responseChoiceQuestion_BTN_save.setVisibility(GONE);
+                responseChoiceQuestion_LL_buttons.setVisibility(GONE);
+                response_LL_navigationButtons.setVisibility(VISIBLE);
+                boolean hasNext = ((QuestionResponseActivity) requireActivity()).hasNext();
+                boolean hasPrevious = ((QuestionResponseActivity) requireActivity()).hasPrevious();
+                response_BTN_next.setVisibility(hasNext ? VISIBLE : GONE);
+                response_BTN_previous.setVisibility(hasPrevious ? VISIBLE : GONE);
+                response_BTN_next.setOnClickListener(v -> skipQuestion());
+                response_BTN_previous.setOnClickListener(v -> previousQuestion());
             }
             else {
+                responseChoiceQuestion_LL_buttons.setVisibility(VISIBLE);
+                response_LL_navigationButtons.setVisibility(GONE);
+
                 if (question.isMandatory()) {
                     responseChoiceQuestion_LBL_mandatory.setVisibility(VISIBLE);
                     responseChoiceQuestion_BTN_skip.setVisibility(GONE);
@@ -176,10 +194,8 @@ public class ChoiceQuestionResponseFragment extends Fragment implements UnsavedC
                     responseChoiceQuestion_LBL_mandatory.setVisibility(GONE);
                     responseChoiceQuestion_BTN_skip.setVisibility(VISIBLE);
                 }
-
                 responseChoiceQuestion_TIL_other.setVisibility(GONE);
 
-                // listeners
                 responseChoiceQuestion_BTN_save.setOnClickListener(v -> save());
                 responseChoiceQuestion_BTN_skip.setOnClickListener(v -> skipQuestion());
             }
@@ -434,6 +450,10 @@ public class ChoiceQuestionResponseFragment extends Fragment implements UnsavedC
 
     private void skipQuestion() {
         ((QuestionResponseActivity) requireActivity()).skipQuestion();
+    }
+
+    private void previousQuestion() {
+        ((QuestionResponseActivity) requireActivity()).previousQuestion();
     }
 
     private void save() {

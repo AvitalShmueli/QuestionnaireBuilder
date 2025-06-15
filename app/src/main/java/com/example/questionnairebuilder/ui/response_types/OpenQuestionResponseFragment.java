@@ -12,6 +12,7 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 
 import com.example.questionnairebuilder.QuestionResponseActivity;
 import com.example.questionnairebuilder.R;
@@ -24,6 +25,7 @@ import com.example.questionnairebuilder.models.Response;
 import com.example.questionnairebuilder.utilities.AuthenticationManager;
 import com.example.questionnairebuilder.utilities.FirestoreManager;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.android.material.textview.MaterialTextView;
@@ -39,6 +41,7 @@ public class OpenQuestionResponseFragment extends Fragment implements UnsavedCha
     private FragmentOpenQuestionResponseBinding binding;
     private MaterialTextView responseOpenQuestion_LBL_question;
     private MaterialTextView responseOpenQuestion_LBL_mandatory;
+    private LinearLayout responseOpenQuestion_LL_buttons;
     private MaterialButton responseOpenQuestion_BTN_save;
     private MaterialButton responseOpenQuestion_BTN_skip;
     private TextInputLayout responseOpenQuestion_TIL_answer;
@@ -46,6 +49,9 @@ public class OpenQuestionResponseFragment extends Fragment implements UnsavedCha
     private NestedScrollView scrollView;
     private View scrollHintBottom;
     private View scrollHintTop;
+    private LinearLayout response_LL_navigationButtons;
+    private ExtendedFloatingActionButton response_BTN_previous;
+    private ExtendedFloatingActionButton response_BTN_next;
     private Question question;
     private Response response;
     private boolean isSurveyCompleted;
@@ -110,22 +116,35 @@ public class OpenQuestionResponseFragment extends Fragment implements UnsavedCha
         scrollView = binding.scrollView;
         scrollHintBottom = binding.scrollHintBottom;
         scrollHintTop = binding.scrollHintTop;
+        responseOpenQuestion_LL_buttons = binding.responseOpenQuestionLLButtons;
         responseOpenQuestion_LBL_question = binding.responseOpenQuestionLBLQuestion;
         responseOpenQuestion_LBL_mandatory = binding.responseOpenQuestionLBLMandatory;
         responseOpenQuestion_BTN_save = binding.responseOpenQuestionBTNSave;
         responseOpenQuestion_BTN_skip = binding.responseOpenQuestionBTNSkip;
         responseOpenQuestion_TIL_answer = binding.responseOpenQuestionTILAnswer;
         responseOpenQuestion_TXT_answer = binding.responseOpenQuestionTXTAnswer;
+        response_LL_navigationButtons = binding.responseLLNavigationButtons;
+        response_BTN_previous = binding.responseBTNPrevious;
+        response_BTN_next = binding.responseBTNNext;
 
         if(question != null){
             responseOpenQuestion_LBL_question.setText(question.getQuestionTitle());
             responseOpenQuestion_TXT_answer.setEnabled(!isSurveyCompleted);
 
             if (isSurveyCompleted) {
-                responseOpenQuestion_BTN_skip.setVisibility(GONE);
-                responseOpenQuestion_BTN_save.setVisibility(GONE);
+                responseOpenQuestion_LL_buttons.setVisibility(GONE);
+                response_LL_navigationButtons.setVisibility(VISIBLE);
+                boolean hasNext = ((QuestionResponseActivity) requireActivity()).hasNext();
+                boolean hasPrevious = ((QuestionResponseActivity) requireActivity()).hasPrevious();
+                response_BTN_next.setVisibility(hasNext ? VISIBLE : GONE);
+                response_BTN_previous.setVisibility(hasPrevious ? VISIBLE : GONE);
+                response_BTN_next.setOnClickListener(v -> skipQuestion());
+                response_BTN_previous.setOnClickListener(v -> previousQuestion());
             }
             else {
+                responseOpenQuestion_LL_buttons.setVisibility(VISIBLE);
+                response_LL_navigationButtons.setVisibility(GONE);
+
                 if (question.isMandatory()) {
                     responseOpenQuestion_LBL_mandatory.setVisibility(VISIBLE);
                     responseOpenQuestion_BTN_skip.setVisibility(GONE);
@@ -134,23 +153,11 @@ public class OpenQuestionResponseFragment extends Fragment implements UnsavedCha
                     responseOpenQuestion_BTN_skip.setVisibility(VISIBLE);
                 }
 
-                // listeners
                 responseOpenQuestion_BTN_save.setOnClickListener(v -> save());
                 responseOpenQuestion_BTN_skip.setOnClickListener(v -> skipQuestion());
             }
 
             initScrollHint();
-
-            /*
-            if(((OpenEndedQuestion)question).isMultipleLineAnswer()) {
-                responseOpenQuestion_TXT_answer.setMinLines(5);
-                responseOpenQuestion_TXT_answer.setMaxLines(5);
-            }
-            else {
-                responseOpenQuestion_TXT_answer.setMinLines(1);
-                responseOpenQuestion_TXT_answer.setMaxLines(1);
-            }
-            */
         }
     }
 
@@ -206,6 +213,10 @@ public class OpenQuestionResponseFragment extends Fragment implements UnsavedCha
         ((QuestionResponseActivity) requireActivity()).skipQuestion();
     }
 
+    private void previousQuestion() {
+        ((QuestionResponseActivity) requireActivity()).previousQuestion();
+    }
+
     private void save() {
         if (isValidResponse()) {
             responseOpenQuestion_TIL_answer.setError(null);
@@ -237,7 +248,7 @@ public class OpenQuestionResponseFragment extends Fragment implements UnsavedCha
         String currentResponse = responseOpenQuestion_TXT_answer.getText() != null
                 ? responseOpenQuestion_TXT_answer.getText().toString().trim()
                 : "";
-        String originalResponse = response != null ? response.getResponseValues().get(0) : "";
+        String originalResponse = response != null ? response.getResponseValues().get(0).trim() : "";
         return !currentResponse.equals(originalResponse);
     }
 }

@@ -65,19 +65,15 @@ public class ChoicesAdapter extends RecyclerView.Adapter<ChoicesAdapter.ViewHold
         holder.rowItemEditText.setEnabled(!isFixedMode);
         holder.rowItemEditText.setError(null);
 
-        // Update IME options: last row should have "Done", others should have "Next"
-        if (position == dataList.size() - 1) {
-            holder.rowItemEditText.setImeOptions(EditorInfo.IME_ACTION_DONE);
-        } else {
-            holder.rowItemEditText.setImeOptions(EditorInfo.IME_ACTION_NEXT);
+        // Remove existing TextWatcher if any
+        if (holder.textWatcher != null) {
+            holder.rowItemEditText.removeTextChangedListener(holder.textWatcher);
         }
 
-        holder.rowItemEditText.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) { }
+        // Create and attach new TextWatcher
+        TextWatcher watcher = new TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
 
             @Override
             public void afterTextChanged(Editable s) {
@@ -85,21 +81,13 @@ public class ChoicesAdapter extends RecyclerView.Adapter<ChoicesAdapter.ViewHold
                 if (position == RecyclerView.NO_POSITION) return;
 
                 String text = s.toString();
-
-                // If text is empty and this is NOT the last row (empty input row),
-                // remove this item from the list
-                if (text.isEmpty() && position != dataList.size() - 1) {
-                    dataList.remove(position);
-                    notifyItemRemoved(position);
-                    notifyItemRangeChanged(position, dataList.size());
-
-                    // Notify listener about row count change
-                    if (rowCountListener != null) {
-                        rowCountListener.onRowCountChanged(getValidChoiceCount());
-                    }
+                if (position < dataList.size()) {
+                    dataList.set(position, text);
                 }
             }
-        });
+        };
+        holder.rowItemEditText.addTextChangedListener(watcher);
+        holder.textWatcher = watcher;
 
         holder.rowItemEditText.setOnEditorActionListener((v, actionId, event) -> {
             if (actionId == android.view.inputmethod.EditorInfo.IME_ACTION_DONE) {
@@ -113,38 +101,10 @@ public class ChoicesAdapter extends RecyclerView.Adapter<ChoicesAdapter.ViewHold
                 } else {
                     holder.rowItemEditText.setError(null);
                 }
-                dataList.set(currentPosition, text);
 
-                // Add a new row only if it's the last row and has content
-                if (currentPosition == dataList.size() - 1 && !text.isEmpty()) {
-                    dataList.add("");
-                    notifyItemInserted(dataList.size() - 1);
-                    notifyItemRangeChanged(currentPosition, dataList.size());
-
-                    // Notify listener about row count change
-                    if (rowCountListener != null) {
-                        rowCountListener.onRowCountChanged(getValidChoiceCount());
-                    }
+                if (currentPosition >= 0 && currentPosition < dataList.size()) {
+                    dataList.set(currentPosition, text);
                 }
-
-                // Move focus to the next row
-//                int nextPosition = currentPosition + 1;
-//                if (nextPosition < dataList.size()) {
-//                    holder.itemView.post(() -> {
-//                        RecyclerView recyclerView = (RecyclerView) holder.itemView.getParent();
-//                        RecyclerView.ViewHolder nextHolder = recyclerView.findViewHolderForAdapterPosition(nextPosition);
-//                        if (nextHolder instanceof ViewHolder) {
-//                            ViewHolder nextViewHolder = (ViewHolder) nextHolder;
-//                            nextViewHolder.rowItemEditText.requestFocus();
-//
-//                            // Show keyboard
-//                            InputMethodManager imm = (InputMethodManager) v.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-//                            if (imm != null) {
-//                                imm.showSoftInput(nextViewHolder.rowItemEditText, InputMethodManager.SHOW_IMPLICIT);
-//                            }
-//                        }
-//                    });
-//                }
 
                 if (currentPosition == dataList.size() - 1) {
                     // If it's the last item, hide the keyboard and clear focus
@@ -181,11 +141,23 @@ public class ChoicesAdapter extends RecyclerView.Adapter<ChoicesAdapter.ViewHold
             int currentPosition = holder.getAdapterPosition();
             if (currentPosition == RecyclerView.NO_POSITION) return;
 
-            if(hasFocus){
-                // If this is the last row and it's not empty, add a new row
-                if (currentPosition == dataList.size() - 1 && !dataList.get(currentPosition).isEmpty()) {
+            if (hasFocus) {
+                // If this is the last row, add a new one (but only if it's not already added)
+                if (currentPosition == dataList.size() - 1) {
+                    String currentText = dataList.get(currentPosition);
                     dataList.add("");
                     notifyItemInserted(dataList.size() - 1);
+
+                    if (rowCountListener != null) {
+                        rowCountListener.onRowCountChanged(getValidChoiceCount());
+                    }
+                }
+
+                // Update IME options: last row should have "Done", others should have "Next"
+                if (currentPosition == dataList.size() - 1) {
+                    holder.rowItemEditText.setImeOptions(EditorInfo.IME_ACTION_DONE);
+                } else {
+                    holder.rowItemEditText.setImeOptions(EditorInfo.IME_ACTION_NEXT);
                 }
             }
             else{
@@ -196,7 +168,10 @@ public class ChoicesAdapter extends RecyclerView.Adapter<ChoicesAdapter.ViewHold
                 } else {
                     holder.rowItemEditText.setError(null);
                 }
-                dataList.set(currentPosition, text);
+
+                if (currentPosition >= 0 && currentPosition < dataList.size()) {
+                    dataList.set(currentPosition, text);
+                }
 
                 // Add a new row only if it's the last row and has content
                 if (currentPosition == dataList.size() - 1 && !text.isEmpty()) {
@@ -237,6 +212,7 @@ public class ChoicesAdapter extends RecyclerView.Adapter<ChoicesAdapter.ViewHold
 
     private boolean isDuplicate(String text, int currentIndex) {
         String normalized = text.trim().toLowerCase();
+        if (normalized.isEmpty()) return false;
         for (int i = 0; i < dataList.size(); i++) {
             if (i == currentIndex) continue;
             if (dataList.get(i).trim().equalsIgnoreCase(normalized)) {
@@ -269,6 +245,9 @@ public class ChoicesAdapter extends RecyclerView.Adapter<ChoicesAdapter.ViewHold
         return (int) dataList.stream().filter(s -> !s.isEmpty()).count();
     }
 
+    /**
+     * @return Arraylist of non-empty choices
+     */
     public ArrayList<String> getDataList() {
         return dataList.stream()
                 .filter(s -> !s.isEmpty())
@@ -278,6 +257,7 @@ public class ChoicesAdapter extends RecyclerView.Adapter<ChoicesAdapter.ViewHold
     public static class ViewHolder extends RecyclerView.ViewHolder {
         TextInputEditText rowItemEditText;
         ShapeableImageView deleteIcon;
+        TextWatcher textWatcher;
 
         public ViewHolder(View itemView) {
             super(itemView);

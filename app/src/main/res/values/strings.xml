@@ -23,6 +23,7 @@
     <string name="add_question">Add Question</string>
     <string name="delete">Delete</string>
     <string name="complete_survey">Complete</string>
+    <string name="save_and_continue">Save &amp; Continue</string>
 
     <string name="title_activity_home">HomeActivity</string>
     <string name="title_home">Home</string>
@@ -107,6 +108,7 @@
     <string name="survey_updated_successfully">Survey details have been updated successfully.</string>
     <string name="survey_update_failed">Failed. Try again later.</string>
     <string name="update_description">Update Description</string>
+    <string name="update_title">Update Title</string>
     <string name="pending">Pending</string>
     <string name="in_progress">In progress</string>
     <string name="completed">Completed</string>
@@ -117,4 +119,6 @@
     <string name="start_date">Start Date</string>
     <string name="end_date">End Date</string>
     <string name="choose_a_tag">Choose one or more tags:</string>
+    <string name="previous">Previous</string>
+    <string name="next">Next</string>
 </resources>

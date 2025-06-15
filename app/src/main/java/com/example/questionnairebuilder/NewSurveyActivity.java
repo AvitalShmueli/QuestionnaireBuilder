@@ -89,6 +89,7 @@ public class NewSurveyActivity extends AppCompatActivity {
 
                 Intent intent = new Intent(NewSurveyActivity.this, QuestionsActivity.class);
                 intent.putExtra("surveyID",survey.getID());
+                intent.putExtra("survey_title",survey.getSurveyTitle());
                 intent.putExtra(QuestionsActivity.KEY_EDIT_MODE, true);
                 startActivity(intent);
                 finish();

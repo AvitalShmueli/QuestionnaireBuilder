@@ -11,6 +11,7 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 
 import com.example.questionnairebuilder.QuestionResponseActivity;
 import com.example.questionnairebuilder.R;
@@ -25,6 +26,7 @@ import com.example.questionnairebuilder.utilities.AuthenticationManager;
 import com.example.questionnairebuilder.utilities.DatePickerHelper;
 import com.example.questionnairebuilder.utilities.FirestoreManager;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.android.material.textview.MaterialTextView;
@@ -49,8 +51,12 @@ public class DateQuestionResponseFragment extends Fragment implements UnsavedCha
     private TextInputEditText startDateTXT;
     private TextInputLayout endDateLayout;
     private TextInputEditText endDateTXT;
+    private LinearLayout responseDateQuestion_LL_buttons;
     private MaterialButton responseDateQuestion_BTN_save;
     private MaterialButton responseDateQuestion_BTN_skip;
+    private LinearLayout response_LL_navigationButtons;
+    private ExtendedFloatingActionButton response_BTN_previous;
+    private ExtendedFloatingActionButton response_BTN_next;
     private Question question;
     private Response response;
     private boolean isSurveyCompleted;
@@ -121,17 +127,30 @@ public class DateQuestionResponseFragment extends Fragment implements UnsavedCha
         startDateTXT = binding.responseDateQuestionTXTDate;
         endDateLayout = binding.responseDateQuestionTILDate2;
         endDateTXT = binding.responseDateQuestionTXTDate2;
+        responseDateQuestion_LL_buttons = binding.responseDateQuestionLLButtons;
         responseDateQuestion_BTN_save = binding.responseDateQuestionBTNSave;
         responseDateQuestion_BTN_skip = binding.responseDateQuestionBTNSkip;
+        response_LL_navigationButtons = binding.responseLLNavigationButtons;
+        response_BTN_previous = binding.responseBTNPrevious;
+        response_BTN_next = binding.responseBTNNext;
 
         if(question != null){
             responseDateQuestion_LBL_question.setText(question.getQuestionTitle());
 
             if (isSurveyCompleted) {
-                responseDateQuestion_BTN_skip.setVisibility(GONE);
-                responseDateQuestion_BTN_save.setVisibility(GONE);
+                responseDateQuestion_LL_buttons.setVisibility(GONE);
+                response_LL_navigationButtons.setVisibility(VISIBLE);
+                boolean hasNext = ((QuestionResponseActivity) requireActivity()).hasNext();
+                boolean hasPrevious = ((QuestionResponseActivity) requireActivity()).hasPrevious();
+                response_BTN_next.setVisibility(hasNext ? VISIBLE : GONE);
+                response_BTN_previous.setVisibility(hasPrevious ? VISIBLE : GONE);
+                response_BTN_next.setOnClickListener(v -> skipQuestion());
+                response_BTN_previous.setOnClickListener(v -> previousQuestion());
             }
             else {
+                responseDateQuestion_LL_buttons.setVisibility(VISIBLE);
+                response_LL_navigationButtons.setVisibility(GONE);
+
                 if (question.isMandatory()) {
                     responseDateQuestion_LBL_mandatory.setVisibility(VISIBLE);
                     responseDateQuestion_BTN_skip.setVisibility(GONE);
@@ -140,7 +159,6 @@ public class DateQuestionResponseFragment extends Fragment implements UnsavedCha
                     responseDateQuestion_BTN_skip.setVisibility(VISIBLE);
                 }
 
-                // listeners
                 responseDateQuestion_BTN_save.setOnClickListener(v -> save());
                 responseDateQuestion_BTN_skip.setOnClickListener(v -> skipQuestion());
             }
@@ -177,6 +195,8 @@ public class DateQuestionResponseFragment extends Fragment implements UnsavedCha
     }
 
     private void setupDateFieldBehavior() {
+        startDateLayout.setEnabled(!isSurveyCompleted);
+        endDateLayout.setEnabled(!isSurveyCompleted);
         startDatePicker = new DatePickerHelper(requireActivity(),requireActivity().getSupportFragmentManager(), startDateLayout, startDateTXT);
         if(((DateQuestion)question).getDateMode() == DateSelectionModeEnum.DATE_RANGE) {
             endDateLayout.setVisibility(VISIBLE);
@@ -186,10 +206,15 @@ public class DateQuestionResponseFragment extends Fragment implements UnsavedCha
         } else{
             endDateLayout.setVisibility(GONE);
         }
+
     }
 
     private void skipQuestion() {
         ((QuestionResponseActivity) requireActivity()).skipQuestion();
+    }
+
+    private void previousQuestion() {
+        ((QuestionResponseActivity) requireActivity()).previousQuestion();
     }
 
     private void save() {

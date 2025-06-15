@@ -95,7 +95,7 @@
                 android:minHeight="40dp"/>
 
             <LinearLayout
-                android:id="@+id/responseOpenQuestion_LLC_buttons"
+                android:id="@+id/responseOpenQuestion_LL_buttons"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom"
@@ -108,7 +108,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_weight="1"
-                    android:text="@string/save"
+                    android:text="@string/save_and_continue"
                     app:cornerRadius="20dp"
                     android:textAllCaps="false"/>
 
@@ -127,6 +127,49 @@
                     app:strokeColor="@color/blue"
                     android:textSize="@dimen/button_text_size"
                     android:textStyle="bold"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/response_LL_navigationButtons"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:layout_marginBottom="@dimen/activity_vertical_margin"
+                android:orientation="horizontal"
+                android:visibility="gone">
+
+                <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+                    android:id="@+id/response_BTN_previous"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingStart="0dp"
+                    android:text="@string/previous"
+                    android:textStyle="bold"
+                    app:icon="@drawable/arrow_back_24px"
+                    app:iconGravity="textStart"
+                    app:iconPadding="8dp"
+                    app:strokeWidth="0dp" />
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"/>
+
+                <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+                    android:id="@+id/response_BTN_next"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingEnd="0dp"
+                    android:text="@string/next"
+                    android:textSize="@dimen/button_text_size"
+                    android:textStyle="bold"
+                    app:icon="@drawable/arrow_forward_24px"
+                    app:iconGravity="textEnd"
+                    app:iconPadding="8dp"
+                    app:strokeWidth="0dp" />
 
             </LinearLayout>
 

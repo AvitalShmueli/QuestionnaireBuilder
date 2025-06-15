@@ -23,6 +23,7 @@
     <string name="add_question">Add Question</string>
     <string name="delete">Delete</string>
     <string name="complete_survey">Complete</string>
+    <string name="save_and_continue">Save &amp; Continue</string>
 
     <string name="title_activity_home">HomeActivity</string>
     <string name="title_home">Home</string>
@@ -117,4 +118,6 @@
     <string name="start_date">Start Date</string>
     <string name="end_date">End Date</string>
     <string name="choose_a_tag">Choose one or more tags:</string>
+    <string name="previous">Previous</string>
+    <string name="next">Next</string>
 </resources>

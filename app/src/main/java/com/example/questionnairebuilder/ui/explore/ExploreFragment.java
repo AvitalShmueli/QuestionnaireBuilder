@@ -1,5 +1,8 @@
 package com.example.questionnairebuilder.ui.explore;
 
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -18,6 +21,7 @@ import com.example.questionnairebuilder.adapters.SurveyWithResponseAdapter;
 import com.example.questionnairebuilder.databinding.FragmentExploreBinding;
 import com.example.questionnairebuilder.models.SurveyResponseStatus;
 import com.google.android.material.tabs.TabLayout;
+import com.google.android.material.textview.MaterialTextView;
 
 import java.util.ArrayList;
 
@@ -31,6 +35,7 @@ public class ExploreFragment extends Fragment {
     private int selectedTabPosition = 0;
     private String currentStatusFilter = SurveyResponseStatus.ResponseStatus.PENDING.name();
     private SurveyWithResponseAdapter surveyAdapter;
+    private MaterialTextView explore_LBL_noSurveys;
 
 
     @Override
@@ -61,6 +66,7 @@ public class ExploreFragment extends Fragment {
         recyclerView = binding.exploreSurveysRecyclerView;
         scrollHintBottom = binding.scrollHintBottom;
         scrollHintTop = binding.scrollHintTop;
+        explore_LBL_noSurveys = binding.exploreLBLNoSurveys;
     }
 
     private void initTabs() {
@@ -110,6 +116,8 @@ public class ExploreFragment extends Fragment {
 
         viewModel.getFilteredSurveys().observe(getViewLifecycleOwner(), surveysWithResponses  -> {
             surveyAdapter.updateSurveys(surveysWithResponses); // Update UI automatically when LiveData changes
+            explore_LBL_noSurveys.setVisibility(surveysWithResponses.isEmpty() ? VISIBLE : GONE);
+            //recyclerView.setVisibility(surveysWithResponses.isEmpty() ? GONE : VISIBLE);
         });
     }
 
@@ -128,8 +136,8 @@ public class ExploreFragment extends Fragment {
         boolean canScrollUp = recyclerView.canScrollVertically(-1); // up
         boolean canScrollDown = recyclerView.canScrollVertically(1); // down
 
-        scrollHintTop.setVisibility(canScrollUp ? View.VISIBLE : View.GONE);
-        scrollHintBottom.setVisibility(canScrollDown ? View.VISIBLE : View.GONE);
+        scrollHintTop.setVisibility(canScrollUp ? VISIBLE : GONE);
+        scrollHintBottom.setVisibility(canScrollDown ? VISIBLE : GONE);
     }
 
     private void getStatusFromTab(int selectedTabPosition){

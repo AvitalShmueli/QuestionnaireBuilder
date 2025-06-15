@@ -26,6 +26,18 @@
             android:background="@drawable/top_fade"
             android:visibility="gone"/>
 
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/explore_LBL_noSurveys"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginVertical="@dimen/no_surveys_margin"
+            android:layout_gravity="center"
+            android:text="@string/no_surveys_yet"
+            android:textColor="@color/dark_blue"
+            android:textSize="16sp"
+            android:paddingHorizontal="8dp"
+            android:visibility="gone"/>
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/exploreSurveysRecyclerView"
             android:layout_width="match_parent"

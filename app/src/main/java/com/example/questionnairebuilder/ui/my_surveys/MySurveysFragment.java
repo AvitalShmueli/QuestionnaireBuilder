@@ -1,5 +1,8 @@
 package com.example.questionnairebuilder.ui.my_surveys;
 
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -16,6 +19,7 @@ import com.example.questionnairebuilder.NewSurveyActivity;
 import com.example.questionnairebuilder.SurveyManagementActivity;
 import com.example.questionnairebuilder.adapters.SurveyAdapter;
 import com.example.questionnairebuilder.databinding.FragmentMySurveysBinding;
+import com.google.android.material.textview.MaterialTextView;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -27,6 +31,7 @@ public class MySurveysFragment extends Fragment {
     private RecyclerView recyclerView;
     private View scrollHintBottom;
     private View scrollHintTop;
+    private MaterialTextView mySurveys_LBL_noSurveys;
 
     private SurveyAdapter surveyAdapter;
 
@@ -54,6 +59,7 @@ public class MySurveysFragment extends Fragment {
         recyclerView = binding.mySurveysRecyclerView;
         scrollHintBottom = binding.scrollHintBottom;
         scrollHintTop = binding.scrollHintTop;
+        mySurveys_LBL_noSurveys = binding.mySurveysLBLNoSurveys;
 
         binding.mySurveysFABAdd.setOnClickListener(v -> {
             Intent intent = new Intent(getActivity(), NewSurveyActivity.class);
@@ -86,6 +92,7 @@ public class MySurveysFragment extends Fragment {
         else {
             viewModel.getSurveys().observe(getViewLifecycleOwner(), surveys -> {
                 surveyAdapter.updateSurveys(surveys); // Update UI automatically when LiveData changes
+                mySurveys_LBL_noSurveys.setVisibility(surveys.isEmpty() ? VISIBLE : GONE);
             });
         }
     }

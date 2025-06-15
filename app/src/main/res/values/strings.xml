@@ -112,4 +112,6 @@
     <string name="completed">Completed</string>
     <string name="sent">Sent</string>
     <string name="other">Other</string>
+    <string name="no_active_surveys">There are currently no active surveys</string>
+    <string name="no_surveys_yet">No surveys yet</string>
 </resources>

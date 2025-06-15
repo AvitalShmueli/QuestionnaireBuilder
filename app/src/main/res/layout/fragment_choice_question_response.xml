@@ -94,7 +94,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/select"
-                    android:layout_marginVertical="@dimen/activity_vertical_margin">
+                    android:layout_marginVertical="@dimen/activity_vertical_margin"
+                    android:visibility="gone">
 
                     <AutoCompleteTextView
                         android:id="@+id/responseChoiceQuestion_DD_dropdown"
@@ -120,7 +121,8 @@
                     app:boxCornerRadiusTopEnd="@dimen/corner_radius"
                     app:boxCornerRadiusTopStart="@dimen/corner_radius"
                     app:boxStrokeColor="?attr/colorPrimary"
-                    app:hintTextColor="?attr/colorSecondaryVariant">
+                    app:hintTextColor="?attr/colorSecondaryVariant"
+                    android:visibility="gone">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/responseChoiceQuestion_TXT_other"

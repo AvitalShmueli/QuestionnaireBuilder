@@ -3,17 +3,11 @@ package com.example.questionnairebuilder.ui.response_types;
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 
-import android.content.Context;
-import android.content.res.ColorStateList;
-import android.graphics.Color;
 import android.os.Bundle;
 
 import androidx.activity.OnBackPressedCallback;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,21 +22,18 @@ import com.example.questionnairebuilder.models.DateSelectionModeEnum;
 import com.example.questionnairebuilder.models.Question;
 import com.example.questionnairebuilder.models.Response;
 import com.example.questionnairebuilder.utilities.AuthenticationManager;
+import com.example.questionnairebuilder.utilities.DatePickerHelper;
 import com.example.questionnairebuilder.utilities.FirestoreManager;
 import com.google.android.material.button.MaterialButton;
-import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.android.material.textview.MaterialTextView;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.UUID;
 
 /**
@@ -54,15 +45,17 @@ public class DateQuestionResponseFragment extends Fragment implements UnsavedCha
     private FragmentDateQuestionResponseBinding binding;
     private MaterialTextView responseDateQuestion_LBL_question;
     private MaterialTextView responseDateQuestion_LBL_mandatory;
-    private TextInputLayout responseDateQuestion_TIL_date;
-    private TextInputEditText responseDateQuestion_TXT_date;
-    private TextInputLayout responseDateQuestion_TIL_date2;
-    private TextInputEditText responseDateQuestion_TXT_date2;
+    private TextInputLayout startDateLayout;
+    private TextInputEditText startDateTXT;
+    private TextInputLayout endDateLayout;
+    private TextInputEditText endDateTXT;
     private MaterialButton responseDateQuestion_BTN_save;
     private MaterialButton responseDateQuestion_BTN_skip;
     private Question question;
     private Response response;
     private boolean isSurveyCompleted;
+    private DatePickerHelper startDatePicker;
+    private DatePickerHelper endDatePicker;
 
     public DateQuestionResponseFragment() {
         // Required empty public constructor
@@ -124,10 +117,10 @@ public class DateQuestionResponseFragment extends Fragment implements UnsavedCha
     private void createBinding() {
         responseDateQuestion_LBL_question = binding.responseDateQuestionLBLQuestion;
         responseDateQuestion_LBL_mandatory = binding.responseDateQuestionLBLMandatory;
-        responseDateQuestion_TIL_date = binding.responseDateQuestionTILDate;
-        responseDateQuestion_TXT_date = binding.responseDateQuestionTXTDate;
-        responseDateQuestion_TIL_date2 = binding.responseDateQuestionTILDate2;
-        responseDateQuestion_TXT_date2 = binding.responseDateQuestionTXTDate2;
+        startDateLayout = binding.responseDateQuestionTILDate;
+        startDateTXT = binding.responseDateQuestionTXTDate;
+        endDateLayout = binding.responseDateQuestionTILDate2;
+        endDateTXT = binding.responseDateQuestionTXTDate2;
         responseDateQuestion_BTN_save = binding.responseDateQuestionBTNSave;
         responseDateQuestion_BTN_skip = binding.responseDateQuestionBTNSkip;
 
@@ -153,6 +146,7 @@ public class DateQuestionResponseFragment extends Fragment implements UnsavedCha
             }
 
             setupDateFieldBehavior();
+
         }
     }
 
@@ -165,11 +159,11 @@ public class DateQuestionResponseFragment extends Fragment implements UnsavedCha
                     response = theResponse;
                     if (!response.getResponseValues().isEmpty()) {
                         if(((DateQuestion)question).getDateMode() == DateSelectionModeEnum.DATE_RANGE && response.getResponseValues().size() == 2){
-                            responseDateQuestion_TXT_date.setText(response.getResponseValues().get(0));
-                            responseDateQuestion_TXT_date2.setText(response.getResponseValues().get(1));
+                            startDateTXT.setText(response.getResponseValues().get(0));
+                            endDateTXT.setText(response.getResponseValues().get(1));
                         }
                         else{
-                            responseDateQuestion_TXT_date.setText(response.getResponseValues().get(0));
+                            startDateTXT.setText(response.getResponseValues().get(0));
                         }
                     }
                 }
@@ -183,106 +177,15 @@ public class DateQuestionResponseFragment extends Fragment implements UnsavedCha
     }
 
     private void setupDateFieldBehavior() {
-        setupDateField(responseDateQuestion_TIL_date, responseDateQuestion_TXT_date);
-
-        if(((DateQuestion)question).getDateMode() == DateSelectionModeEnum.DATE_RANGE){
-            responseDateQuestion_TIL_date2.setVisibility(VISIBLE);
-            responseDateQuestion_TIL_date.setHint("Start Date");
-            responseDateQuestion_TIL_date2.setHint("End Date");
-            setupDateField(responseDateQuestion_TIL_date2, responseDateQuestion_TXT_date2);
+        startDatePicker = new DatePickerHelper(requireActivity(),requireActivity().getSupportFragmentManager(), startDateLayout, startDateTXT);
+        if(((DateQuestion)question).getDateMode() == DateSelectionModeEnum.DATE_RANGE) {
+            endDateLayout.setVisibility(VISIBLE);
+            startDateLayout.setHint(getString(R.string.start_date));
+            endDateLayout.setHint(getString(R.string.end_date));
+            endDatePicker = new DatePickerHelper(requireActivity(), requireActivity().getSupportFragmentManager(), endDateLayout, endDateTXT);
+        } else{
+            endDateLayout.setVisibility(GONE);
         }
-        else{
-            responseDateQuestion_TIL_date2.setVisibility(GONE);
-        }
-    }
-
-    private void setupDateField(TextInputLayout inputLayout, TextInputEditText editText) {
-        inputLayout.setEndIconOnClickListener(v -> showMaterialDatePicker(editText));
-        inputLayout.setEnabled(!isSurveyCompleted);
-
-        if(!isSurveyCompleted) {
-            editText.addTextChangedListener(new TextWatcher() {
-                boolean isEditing;
-
-                @Override
-                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                }
-
-                @Override
-                public void onTextChanged(CharSequence s, int start, int before, int count) {
-                }
-
-                @Override
-                public void afterTextChanged(Editable s) {
-                    if (isEditing) return;
-                    isEditing = true;
-
-                    String input = s.toString().replaceAll("[^\\d]", "");
-                    StringBuilder formatted = new StringBuilder();
-
-                    for (int i = 0; i < input.length() && i < 8; i++) {
-                        if (i == 2 || i == 4) formatted.append("/");
-                        formatted.append(input.charAt(i));
-                    }
-
-                    editText.setText(formatted.toString());
-                    editText.setSelection(formatted.length());
-
-                    if (formatted.length() == 10 && !isValidDate(formatted.toString()))
-                        inputLayout.setError("Invalid date");
-                    else
-                        inputLayout.setError(null);
-
-                    isEditing = false;
-                }
-            });
-
-            editText.setOnFocusChangeListener((v, hasFocus) ->
-                    editText.setHint(hasFocus ? "DD/MM/YYYY" : "")
-            );
-
-            inputLayout.setEndIconTintList(ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.blue)));
-        }
-        else{
-            inputLayout.setEndIconTintList(ColorStateList.valueOf(Color.GRAY));
-        }
-    }
-
-    private boolean isValidDate(String date) {
-        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
-        sdf.setLenient(false); // Ensures 32/13/2025 is rejected
-
-        try {
-            sdf.parse(date); // Will throw ParseException if invalid
-            return true;
-        } catch (ParseException e) {
-            return false;
-        }
-    }
-
-    private void showMaterialDatePicker(TextInputEditText editText) {
-        MaterialDatePicker<Long> datePicker = MaterialDatePicker.Builder
-                .datePicker()
-                .setTitleText("Select Date")
-                .setSelection(MaterialDatePicker.todayInUtcMilliseconds())
-                .build();
-
-        datePicker.addOnPositiveButtonClickListener(selection -> {
-            Calendar calendar = Calendar.getInstance();
-            calendar.setTimeInMillis(selection);
-
-            int day = calendar.get(Calendar.DAY_OF_MONTH);
-            int month = calendar.get(Calendar.MONTH) + 1;
-            int year = calendar.get(Calendar.YEAR);
-
-            String formattedDate = String.format(Locale.getDefault(), "%02d/%02d/%04d", day, month, year);
-            editText.setText(formattedDate);
-
-            editText.requestFocus();
-            editText.setSelection(formattedDate.length());
-        });
-
-        datePicker.show(requireActivity().getSupportFragmentManager(), "DATE_PICKER");
     }
 
     private void skipQuestion() {
@@ -292,9 +195,9 @@ public class DateQuestionResponseFragment extends Fragment implements UnsavedCha
     private void save() {
         if (isValidResponse()) {
             ArrayList<String> selectedDates = new ArrayList<>();
-            selectedDates.add(responseDateQuestion_TXT_date.getText().toString());
+            selectedDates.add(startDateTXT.getText().toString());
             if(((DateQuestion)question).getDateMode() == DateSelectionModeEnum.DATE_RANGE)
-                selectedDates.add(responseDateQuestion_TXT_date2.getText().toString());
+                selectedDates.add(endDateTXT.getText().toString());
 
             if(response == null) {
                 response = new Response()
@@ -312,45 +215,38 @@ public class DateQuestionResponseFragment extends Fragment implements UnsavedCha
     }
 
     private boolean isValidResponse() {
-        boolean valid = validateDateField(responseDateQuestion_TXT_date, responseDateQuestion_TIL_date);
+        Date start = startDatePicker.getSelectedDate();
+        Date end = endDatePicker.getSelectedDate();
 
-        // If it's a date range, validate the second date field
-        if (((DateQuestion) question).getDateMode() == DateSelectionModeEnum.DATE_RANGE) {
-            if (!validateDateField(responseDateQuestion_TXT_date2, responseDateQuestion_TIL_date2)) {
-                valid = false;
-            }
+        boolean valid = true;
+
+        if (start == null || !startDatePicker.isSelectedDateValid()) {
+            startDateLayout.setError("Start date is invalid");
+            valid = false;
+        } else {
+            startDateLayout.setError(null);
+        }
+
+        if (end == null || !endDatePicker.isSelectedDateValid()) {
+            endDateLayout.setError("End date is invalid");
+            valid = false;
+        } else if (start != null && end.before(start)) {
+            endDateLayout.setError("End date cannot be before start date");
+            valid = false;
+        } else {
+            endDateLayout.setError(null);
         }
 
         return valid;
     }
 
-    private boolean validateDateField(TextInputEditText editText, TextInputLayout inputLayout) {
-        String date = "";
-        if(editText.getText() != null)
-            date = editText.getText().toString().trim();
-        Context context = requireContext();
-
-        if (question.isMandatory() && date.isEmpty()) {
-            inputLayout.setError("Date is required");
-            editText.setHintTextColor(ContextCompat.getColor(context, com.google.android.material.R.color.design_default_color_error));
-            return false;
-        } else if (!date.isEmpty() && !isValidDate(date)) {
-            inputLayout.setError("Invalid date format");
-            editText.setHintTextColor(ContextCompat.getColor(context, com.google.android.material.R.color.design_default_color_error));
-            return false;
-        } else {
-            inputLayout.setError(null);
-            return true;
-        }
-    }
-
     public boolean hasUnsavedChanges() {
         ArrayList<String> selectedDates = new ArrayList<>();
-        String date1 = responseDateQuestion_TXT_date.getText().toString();
+        String date1 = startDateTXT.getText().toString();
         if(!date1.isEmpty())
             selectedDates.add(date1);
         if(((DateQuestion)question).getDateMode() == DateSelectionModeEnum.DATE_RANGE) {
-            String date2 = responseDateQuestion_TXT_date2.getText().toString();
+            String date2 = endDateTXT.getText().toString();
             if(!date2.isEmpty())
                 selectedDates.add(date2);
         }

@@ -27,6 +27,8 @@ import com.example.questionnairebuilder.models.Survey;
 import com.example.questionnairebuilder.models.SurveyResponseStatus;
 import com.example.questionnairebuilder.utilities.FirestoreManager;
 import com.google.android.material.appbar.MaterialToolbar;
+import com.google.android.material.datepicker.CalendarConstraints;
+import com.google.android.material.datepicker.DateValidatorPointForward;
 import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.materialswitch.MaterialSwitch;
 import com.google.android.material.textfield.TextInputEditText;
@@ -49,8 +51,6 @@ public class SurveyManagementActivity extends AppCompatActivity {
     private MaterialToolbar toolbar;
     private Menu mMenu;
     private LinearLayout management_LL_edit;
-    //private MaterialTextView management_LBL_isOpen;
-    //private MaterialSwitch management_SW_isOpen;
     private LinearLayout management_LL_analyze;
     private MaterialTextView management_LBL_totalResponses;
     private MaterialTextView management_LBL_completedResponses;
@@ -59,7 +59,6 @@ public class SurveyManagementActivity extends AppCompatActivity {
     private LinearLayout management_LL_dueDate;
     private MaterialTextView management_LBL_dueDate;
     private MaterialTextView management_LBL_questionCount;
-    //private MaterialTextView management_LBL_pageCount;
     private AppCompatSpinner management_SP_status;
     private MaterialSwitch management_SW_alert;
     private LinearLayout management_LL_description;
@@ -125,15 +124,6 @@ public class SurveyManagementActivity extends AppCompatActivity {
             public void onSurveyLoaded(Survey loadedSurvey) {
                 survey = loadedSurvey;
 
-                /*
-                // Total Responses
-                int totalResponses = survey.getSurveyViewers() != null ? survey.getSurveyViewers().size() : 0;
-                management_LBL_totalResponses.setText(String.valueOf(totalResponses));
-
-                // Completed Responses
-                management_LBL_completedResponses.setText(String.valueOf(totalResponses));
-                */
-
                 // Created Date
                 if (survey.getCreated() != null) {
                     management_LBL_createdDate.setText(formatDate(survey.getCreated()));
@@ -157,16 +147,6 @@ public class SurveyManagementActivity extends AppCompatActivity {
                 management_SW_alert.setChecked(survey.isNewResponseAlert());
 
                 management_LBL_description.setText(survey.getDescription());
-
-                //updateStatusLabel(isPublished); // Already implemented
-
-                // Page Count
-                //management_LBL_pageCount.setText("1");
-
-                // Status Switch & Label
-                //boolean isPublished = survey.getStatus() == Survey.SurveyStatus.Published;
-                //management_SW_isOpen.setChecked(isPublished);
-                //updateStatusLabel(isPublished); // Already implemented
             }
 
             @Override
@@ -240,12 +220,6 @@ public class SurveyManagementActivity extends AppCompatActivity {
     }
 
     private void initSpinner() {
-        /*String[] statuses = {
-                getString(R.string.draft),
-                getString(R.string.published),
-                getString(R.string.close)
-        };*/
-
         statusesMap.put(Survey.SurveyStatus.Draft,getString(R.string.draft));
         statusesMap.put(Survey.SurveyStatus.Published,getString(R.string.published));
         statusesMap.put(Survey.SurveyStatus.Close,getString(R.string.close));
@@ -310,34 +284,9 @@ public class SurveyManagementActivity extends AppCompatActivity {
         });
     }
 
-
-    /*
-    private void initIsOpenSwitch() {
-
-        management_SW_isOpen.setChecked(false); // Initialize current state default to Closed (unchecked)
-        updateStatusLabel(false);
-        management_SW_isOpen.setOnCheckedChangeListener((buttonView, isChecked) -> { // Listen for future changes
-            updateStatusLabel(isChecked);
-        });
-    }
-
-    private void updateStatusLabel(boolean isChecked) {
-        if (isChecked) {
-            management_LBL_isOpen.setText(R.string.open);
-            management_LBL_isOpen.setTextColor(getColor(R.color.theme_circle_green));
-        }
-        else {
-            management_LBL_isOpen.setText(R.string.closed);
-            management_LBL_isOpen.setTextColor(getColor(R.color.theme_circle_red));
-        }
-    }
-    */
-
     private void findViews() {
         toolbar = findViewById(R.id.topAppBar);
         management_LL_edit = findViewById(R.id.management_LL_edit);
-        //management_LBL_isOpen = findViewById(R.id.management_LBL_isOpen);
-        //management_SW_isOpen = findViewById(R.id.management_SW_isOpen);
         management_LL_analyze = findViewById(R.id.management_LL_analyze);
         management_LBL_totalResponses = findViewById(R.id.management_LBL_totalResponses);
         management_LBL_completedResponses = findViewById(R.id.management_LBL_completedResponses);
@@ -346,7 +295,6 @@ public class SurveyManagementActivity extends AppCompatActivity {
         management_LL_dueDate = findViewById(R.id.management_LL_dueDate);
         management_LBL_dueDate = findViewById(R.id.management_LBL_dueDate);
         management_LBL_questionCount = findViewById(R.id.management_LBL_questionCount);
-        //management_LBL_pageCount = findViewById(R.id.management_LBL_pageCount);
         management_SP_status = findViewById(R.id.management_SP_status);
         management_SW_alert = findViewById(R.id.management_SW_alert);
         management_LL_description = findViewById(R.id.management_LL_description);
@@ -354,11 +302,39 @@ public class SurveyManagementActivity extends AppCompatActivity {
     }
 
     private void showMaterialDatePicker() {
-        MaterialDatePicker<Long> datePicker = MaterialDatePicker.Builder
-                .datePicker()
-                .setTitleText(R.string.select_due_date)
-                .setSelection(MaterialDatePicker.todayInUtcMilliseconds())
-                .build();
+        Date selectedDate;
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+            selectedDate = sdf.parse(management_LBL_dueDate.getText().toString());
+        } catch (ParseException e) {
+            e.printStackTrace();
+            selectedDate = survey.getDueDate();
+            return;
+        }
+        MaterialDatePicker.Builder<Long> builder = MaterialDatePicker.Builder.datePicker()
+                .setTitleText("Select date");
+
+        if (selectedDate != null) {
+            Calendar localCal = Calendar.getInstance();
+            localCal.setTime(selectedDate);
+            localCal.set(Calendar.HOUR_OF_DAY, 0);
+            localCal.set(Calendar.MINUTE, 0);
+            localCal.set(Calendar.SECOND, 0);
+            localCal.set(Calendar.MILLISECOND, 0);
+
+            // Convert local midnight to UTC midnight
+            Log.d("DatePickerHelper","Timezone offset: "+localCal.getTimeZone().getOffset(localCal.getTimeInMillis())/3600000+"");
+            long utcMillis = localCal.getTimeInMillis() + localCal.getTimeZone().getOffset(localCal.getTimeInMillis());
+            builder.setSelection(utcMillis);
+        } else {
+            builder.setSelection(MaterialDatePicker.todayInUtcMilliseconds());
+        }
+
+        CalendarConstraints.Builder constraintsBuilder = new CalendarConstraints.Builder();
+        constraintsBuilder.setValidator(DateValidatorPointForward.now());
+        builder.setCalendarConstraints(constraintsBuilder.build());
+
+        final MaterialDatePicker<Long> datePicker = builder.build();
 
         datePicker.show(getSupportFragmentManager(), "DATE_PICKER");
 

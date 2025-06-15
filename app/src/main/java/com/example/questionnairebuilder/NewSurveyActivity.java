@@ -14,6 +14,7 @@ import androidx.core.content.ContextCompat;
 import com.example.questionnairebuilder.models.Survey;
 import com.example.questionnairebuilder.models.User;
 import com.example.questionnairebuilder.utilities.AuthenticationManager;
+import com.example.questionnairebuilder.utilities.DatePickerHelper;
 import com.example.questionnairebuilder.utilities.FirestoreManager;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.button.MaterialButton;
@@ -23,15 +24,12 @@ import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
+
 import java.util.UUID;
 
 public class NewSurveyActivity extends AppCompatActivity {
@@ -44,6 +42,7 @@ public class NewSurveyActivity extends AppCompatActivity {
     private ChipGroup tagChipGroup;
     private final Set<String> selectedTags = new HashSet<>();
     private User author;
+    private DatePickerHelper datePicker;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,24 +75,12 @@ public class NewSurveyActivity extends AppCompatActivity {
 
         newSurvey_BTN_continue.setOnClickListener(v -> {
             if (validateForm()) {
-                String dateStr = newSurvey_TIET_date.getText().toString().trim();
-                Date dueDate;
-                try {
-                    SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
-                    dueDate = sdf.parse(dateStr);
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                    newSurvey_TIL_date.setError(getString(R.string.invalid_date_format));
-                    return;
-                }
-
                 Date now = new Date(); // current timestamp
-
                 Survey survey = new Survey()
                         .setID(UUID.randomUUID().toString())
                         .setSurveyTitle(newSurvey_TXT_title.getText().toString().trim())
                         .setDescription(newSurvey_TXT_description.getText().toString().trim())
-                        .setDueDate(dueDate)
+                        .setDueDate(datePicker.getSelectedDate())
                         .setStatus(Survey.SurveyStatus.Draft)
                         .setAuthor(author)
                         .setCreated(now)
@@ -196,7 +183,7 @@ public class NewSurveyActivity extends AppCompatActivity {
             newSurvey_TIL_date.setError(getString(R.string.date_required_alert));
             newSurvey_TIET_date.setHintTextColor(ContextCompat.getColor(this, R.color.error_red));
             valid = false;
-        } else if (!isValidDate(date)) {
+        } else if (!datePicker.isSelectedDateValid()) {
             newSurvey_TIL_date.setError(getString(R.string.invalid_date_format));
             newSurvey_TIET_date.setHintTextColor(ContextCompat.getColor(this, R.color.error_red));
             valid = false;
@@ -212,51 +199,8 @@ public class NewSurveyActivity extends AppCompatActivity {
     }
 
     private void setupDateFieldBehavior() {
-        newSurvey_TIL_date.setEndIconOnClickListener(v -> showMaterialDatePicker());
-        newSurvey_TIET_date.addTextChangedListener(new TextWatcher() {
-            boolean isEditing;
-
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                if (isEditing)
-                    return;
-                isEditing = true;
-
-                String input = s.toString().replaceAll("[^\\d]", ""); // Only digits
-                StringBuilder formatted = new StringBuilder();
-
-                for (int i = 0; i < input.length() && i < 8; i++) {
-                    if (i == 2 || i == 4)
-                        formatted.append("/");
-                    formatted.append(input.charAt(i));
-                }
-
-                newSurvey_TIET_date.setText(formatted.toString());
-                newSurvey_TIET_date.setSelection(formatted.length()); // Move cursor to end
-
-                if (formatted.length() == 10 && !isValidDate(formatted.toString()))
-                    newSurvey_TIL_date.setError(getString(R.string.invalid_date));
-                else
-                    newSurvey_TIL_date.setError(null);
-
-                isEditing = false;
-            }
-        });
-
-        newSurvey_TIET_date.setOnFocusChangeListener((v, hasFocus) -> {
-            if (hasFocus)
-                newSurvey_TIET_date.setHint("DD/MM/YYYY");
-            else
-                newSurvey_TIET_date.setHint(""); // Remove when not focused
-        });
+        datePicker = new DatePickerHelper(this,getSupportFragmentManager(),newSurvey_TIL_date,newSurvey_TIET_date);
+        datePicker.setAllowPastDates(false);
     }
 
     private void findViews() {
@@ -267,43 +211,6 @@ public class NewSurveyActivity extends AppCompatActivity {
         newSurvey_TXT_title = findViewById(R.id.newSurvey_TXT_title);
         newSurvey_TXT_description = findViewById(R.id.newSurvey_TXT_description);
         tagChipGroup = findViewById(R.id.tagChipGroup);
-    }
-
-    private boolean isValidDate(String date) {
-        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
-        sdf.setLenient(false); // Ensures 32/13/2025 is rejected
-
-        try {
-            sdf.parse(date); // Will throw ParseException if invalid
-            return true;
-        } catch (ParseException e) {
-            return false;
-        }
-    }
-
-    private void showMaterialDatePicker() {
-        MaterialDatePicker<Long> datePicker = MaterialDatePicker.Builder
-                .datePicker()
-                .setTitleText(R.string.select_due_date)
-                .setSelection(MaterialDatePicker.todayInUtcMilliseconds())
-                .build();
-
-        datePicker.show(getSupportFragmentManager(), "DATE_PICKER");
-
-        datePicker.addOnPositiveButtonClickListener(selection -> {
-            Calendar calendar = Calendar.getInstance();
-            calendar.setTimeInMillis(selection);
-
-            int day = calendar.get(Calendar.DAY_OF_MONTH);
-            int month = calendar.get(Calendar.MONTH) + 1;
-            int year = calendar.get(Calendar.YEAR);
-
-            String formattedDate = String.format(Locale.getDefault(), "%02d/%02d/%04d", day, month, year);
-            newSurvey_TIET_date.setText(formattedDate);
-
-            newSurvey_TIET_date.requestFocus();
-            newSurvey_TIET_date.setSelection(formattedDate.length());
-        });
     }
 
     private void animateButtonClick(MaterialButton button) {

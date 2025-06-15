@@ -26,6 +26,18 @@
         app:maxImageSize="32dp"
         app:tint="@android:color/white" />
 
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/mySurveys_LBL_noSurveys"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/no_surveys_margin"
+        android:layout_gravity="center"
+        android:text="@string/no_surveys_yet"
+        android:textColor="@color/dark_blue"
+        android:textSize="16sp"
+        android:paddingHorizontal="8dp"
+        android:visibility="gone"/>
+
     <View
         android:id="@+id/scrollHintTop"
         android:layout_width="match_parent"

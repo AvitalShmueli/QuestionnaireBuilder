@@ -1,5 +1,7 @@
 package com.example.questionnairebuilder.ui.home;
 
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
 import static com.example.questionnairebuilder.models.User.USERNAME;
 
 import android.content.Intent;
@@ -21,6 +23,7 @@ import com.example.questionnairebuilder.SurveyManagementActivity;
 import com.example.questionnairebuilder.adapters.SurveyAdapter;
 import com.example.questionnairebuilder.databinding.FragmentHomeBinding;
 import com.example.questionnairebuilder.utilities.SharedPreferencesManager;
+import com.google.android.material.textview.MaterialTextView;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -33,6 +36,7 @@ public class HomeFragment extends Fragment {
     private RecyclerView recyclerView;
     private View scrollHintBottom;
     private View scrollHintTop;
+    private MaterialTextView home_LBL_noActiveSurveys;
 
     private SurveyAdapter surveyAdapter;
 
@@ -76,6 +80,8 @@ public class HomeFragment extends Fragment {
         recyclerView = binding.homeLSTSurveys;
         scrollHintBottom = binding.scrollHintBottom;
         scrollHintTop = binding.scrollHintTop;
+        home_LBL_noActiveSurveys = binding.homeLBLNoActiveSurveys;
+
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
         surveyAdapter = new SurveyAdapter(requireContext(), new ArrayList<>(), survey -> {
@@ -100,6 +106,7 @@ public class HomeFragment extends Fragment {
         else {
             viewModel.getSurveys().observe(getViewLifecycleOwner(), surveys -> {
                 surveyAdapter.updateSurveys(surveys); // Update UI automatically when LiveData changes
+                home_LBL_noActiveSurveys.setVisibility(surveys.isEmpty() ? VISIBLE : GONE);
             });
         }
     }
@@ -120,7 +127,7 @@ public class HomeFragment extends Fragment {
         boolean canScrollDown = recyclerView.canScrollVertically(1); // down
 
         //scrollHintTop.setVisibility(canScrollUp ? View.VISIBLE : View.GONE);
-        scrollHintBottom.setVisibility(canScrollDown ? View.VISIBLE : View.GONE);
+        scrollHintBottom.setVisibility(canScrollDown ? VISIBLE : GONE);
     }
 
     @Override

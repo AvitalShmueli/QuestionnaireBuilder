@@ -95,21 +95,25 @@ public class AnalyzeResponsesActivity extends AppCompatActivity {
                             if (question instanceof OpenEndedQuestion) {
                                 OpenEndedQuestion openQuestion = (OpenEndedQuestion) question;
 
-                                String combinedText = android.text.TextUtils.join("\n", openQuestion.getAllResponses());
+                                if (openQuestion.getAllResponses().isEmpty()) {
+                                    openQuestion.setAnalysisResult("No analysis to display");
+                                } else {
+                                    String combinedText = android.text.TextUtils.join("\n", openQuestion.getAllResponses());
 
-                                AILogicManager.getInstance().analyzeOpenAnswer(combinedText, new OnAnalysisCompleteListener() {
-                                    @Override
-                                    public void onAnalysisComplete(String summary) {
-                                        openQuestion.setAnalysisResult(summary);
-                                        runOnUiThread(() -> adapter.notifyDataSetChanged());
-                                    }
+                                    AILogicManager.getInstance().analyzeOpenAnswer(combinedText, new OnAnalysisCompleteListener() {
+                                        @Override
+                                        public void onAnalysisComplete(String summary) {
+                                            openQuestion.setAnalysisResult(summary);
+                                            runOnUiThread(() -> adapter.notifyDataSetChanged());
+                                        }
 
-                                    @Override
-                                    public void onError(Exception e) {
-                                        openQuestion.setAnalysisResult("Error generating summary.");
-                                        runOnUiThread(() -> adapter.notifyDataSetChanged());
-                                    }
-                                });
+                                        @Override
+                                        public void onError(Exception e) {
+                                            openQuestion.setAnalysisResult("Error generating summary.");
+                                            runOnUiThread(() -> adapter.notifyDataSetChanged());
+                                        }
+                                    });
+                                }
                             }
                         }
 

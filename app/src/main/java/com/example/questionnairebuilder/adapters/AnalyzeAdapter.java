@@ -186,7 +186,15 @@ public class AnalyzeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     }
 
     private void setupPieChart(PieChart chart, AnalyzableQuestion question) {
-        Map<String, Integer> data = question.getAnswerDistribution(); // You implement this
+        Map<String, Integer> data = question.getAnswerDistribution();
+
+        if (data == null || data.isEmpty()) {
+            chart.clear();
+            chart.setNoDataText("No responses to display");
+            chart.invalidate();
+            return;
+        }
+
         List<PieEntry> entries = new ArrayList<>();
         for (Map.Entry<String, Integer> entry : data.entrySet()) {
             entries.add(new PieEntry(entry.getValue(), entry.getKey()));
@@ -205,6 +213,14 @@ public class AnalyzeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
     private void setupDateBarChart(BarChart chart, AnalyzableQuestion question) {
         Map<String, Integer> data = question.getAnswerDistribution(); // key = date string, value = count
+
+        if (data == null || data.isEmpty()) {
+            chart.clear();
+            chart.setNoDataText("No responses to display");
+            chart.invalidate();
+            return;
+        }
+
         List<BarEntry> entries = new ArrayList<>();
         List<String> labels = new ArrayList<>();
 

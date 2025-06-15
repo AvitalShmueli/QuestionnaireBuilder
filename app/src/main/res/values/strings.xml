@@ -108,6 +108,7 @@
     <string name="survey_updated_successfully">Survey details have been updated successfully.</string>
     <string name="survey_update_failed">Failed. Try again later.</string>
     <string name="update_description">Update Description</string>
+    <string name="update_title">Update Title</string>
     <string name="pending">Pending</string>
     <string name="in_progress">In progress</string>
     <string name="completed">Completed</string>

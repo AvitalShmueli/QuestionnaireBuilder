@@ -63,6 +63,8 @@ public class SurveyManagementActivity extends AppCompatActivity {
     private MaterialSwitch management_SW_alert;
     private LinearLayout management_LL_description;
     private MaterialTextView management_LBL_description;
+    private LinearLayout management_LL_title;
+    private MaterialTextView management_LBL_title;
     private final Map<Survey.SurveyStatus, String> statusesMap = new LinkedHashMap<>();
     private ArrayAdapter<String> statusAdapter;
     private boolean isFirstSelection = true;
@@ -147,6 +149,7 @@ public class SurveyManagementActivity extends AppCompatActivity {
                 management_SW_alert.setChecked(survey.isNewResponseAlert());
 
                 management_LBL_description.setText(survey.getDescription());
+                management_LBL_title.setText(survey.getSurveyTitle());
             }
 
             @Override
@@ -185,7 +188,6 @@ public class SurveyManagementActivity extends AppCompatActivity {
                 onBack();
             }
         });
-        //initIsOpenSwitch();
         setupEditClick();
         setupAnalyzeClick();
         initSpinner();
@@ -207,8 +209,8 @@ public class SurveyManagementActivity extends AppCompatActivity {
         });
 
         management_LL_dueDate.setOnClickListener(v -> showMaterialDatePicker());
-
         management_LL_description.setOnClickListener(v -> showDescriptionDialog());
+        management_LL_title.setOnClickListener(v -> showTitleDialog());
     }
 
     private void setupAnalyzeClick() {
@@ -299,6 +301,8 @@ public class SurveyManagementActivity extends AppCompatActivity {
         management_SW_alert = findViewById(R.id.management_SW_alert);
         management_LL_description = findViewById(R.id.management_LL_description);
         management_LBL_description = findViewById(R.id.management_LBL_description);
+        management_LL_title = findViewById(R.id.management_LL_title);
+        management_LBL_title = findViewById(R.id.management_LBL_title);
     }
 
     private void showMaterialDatePicker() {
@@ -390,6 +394,7 @@ public class SurveyManagementActivity extends AppCompatActivity {
                     @Override
                     public void onSuccess(Survey updatedSurvey) {
                         survey = updatedSurvey;
+                        toolbar.setTitle(survey.getSurveyTitle());
                         Toast.makeText(getApplicationContext(),getString(R.string.survey_updated_successfully),Toast.LENGTH_SHORT).show();
                         updates.clear();
                     }
@@ -461,4 +466,40 @@ public class SurveyManagementActivity extends AppCompatActivity {
         dialog.show();
     }
 
+    private void showTitleDialog(){
+        // Inflate the custom layout
+        LayoutInflater inflater = LayoutInflater.from(this); // or getActivity() for a Fragment
+        View dialogView = inflater.inflate(R.layout.dialog_input, null);
+
+        View customTitleView = inflater.inflate(R.layout.dialog_title, null);
+        TextView titleTextView = customTitleView.findViewById(R.id.dialog_custom_title);
+        titleTextView.setText(getString(R.string.update_title));
+
+        // Find the EditText in the custom layout
+        TextInputEditText inputEditText = dialogView.findViewById(R.id.dialog_edittext);
+        inputEditText.setText(management_LBL_title.getText());
+
+        // Build the AlertDialog
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setCustomTitle(customTitleView)
+                .setView(dialogView)
+                .setPositiveButton("OK", (dialog, which) -> {
+                    String enteredText = inputEditText.getText().toString().trim();
+                    if(!enteredText.equals(survey.getDescription())) {
+                        management_LBL_title.setText(enteredText);
+                        updates.put("surveyTitle", enteredText);
+                        if (mMenu != null) {
+                            MenuItem saveMenuItem = mMenu.findItem(R.id.action_save);
+                            if (saveMenuItem != null) {
+                                saveMenuItem.setVisible(true); // or true
+                            }
+                        }
+                    }
+                })
+                .setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss());
+
+        // Show the dialog
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
 }

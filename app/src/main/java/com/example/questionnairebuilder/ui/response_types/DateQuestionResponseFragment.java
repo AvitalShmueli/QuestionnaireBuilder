@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.questionnairebuilder.QuestionResponseActivity;
+import com.example.questionnairebuilder.R;
 import com.example.questionnairebuilder.databinding.FragmentDateQuestionResponseBinding;
 import com.example.questionnairebuilder.interfaces.OneResponseCallback;
 import com.example.questionnairebuilder.interfaces.UnsavedChangesHandler;
@@ -179,8 +180,8 @@ public class DateQuestionResponseFragment extends Fragment implements UnsavedCha
         startDatePicker = new DatePickerHelper(requireActivity(),requireActivity().getSupportFragmentManager(), startDateLayout, startDateTXT);
         if(((DateQuestion)question).getDateMode() == DateSelectionModeEnum.DATE_RANGE) {
             endDateLayout.setVisibility(VISIBLE);
-            startDateLayout.setHint("Start Date");
-            endDateLayout.setHint("End Date");
+            startDateLayout.setHint(getString(R.string.start_date));
+            endDateLayout.setHint(getString(R.string.end_date));
             endDatePicker = new DatePickerHelper(requireActivity(), requireActivity().getSupportFragmentManager(), endDateLayout, endDateTXT);
         } else{
             endDateLayout.setVisibility(GONE);

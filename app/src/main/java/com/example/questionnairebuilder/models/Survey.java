@@ -21,8 +21,8 @@ public class Survey {
         EVALUATION(R.drawable.ic_evaluation),
         APPLICATION(R.drawable.ic_application),
         TEST(R.drawable.ic_test),
-        REGISTRATION(R.drawable.ic_registration),
         REVIEW(R.drawable.ic_review),
+        REGISTRATION(R.drawable.ic_registration),
         RESEARCH(R.drawable.ic_research);
 
         private final int iconResId;

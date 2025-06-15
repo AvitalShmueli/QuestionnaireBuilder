@@ -116,4 +116,5 @@
     <string name="no_surveys_yet">No surveys yet</string>
     <string name="start_date">Start Date</string>
     <string name="end_date">End Date</string>
+    <string name="choose_a_tag">Choose one or more tags:</string>
 </resources>

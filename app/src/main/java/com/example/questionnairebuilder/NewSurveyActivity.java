@@ -1,15 +1,15 @@
 package com.example.questionnairebuilder;
 
 import android.content.Intent;
-import android.content.res.ColorStateList;
-import android.graphics.Color;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.widget.Toast;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
-import androidx.core.graphics.ColorUtils;
 
 import com.example.questionnairebuilder.models.Survey;
 import com.example.questionnairebuilder.models.User;
@@ -18,24 +18,29 @@ import com.example.questionnairebuilder.utilities.DatePickerHelper;
 import com.example.questionnairebuilder.utilities.FirestoreManager;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.chip.Chip;
+import com.google.android.material.chip.ChipGroup;
+import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
 import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Set;
+
 import java.util.UUID;
 
 public class NewSurveyActivity extends AppCompatActivity {
     private TextInputLayout newSurvey_TIL_date;
     private TextInputEditText newSurvey_TIET_date;
-    private MaterialButton newSurvey_BTN_themeRed;
-    private MaterialButton newSurvey_BTN_themeGreen;
-    private MaterialButton newSurvey_BTN_themeBlue;
-    private MaterialButton newSurvey_BTN_themePurple;
     private MaterialToolbar myToolBar;
     private MaterialButton newSurvey_BTN_continue;
     private TextInputEditText newSurvey_TXT_title;
     private TextInputEditText newSurvey_TXT_description;
-    private String selectedTheme = null;
+    private ChipGroup tagChipGroup;
+    private final Set<String> selectedTags = new HashSet<>();
     private User author;
     private DatePickerHelper datePicker;
 
@@ -48,7 +53,6 @@ public class NewSurveyActivity extends AppCompatActivity {
         initViews();
 
         setupDateFieldBehavior();
-        handleThemeColorSelection();
 
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override
@@ -81,7 +85,8 @@ public class NewSurveyActivity extends AppCompatActivity {
                         .setAuthor(author)
                         .setCreated(now)
                         .setModified(now)
-                        .setTheme(getThemeEnumFromString(selectedTheme));
+                        .setSurveyViewers(new ArrayList<>())
+                        .setTags(convertToTagEnums(new ArrayList<>(selectedTags)));
 
                 survey.save();
 
@@ -92,15 +97,49 @@ public class NewSurveyActivity extends AppCompatActivity {
                 finish();
             }
         });
+
+        setupTagChips();
     }
 
-    private Survey.Theme getThemeEnumFromString(String selectedTheme) {
-        switch (selectedTheme != null ? selectedTheme.toLowerCase() : "") {
-            case "red": return Survey.Theme.Red;
-            case "green": return Survey.Theme.Green;
-            case "blue": return Survey.Theme.Blue;
-            case "purple": return Survey.Theme.Purple;
-            default: return Survey.Theme.Blue; // fallback
+    private List<Survey.SurveyTag> convertToTagEnums(List<String> tags) {
+        List<Survey.SurveyTag> tagEnums = new ArrayList<>();
+        for (String tag : tags) {
+            try {
+                tagEnums.add(Survey.SurveyTag.valueOf(tag.toUpperCase()));
+            } catch (IllegalArgumentException ignored) {}
+        }
+        return tagEnums;
+    }
+
+    private void setupTagChips() {
+        for (Survey.SurveyTag tagEnum : Survey.SurveyTag.values()) {
+            String tag = tagEnum.name().charAt(0) + tagEnum.name().substring(1).toLowerCase();
+            Chip chip = new Chip(this);
+            chip.setText(tag);
+            chip.setCheckable(true);
+            chip.setCheckedIconVisible(false);
+            chip.setTextColor(ContextCompat.getColor(this, R.color.dark_blue));
+            chip.setChipBackgroundColorResource(R.color.light_blue);
+            chip.setChipStrokeWidth(2f);
+            chip.setChipStrokeColorResource(R.color.blackish);
+            chip.setChipCornerRadius(12f);
+            chip.setChipIconResource(tagEnum.getIconResId());
+            chip.setChipIconTintResource(R.color.dark_blue);
+            chip.setChipIconSize(50f);
+            chip.setIconStartPadding(8f);
+            chip.setChipIconVisible(true);
+            chip.setOnClickListener(v -> {
+                if (selectedTags.contains(tag)) {
+                    selectedTags.remove(tag);
+                    chip.setChipBackgroundColorResource(R.color.light_blue);
+                    chip.setTextColor(ContextCompat.getColor(this, R.color.dark_blue));
+                } else {
+                    selectedTags.add(tag);
+                    chip.setChipBackgroundColorResource(R.color.blue);
+                    chip.setTextColor(ContextCompat.getColor(this, R.color.white));
+                }
+            });
+            tagChipGroup.addView(chip);
         }
     }
 
@@ -142,14 +181,19 @@ public class NewSurveyActivity extends AppCompatActivity {
 
         if (date.isEmpty()) {
             newSurvey_TIL_date.setError(getString(R.string.date_required_alert));
-            newSurvey_TIET_date.setHintTextColor(ContextCompat.getColor(this, R.color.theme_circle_red));
+            newSurvey_TIET_date.setHintTextColor(ContextCompat.getColor(this, R.color.error_red));
             valid = false;
         } else if (!datePicker.isSelectedDateValid()) {
             newSurvey_TIL_date.setError(getString(R.string.invalid_date_format));
-            newSurvey_TIET_date.setHintTextColor(ContextCompat.getColor(this, R.color.theme_circle_red));
+            newSurvey_TIET_date.setHintTextColor(ContextCompat.getColor(this, R.color.error_red));
             valid = false;
         } else
             newSurvey_TIL_date.setError(null);
+
+        if (selectedTags.isEmpty()) {
+            Toast.makeText(this, "Please select at least one tag", Toast.LENGTH_SHORT).show();
+            valid = false;
+        }
 
         return valid;
     }
@@ -162,41 +206,11 @@ public class NewSurveyActivity extends AppCompatActivity {
     private void findViews() {
         newSurvey_TIET_date = findViewById(R.id.newSurvey_TIET_date);
         newSurvey_TIL_date = findViewById(R.id.newSurvey_TIL_date);
-        newSurvey_BTN_themeRed = findViewById(R.id.newSurvey_BTN_themeRed);
-        newSurvey_BTN_themeGreen = findViewById(R.id.newSurvey_BTN_themeGreen);
-        newSurvey_BTN_themeBlue = findViewById(R.id.newSurvey_BTN_themeBlue);
-        newSurvey_BTN_themePurple = findViewById(R.id.newSurvey_BTN_themePurple);
         myToolBar = findViewById(R.id.topAppBar);
         newSurvey_BTN_continue = findViewById(R.id.newSurvey_BTN_continue);
         newSurvey_TXT_title = findViewById(R.id.newSurvey_TXT_title);
         newSurvey_TXT_description = findViewById(R.id.newSurvey_TXT_description);
-    }
-
-    private void handleThemeColorSelection() {
-        MaterialButton[] themeButtons = {newSurvey_BTN_themeRed, newSurvey_BTN_themeGreen, newSurvey_BTN_themeBlue, newSurvey_BTN_themePurple};
-
-        int[] fillColors = { // Define their corresponding fill colors
-                ColorUtils.setAlphaComponent(ContextCompat.getColor(this, R.color.theme_circle_red), 200),
-                ColorUtils.setAlphaComponent(ContextCompat.getColor(this, R.color.theme_circle_green), 200),
-                ColorUtils.setAlphaComponent(ContextCompat.getColor(this, R.color.theme_circle_blue), 200),
-                ColorUtils.setAlphaComponent(ContextCompat.getColor(this, R.color.theme_circle_purple), 200)
-        };
-
-        final String[] themeIds = {"red", "green", "blue", "purple"};
-
-        for (int i = 0; i < themeButtons.length; i++) { // Add click listeners
-            final int index = i;
-            themeButtons[i].setOnClickListener(v -> {
-                animateButtonClick(themeButtons[index]);
-                for (int j = 0; j < themeButtons.length; j++) // Reset background colors
-                    themeButtons[j].setBackgroundTintList(ColorStateList.valueOf(Color.TRANSPARENT));
-                themeButtons[index].setBackgroundTintList(ColorStateList.valueOf(fillColors[index])); // Fill selected one
-                selectedTheme = themeIds[index]; // Save selected theme
-            });
-        }
-
-        int defaultIndex = 2;
-        themeButtons[defaultIndex].setBackgroundTintList(ColorStateList.valueOf(fillColors[defaultIndex]));
+        tagChipGroup = findViewById(R.id.tagChipGroup);
     }
 
     private void animateButtonClick(MaterialButton button) {

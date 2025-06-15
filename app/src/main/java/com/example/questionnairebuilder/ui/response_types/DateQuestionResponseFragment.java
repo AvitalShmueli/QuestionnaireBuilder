@@ -177,7 +177,14 @@ public class DateQuestionResponseFragment extends Fragment implements UnsavedCha
 
     private void setupDateFieldBehavior() {
         startDatePicker = new DatePickerHelper(requireActivity(),requireActivity().getSupportFragmentManager(), startDateLayout, startDateTXT);
-        endDatePicker = new DatePickerHelper(requireActivity(),requireActivity().getSupportFragmentManager(), endDateLayout, endDateTXT);
+        if(((DateQuestion)question).getDateMode() == DateSelectionModeEnum.DATE_RANGE) {
+            endDateLayout.setVisibility(VISIBLE);
+            startDateLayout.setHint("Start Date");
+            endDateLayout.setHint("End Date");
+            endDatePicker = new DatePickerHelper(requireActivity(), requireActivity().getSupportFragmentManager(), endDateLayout, endDateTXT);
+        } else{
+            endDateLayout.setVisibility(GONE);
+        }
     }
 
     private void skipQuestion() {

@@ -22,7 +22,19 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:clipChildren="false"
+            android:clipToPadding="false"
             android:padding="8dp">
+
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/item_CHIPGROUP_tags"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginVertical="2dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:singleLine="true" />
 
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/item_LBL_surveyTitle"
@@ -33,10 +45,10 @@
                 android:textStyle="bold"
                 android:layout_marginVertical="4dp"
                 android:textColor="@android:color/black"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/item_LBL_surveyStatus"
                 app:layout_constraintBottom_toTopOf="@id/item_LBL_surveySent"
+                app:layout_constraintEnd_toStartOf="@id/item_LBL_surveyStatus"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/item_CHIPGROUP_tags"
                 android:layout_marginEnd="8dp"/>
 
             <com.google.android.material.textview.MaterialTextView
@@ -48,9 +60,9 @@
                 android:textColor="@color/dark_blue"
                 android:textSize="14sp"
                 android:textStyle="bold"
-                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintTop_toTopOf="@id/item_LBL_surveyCompleted"
+                app:layout_constraintBottom_toBottomOf="@id/item_LBL_surveyCompleted"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
                 tools:text="Pending"/>
 
             <com.google.android.material.textview.MaterialTextView

@@ -469,6 +469,14 @@ public class ChoiceQuestionResponseFragment extends Fragment implements UnsavedC
                 }
             }
 
+            if (selectedChoices.isEmpty()) {
+                if (!question.isMandatory()) {
+                    skipQuestion();
+                    return;
+                }
+                return; // For mandatory questions, don't save anything
+            }
+
             if(response == null) {
                 response = new Response()
                         .setResponseID(UUID.randomUUID().toString())
@@ -489,11 +497,24 @@ public class ChoiceQuestionResponseFragment extends Fragment implements UnsavedC
     }
 
     private boolean isValidResponse() {
+        boolean hasResponse = !selectedChoices.isEmpty();
         boolean otherOptionValid = true;
         if (((ChoiceQuestion)question).isOther() && responseChoiceQuestion_TIL_other.getVisibility() == VISIBLE) {
-            otherOptionValid = responseChoiceQuestion_TXT_other.getText() != null && !responseChoiceQuestion_TXT_other.getText().toString().isEmpty();
+            String otherText = responseChoiceQuestion_TXT_other.getText() != null ?
+                    responseChoiceQuestion_TXT_other.getText().toString().trim() : "";
+            otherOptionValid = !otherText.isEmpty();
+
+            if (!otherText.isEmpty()) {
+                hasResponse = true;
+            }
         }
-        return (!question.isMandatory() || !selectedChoices.isEmpty()) && otherOptionValid;
+        if (question.isMandatory()) {
+            return hasResponse && otherOptionValid;
+        }
+        if (hasResponse) {
+            return otherOptionValid;
+        }
+        return true;
     }
 
     public boolean hasUnsavedChanges() {

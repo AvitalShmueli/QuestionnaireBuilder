@@ -220,6 +220,15 @@ public class OpenQuestionResponseFragment extends Fragment implements UnsavedCha
     private void save() {
         if (isValidResponse()) {
             responseOpenQuestion_TIL_answer.setError(null);
+
+            if (responseOpenQuestion_TXT_answer.getText() == null || responseOpenQuestion_TXT_answer.getText().toString().isEmpty()){
+                if (!question.isMandatory()) {
+                    skipQuestion();
+                    return;
+                }
+                return; // For mandatory questions, don't save anything
+            }
+
             if(response == null) {
                 response = new Response()
                         .setResponseID(UUID.randomUUID().toString())

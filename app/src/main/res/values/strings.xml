@@ -122,4 +122,6 @@
     <string name="previous">Previous</string>
     <string name="next">Next</string>
     <string name="no_questions_available_for_analysis">No questions available for analysis</string>
+    <string name="warning">Warning!</string>
+    <string name="survey_already_has_response">This survey already has responses. Editing may affect the responses that were already collected.</string>
 </resources>

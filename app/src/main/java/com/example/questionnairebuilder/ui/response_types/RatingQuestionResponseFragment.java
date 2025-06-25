@@ -210,6 +210,15 @@ public class RatingQuestionResponseFragment extends Fragment implements UnsavedC
     private void save() {
        if(isValidResponse()) {
            responseRatingQuestion_LBL_error.setVisibility(GONE);
+
+           if(selectedRating == 0){
+               if (!question.isMandatory()) {
+                   skipQuestion();
+                   return;
+               }
+               return; // For mandatory questions, don't save anything
+           }
+
            if(response == null) {
                response = new Response()
                        .setResponseID(UUID.randomUUID().toString())

@@ -95,7 +95,7 @@ public class QuestionsAdapter extends RecyclerView.Adapter<QuestionsAdapter.View
             Question question = questionsList.get(position);
             int order = question.getOrder();
             holder.rv_mandatory_star.setVisibility(question.isMandatory()? VISIBLE : GONE);
-            holder.rv_title.setText(question.getQuestionTitle() + " | " + order); // TODO: remove order
+            holder.rv_title.setText(question.getQuestionTitle());
             holder.dragHandle.setVisibility(reorderEnabled ? VISIBLE : GONE);
 
             holder.item_CARD_data.setOnClickListener(v -> {

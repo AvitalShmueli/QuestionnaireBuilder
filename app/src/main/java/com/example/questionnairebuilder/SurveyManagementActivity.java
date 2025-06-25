@@ -68,6 +68,7 @@ public class SurveyManagementActivity extends AppCompatActivity {
     private final Map<Survey.SurveyStatus, String> statusesMap = new LinkedHashMap<>();
     private ArrayAdapter<String> statusAdapter;
     private boolean isFirstSelection = true;
+    private String surveyID;
     private Survey survey;
     Map<String, Object> updates = new HashMap<>();
 
@@ -76,6 +77,8 @@ public class SurveyManagementActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_survey_management);
 
+        surveyID = getIntent().getStringExtra("surveyID");
+
         findViews();
         initViews();
 
@@ -83,44 +86,14 @@ public class SurveyManagementActivity extends AppCompatActivity {
     }
 
     private void getAllSurveyData(){
-        String surveyID = getIntent().getStringExtra("surveyID");
         String title = getIntent().getStringExtra("survey_title");
         if (title != null) {
             toolbar.setTitle(title);
         }
 
-        // Completed Responses
-        FirestoreManager.getInstance().getSurveyResponseStatusCount(
-                surveyID,
-                Collections.singletonList(SurveyResponseStatus.ResponseStatus.COMPLETED),
-                new OnCountListener() {
-                    @Override
-                    public void onCountSuccess(int count) {
-                        management_LBL_completedResponses.setText(String.valueOf(count));
-                    }
-                    @Override
-                    public void onCountFailure(Exception e) {
-                        Log.e("Survey", "Failed to get completed responses count", e);
-                    }
-                }
-        );
-
-        // Total Responses
-        FirestoreManager.getInstance().getSurveyResponseStatusCount(
-                surveyID,
-                Arrays.asList(SurveyResponseStatus.ResponseStatus.IN_PROGRESS, SurveyResponseStatus.ResponseStatus.COMPLETED),
-                new OnCountListener() {
-                    @Override
-                    public void onCountSuccess(int count) {
-                        management_LBL_totalResponses.setText(String.valueOf(count));
-                    }
-                    @Override
-                    public void onCountFailure(Exception e) {
-                        Log.e("Survey", "Failed to get total responses count", e);
-                    }
-                }
-        );
-
+        getCompletedResponsesCounter();
+        getTotalResponsesCounter();
+        getQuestionsCount();
         FirestoreManager.getInstance().getSurveyById(surveyID, new OneSurveyCallback() {
             @Override
             public void onSurveyLoaded(Survey loadedSurvey) {
@@ -157,8 +130,9 @@ public class SurveyManagementActivity extends AppCompatActivity {
                 Log.e("pttt","Failed to load survey: " + e.getMessage());
             }
         });
+    }
 
-        // Question Count
+    private void getQuestionsCount() {
         FirestoreManager.getInstance().countSurveysQuestions(surveyID, new OnCountListener() {
             @Override
             public void onCountSuccess(int count) {
@@ -171,6 +145,40 @@ public class SurveyManagementActivity extends AppCompatActivity {
                 Log.e("pttt",e.getMessage());
             }
         });
+    }
+
+    private void getTotalResponsesCounter() {
+        FirestoreManager.getInstance().getSurveyResponseStatusCount(
+                surveyID,
+                Arrays.asList(SurveyResponseStatus.ResponseStatus.IN_PROGRESS, SurveyResponseStatus.ResponseStatus.COMPLETED),
+                new OnCountListener() {
+                    @Override
+                    public void onCountSuccess(int count) {
+                        management_LBL_totalResponses.setText(String.valueOf(count));
+                    }
+                    @Override
+                    public void onCountFailure(Exception e) {
+                        Log.e("Survey", "Failed to get total responses count", e);
+                    }
+                }
+        );
+    }
+
+    private void getCompletedResponsesCounter(){
+        FirestoreManager.getInstance().getSurveyResponseStatusCount(
+                surveyID,
+                Collections.singletonList(SurveyResponseStatus.ResponseStatus.COMPLETED),
+                new OnCountListener() {
+                    @Override
+                    public void onCountSuccess(int count) {
+                        management_LBL_completedResponses.setText(String.valueOf(count));
+                    }
+                    @Override
+                    public void onCountFailure(Exception e) {
+                        Log.e("Survey", "Failed to get completed responses count", e);
+                    }
+                }
+        );
     }
 
     @NonNull
@@ -501,5 +509,13 @@ public class SurveyManagementActivity extends AppCompatActivity {
         // Show the dialog
         AlertDialog dialog = builder.create();
         dialog.show();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        getCompletedResponsesCounter();
+        getTotalResponsesCounter();
+        getQuestionsCount();
     }
 }

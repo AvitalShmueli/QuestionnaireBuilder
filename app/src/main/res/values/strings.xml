@@ -121,4 +121,5 @@
     <string name="choose_a_tag">Choose one or more tags:</string>
     <string name="previous">Previous</string>
     <string name="next">Next</string>
+    <string name="no_questions_available_for_analysis">No questions available for analysis</string>
 </resources>

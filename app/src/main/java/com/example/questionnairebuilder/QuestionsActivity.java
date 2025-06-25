@@ -234,9 +234,10 @@ public class QuestionsActivity extends AppCompatActivity {
 
         // Skip button (handled later depending on list size)
         questions_BTN_skip.setOnClickListener(v -> {
-            Intent intent = new Intent(this, MainActivity.class);
-            intent.putExtra("navigateTo", "navigation_my_surveys");
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            Intent intent = new Intent(this, SurveyManagementActivity.class);
+            intent.putExtra("surveyID", surveyID);
+            intent.putExtra("survey_title", surveyTitle);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
             finish();
         });

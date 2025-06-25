@@ -60,6 +60,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class QuestionsActivity extends AppCompatActivity {
     public static final String KEY_EDIT_MODE = "KEY_EDIT_MODE";
@@ -159,7 +160,17 @@ public class QuestionsActivity extends AppCompatActivity {
         if (item.getItemId() == R.id.action_done) {
             if(questionsAdapter.hasUnsavedChanges()) {
                 Set<Question> changedQuestions = questionsAdapter.getQuestionsToUpdate();
-                saveToDatabase(changedQuestions);
+
+                // Only save questions that still exist in the current list
+                Set<String> currentQuestionIds = questionsList.stream()
+                        .map(Question::getQuestionID)
+                        .collect(Collectors.toSet());
+
+                Set<Question> questionsToSave = changedQuestions.stream()
+                        .filter(q -> currentQuestionIds.contains(q.getQuestionID()))
+                        .collect(Collectors.toSet());
+
+                saveToDatabase(questionsToSave);
                 changedQuestions.clear(); // Reset for future edits
                 cachedQuestionList = null;
                 FirestoreManager.getInstance().fixQuestionOrder(surveyID);

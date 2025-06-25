@@ -1,6 +1,7 @@
 package com.example.questionnairebuilder;
 
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -17,6 +18,7 @@ import com.example.questionnairebuilder.models.Question;
 import com.example.questionnairebuilder.utilities.FirestoreManager;
 import com.example.questionnairebuilder.utilities.AILogicManager;
 import com.google.android.material.appbar.MaterialToolbar;
+import com.google.android.material.textview.MaterialTextView;
 import com.google.firebase.firestore.DocumentSnapshot;
 
 import java.util.ArrayList;
@@ -29,6 +31,7 @@ public class AnalyzeResponsesActivity extends AppCompatActivity {
     private AnalyzeAdapter adapter;
     private List<Question> questions = new ArrayList<>();
     private String surveyID;
+    private MaterialTextView analyze_LBL_empty;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +41,7 @@ public class AnalyzeResponsesActivity extends AppCompatActivity {
         surveyID = getIntent().getStringExtra("surveyID");
         toolbar = findViewById(R.id.topAppBar);
         recyclerView = findViewById(R.id.analyze_recycler);
+        analyze_LBL_empty = findViewById(R.id.analyze_LBL_empty);
 
         toolbar.setNavigationOnClickListener(v -> finish());
 
@@ -52,6 +56,15 @@ public class AnalyzeResponsesActivity extends AppCompatActivity {
         FirestoreManager.getInstance().getSurveyQuestionsOnce(surveyID, new QuestionsCallback() {
             @Override
             public void onQuestionsLoaded(List<Question> questionList) {
+                if (questionList.isEmpty()) {
+                    analyze_LBL_empty.setVisibility(View.VISIBLE);
+                    recyclerView.setVisibility(View.GONE);
+                    return;
+                } else {
+                    analyze_LBL_empty.setVisibility(View.GONE);
+                    recyclerView.setVisibility(View.VISIBLE);
+                }
+
                 questions.clear();
                 questions.addAll(questionList);
 

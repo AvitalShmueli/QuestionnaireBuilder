@@ -1,5 +1,8 @@
 package com.example.questionnairebuilder.adapters;
 
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
+
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.view.LayoutInflater;
@@ -94,10 +97,12 @@ public class SurveyWithResponseAdapter extends RecyclerView.Adapter<SurveyWithRe
     }
 
     private void bindTagsToChipGroup(List<Survey.SurveyTag> tags, ChipGroup chipGroup) {
+        chipGroup.setVisibility(GONE);
         chipGroup.removeAllViews();
         for (Survey.SurveyTag tag : tags) {
             Chip chip = new Chip(chipGroup.getContext());
-            chip.setText(tag.name().charAt(0) + tag.name().substring(1).toLowerCase());
+            String tagName = tag.name().charAt(0) + tag.name().substring(1).toLowerCase();
+            chip.setText(tagName);
             chip.setChipBackgroundColorResource(R.color.light_blue);
             chip.setTextColor(ContextCompat.getColor(chipGroup.getContext(), R.color.dark_blue));
             chip.setElevation(4f);
@@ -125,6 +130,7 @@ public class SurveyWithResponseAdapter extends RecyclerView.Adapter<SurveyWithRe
             chip.setChipIconSize(36f); // Adjust size if needed
             chip.setChipIconVisible(true);
         }
+        chipGroup.setVisibility(VISIBLE);
     }
 
     @Override

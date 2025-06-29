@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.questionnairebuilder.NewSurveyActivity;
 import com.example.questionnairebuilder.SurveyManagementActivity;
+import com.example.questionnairebuilder.adapters.ShimmerAdapter;
 import com.example.questionnairebuilder.adapters.SurveyAdapter;
 import com.example.questionnairebuilder.databinding.FragmentMySurveysBinding;
 import com.google.android.material.textview.MaterialTextView;
@@ -32,8 +33,8 @@ public class MySurveysFragment extends Fragment {
     private View scrollHintBottom;
     private View scrollHintTop;
     private MaterialTextView mySurveys_LBL_noSurveys;
-
     private SurveyAdapter surveyAdapter;
+    private ShimmerAdapter shimmerAdapter;
 
     private final boolean testMode = false;
 
@@ -49,6 +50,7 @@ public class MySurveysFragment extends Fragment {
         View root = binding.getRoot();
 
         createBinding();
+        setupRecyclerView();
         initSurveysList();
         initScrollHint();
 
@@ -67,9 +69,8 @@ public class MySurveysFragment extends Fragment {
         });
     }
 
-    private void initSurveysList(){
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-
+    private void setupRecyclerView(){
+        shimmerAdapter = new ShimmerAdapter(6); // Show 6 shimmer items
         surveyAdapter = new SurveyAdapter(requireContext(), new ArrayList<>(), survey -> {
             // OnSurveyClickListener
             Intent intent = new Intent(getActivity(), SurveyManagementActivity.class);
@@ -82,7 +83,12 @@ public class MySurveysFragment extends Fragment {
             startActivity(intent);
         });
 
-        recyclerView.setAdapter(surveyAdapter);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        recyclerView.setHasFixedSize(true);
+    }
+
+    private void initSurveysList(){
+        //recyclerView.setAdapter(surveyAdapter);
 
         if(testMode){
             viewModel.getFakeSurveys().observe(getViewLifecycleOwner(), surveys -> {
@@ -95,6 +101,9 @@ public class MySurveysFragment extends Fragment {
                 mySurveys_LBL_noSurveys.setVisibility(surveys.isEmpty() ? VISIBLE : GONE);
             });
         }
+
+        // Observe loading state
+        viewModel.getIsLoadingLiveData().observe(getViewLifecycleOwner(), this::showShimmerLoading);
     }
 
     private void initScrollHint() {
@@ -114,6 +123,10 @@ public class MySurveysFragment extends Fragment {
 
         scrollHintTop.setVisibility(canScrollUp ? View.VISIBLE : View.GONE);
         scrollHintBottom.setVisibility(canScrollDown ? View.VISIBLE : View.GONE);
+    }
+
+    private void showShimmerLoading(boolean isLoading){
+        recyclerView.setAdapter(isLoading ? shimmerAdapter : surveyAdapter);
     }
 
     @Override

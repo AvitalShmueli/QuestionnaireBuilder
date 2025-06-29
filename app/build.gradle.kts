@@ -73,5 +73,5 @@ dependencies {
     implementation(libs.mpandroidchart)
 
     implementation (libs.lottie)
-
+    implementation(libs.shimmer)
 }

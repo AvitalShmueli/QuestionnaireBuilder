@@ -70,6 +70,8 @@ public class SurveyManagementActivity extends AppCompatActivity {
     private boolean isFirstSelection = true;
     private String surveyID;
     private Survey survey;
+    private int totalResponseCount = 0;
+    private int totalCompletedResponseCount = 0;
     Map<String, Object> updates = new HashMap<>();
 
     @Override
@@ -154,6 +156,7 @@ public class SurveyManagementActivity extends AppCompatActivity {
                 new OnCountListener() {
                     @Override
                     public void onCountSuccess(int count) {
+                        totalResponseCount = count;
                         management_LBL_totalResponses.setText(String.valueOf(count));
                     }
                     @Override
@@ -171,6 +174,7 @@ public class SurveyManagementActivity extends AppCompatActivity {
                 new OnCountListener() {
                     @Override
                     public void onCountSuccess(int count) {
+                        totalCompletedResponseCount = count;
                         management_LBL_completedResponses.setText(String.valueOf(count));
                     }
                     @Override
@@ -219,6 +223,9 @@ public class SurveyManagementActivity extends AppCompatActivity {
         management_LL_dueDate.setOnClickListener(v -> showMaterialDatePicker());
         management_LL_description.setOnClickListener(v -> showDescriptionDialog());
         management_LL_title.setOnClickListener(v -> showTitleDialog());
+
+        management_LBL_totalResponses.setText(String.valueOf(totalResponseCount));
+        management_LBL_completedResponses.setText(String.valueOf(totalCompletedResponseCount));
     }
 
     private void setupAnalyzeClick() {
@@ -286,12 +293,19 @@ public class SurveyManagementActivity extends AppCompatActivity {
 
     private void setupEditClick() {
         management_LL_edit.setOnClickListener(v -> {
-            Intent intent = new Intent(SurveyManagementActivity.this, QuestionsActivity.class);
-            intent.putExtra(QuestionsActivity.KEY_EDIT_MODE, true);
-            intent.putExtra("surveyID",survey.getID());
-            intent.putExtra("survey_title",survey.getSurveyTitle());
-            startActivity(intent);
+            if(totalResponseCount > 0)
+                showEditWarningDialog();
+            else
+                navigateToEditScreen();
         });
+    }
+
+    private void navigateToEditScreen(){
+        Intent intent = new Intent(SurveyManagementActivity.this, QuestionsActivity.class);
+        intent.putExtra(QuestionsActivity.KEY_EDIT_MODE, true);
+        intent.putExtra("surveyID",survey.getID());
+        intent.putExtra("survey_title",survey.getSurveyTitle());
+        startActivity(intent);
     }
 
     private void findViews() {
@@ -431,6 +445,19 @@ public class SurveyManagementActivity extends AppCompatActivity {
                 .setPositiveButton(R.string.continue_btn, (dialog, which) -> {
                     dialog.dismiss();
                     finish();
+                })
+                .setNegativeButton(R.string.cancel, (dialog, which) -> dialog.dismiss())
+                .setCancelable(true)
+                .show();
+    }
+
+    private void showEditWarningDialog() {
+        new AlertDialog.Builder(this)
+                .setTitle(R.string.warning)
+                .setMessage(R.string.survey_already_has_response)
+                .setPositiveButton(R.string.edit, (dialog, which) -> {
+                    dialog.dismiss();
+                    navigateToEditScreen();
                 })
                 .setNegativeButton(R.string.cancel, (dialog, which) -> dialog.dismiss())
                 .setCancelable(true)

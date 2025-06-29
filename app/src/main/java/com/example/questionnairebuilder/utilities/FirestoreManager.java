@@ -8,6 +8,7 @@ import androidx.annotation.Nullable;
 
 
 import com.example.questionnairebuilder.interfaces.SurveyResponsesStatusCallback;
+import com.example.questionnairebuilder.interfaces.SurveysWithCountCallback;
 import com.example.questionnairebuilder.interfaces.UpdateSurveyDetailsCallback;
 import com.example.questionnairebuilder.listeners.OnCountListener;
 import com.example.questionnairebuilder.interfaces.AllResponsesCallback;
@@ -32,6 +33,7 @@ import com.example.questionnairebuilder.models.Response;
 import com.example.questionnairebuilder.models.SingleChoiceQuestion;
 import com.example.questionnairebuilder.models.Survey;
 import com.example.questionnairebuilder.models.SurveyResponseStatus;
+import com.example.questionnairebuilder.models.SurveyWithResponseCount;
 import com.example.questionnairebuilder.models.User;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -55,6 +57,7 @@ import com.google.firebase.firestore.WriteBatch;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -172,6 +175,64 @@ public class FirestoreManager {
                 });
     }
 
+    // Combined method in your FirestoreManager
+    public ListenerRegistration listenToMyActiveSurveysWithResponseCount(String currentUserId, SurveysWithCountCallback callback) {
+        return surveysRef.whereEqualTo("author.uid", currentUserId)
+                .where(Filter.or(
+                        Filter.equalTo("status",Survey.SurveyStatus.Draft),
+                        Filter.equalTo("status",Survey.SurveyStatus.Published)
+                )).orderBy("dueDate")
+                .addSnapshotListener((value, error) -> {
+                    if (error != null) {
+                        callback.onError(error);
+                        return;
+                    }
+
+                    if (value != null) {
+                        List<SurveyWithResponseCount> surveyList = new ArrayList<>();
+                        for (DocumentSnapshot document : value.getDocuments()) {
+                            Survey survey = document.toObject(Survey.class);
+                            if (survey != null) {
+                                survey.setID(document.getId());
+                                surveyList.add(new SurveyWithResponseCount(survey));
+                            }
+                        }
+
+                        // First callback with surveys (response counts still loading)
+                        callback.onSurveysLoaded(surveyList);
+
+                        // Then fetch response counts for each survey
+                        fetchResponseCountsForSurveys(surveyList, callback);
+                    }
+                });
+    }
+
+    private void fetchResponseCountsForSurveys(List<SurveyWithResponseCount> surveysWithCount, SurveysWithCountCallback callback) {
+        for (int i = 0; i < surveysWithCount.size(); i++) {
+            final int position = i;
+            SurveyWithResponseCount surveyWithCount = surveysWithCount.get(i);
+            String surveyId = surveyWithCount.getSurvey().getID();
+
+            getSurveyResponseStatusCount(
+                    surveyId,
+                    Arrays.asList(SurveyResponseStatus.ResponseStatus.IN_PROGRESS, SurveyResponseStatus.ResponseStatus.COMPLETED),
+                    new OnCountListener() {
+                        @Override
+                        public void onCountSuccess(int count) {
+                            surveyWithCount.setResponseCount(count);
+                            callback.onSurveyCountUpdated(position, count);
+                        }
+
+                        @Override
+                        public void onCountFailure(Exception e) {
+                            surveyWithCount.setResponseCount(0);
+                            callback.onSurveyCountUpdated(position, 0);
+                        }
+                    }
+            );
+        }
+    }
+
     public ListenerRegistration listenToAllActiveSurveys(SurveysCallback callback) {
         return surveysRef.where(Filter.or(
                         Filter.equalTo("status",Survey.SurveyStatus.Draft),
@@ -216,6 +277,31 @@ public class FirestoreManager {
                             }
                         }
                         callback.onSurveysLoaded(surveyList);
+
+                    }
+                });
+    }
+
+    public ListenerRegistration listenToMySurveysWithResponseCount(String currentUserId, SurveysWithCountCallback callback) {
+        return surveysRef.whereEqualTo("author.uid", currentUserId)
+                .orderBy("dueDate")
+                .addSnapshotListener((value, error) -> {
+                    if (error != null) {
+                        callback.onError(error);
+                        return;
+                    }
+
+                    if (value != null) {
+                        List<SurveyWithResponseCount> surveyList = new ArrayList<>();
+                        for (DocumentSnapshot document : value.getDocuments()) {
+                            Survey survey = document.toObject(Survey.class);
+                            if (survey != null) {
+                                survey.setID(document.getId());
+                                surveyList.add(new SurveyWithResponseCount(survey));
+                            }
+                        }
+                        callback.onSurveysLoaded(surveyList);
+                        fetchResponseCountsForSurveys(surveyList, callback);
                     }
                 });
     }

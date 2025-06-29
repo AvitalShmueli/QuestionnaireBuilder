@@ -5,6 +5,7 @@ import static android.view.View.VISIBLE;
 
 import android.content.Context;
 import android.content.res.ColorStateList;
+import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -19,6 +20,7 @@ import com.example.questionnairebuilder.models.SurveyResponseStatus;
 import com.example.questionnairebuilder.models.SurveyWithResponseCount;
 import com.example.questionnairebuilder.utilities.AuthenticationManager;
 import com.google.android.material.chip.Chip;
+import com.google.android.material.chip.ChipDrawable;
 import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.textview.MaterialTextView;
 
@@ -139,35 +141,6 @@ public class SurveyAdapter extends RecyclerView.Adapter<SurveyAdapter.SurveyView
         for (Survey.SurveyTag tag : tags) {
             Chip chip = createStyledChip(chipGroup.getContext(), tag);
             chipGroup.addView(chip);
-            /*Chip chip = new Chip(chipGroup.getContext());
-            String tagName = tag.name().charAt(0) + tag.name().substring(1).toLowerCase();
-            chip.setText(tagName);
-            chip.setChipBackgroundColorResource(R.color.light_blue);
-            chip.setTextColor(ContextCompat.getColor(chipGroup.getContext(), R.color.dark_blue));
-            chip.setElevation(4f);
-            chip.setChipStrokeColor(ColorStateList.valueOf(ContextCompat.getColor(chipGroup.getContext(), R.color.light_blue)));
-            chip.setChipCornerRadius(24f);
-            chip.setTextSize(10);
-            chip.setMinHeight(0);
-            chip.setMinimumHeight(0);
-            chip.setEnsureMinTouchTargetSize(false);
-            chip.setChipStartPadding(4f);
-            chip.setChipEndPadding(4f);
-            chip.setTextStartPadding(6f);
-            chip.setTextEndPadding(6f);
-            chip.setClickable(false);
-            chip.setCheckable(false);
-            ChipGroup.LayoutParams layoutParams = new ChipGroup.LayoutParams(
-                    ViewGroup.LayoutParams.WRAP_CONTENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT
-            );
-            chip.setLayoutParams(layoutParams);
-            chipGroup.addView(chip);
-
-            chip.setChipIconResource(tag.getIconResId());
-            chip.setChipIconTintResource(R.color.dark_blue); // Optional tint
-            chip.setChipIconSize(36f); // Adjust size if needed
-            chip.setChipIconVisible(true);*/
         }
         chipGroup.setVisibility(tags.isEmpty() ? GONE : VISIBLE);
     }
@@ -175,52 +148,39 @@ public class SurveyAdapter extends RecyclerView.Adapter<SurveyAdapter.SurveyView
     private Chip createStyledChip(Context context, Survey.SurveyTag tag) {
         Chip chip = new Chip(context);
 
-        // Set text first
         String tagName = tag.name().charAt(0) + tag.name().substring(1).toLowerCase();
         chip.setText(tagName);
 
-        // Configure all visual properties before measuring
+        ChipDrawable chipDrawable = ChipDrawable.createFromAttributes(context, null, 0, com.google.android.material.R.style.Widget_Material3_Chip_Assist);
+        chip.setChipDrawable(chipDrawable);
+
+        // Set icon properties
+        chip.setChipIconResource(tag.getIconResId());
+        chip.setChipIconTintResource(R.color.dark_blue);
+        chip.setChipIconSize(dpToPx(13));
+        chip.setIconStartPadding(dpToPx(2));
+        chip.setChipIconVisible(true);
+
         chip.setChipBackgroundColorResource(R.color.light_blue);
         chip.setTextColor(ContextCompat.getColor(context, R.color.dark_blue));
-        chip.setElevation(4f);
+        int elevation = dpToPx(2);
+        chip.setElevation(elevation);
         chip.setChipStrokeColor(ColorStateList.valueOf(ContextCompat.getColor(context, R.color.light_blue)));
-        chip.setChipCornerRadius(24f);
         chip.setTextSize(10);
 
-        // Set fixed dimensions to prevent resizing
         chip.setMinHeight(0);
         chip.setMinimumHeight(0);
         chip.setEnsureMinTouchTargetSize(false);
-
-        // Use consistent padding
-        chip.setChipStartPadding(4f);
-        chip.setChipEndPadding(4f);
-        chip.setTextStartPadding(6f);
-        chip.setTextEndPadding(6f);
+        chip.setChipStartPadding(dpToPx(2));
+        chip.setChipEndPadding(dpToPx(2));
 
         // Disable interactions
         chip.setClickable(false);
         chip.setCheckable(false);
         chip.setFocusable(false);
 
-        // Set icon properties
-        chip.setChipIconResource(tag.getIconResId());
-        chip.setChipIconTintResource(R.color.dark_blue);
-        chip.setChipIconSize(36f);
-        chip.setChipIconVisible(true);
-
-        // Create layout params with fixed dimensions if needed
-        ChipGroup.LayoutParams layoutParams = new ChipGroup.LayoutParams(
-                ViewGroup.LayoutParams.WRAP_CONTENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
-        );
-        // Optional: Set margins to prevent layout shifts
-        layoutParams.setMargins(2, 2, 2, 2);
-        chip.setLayoutParams(layoutParams);
-
         return chip;
     }
-
 
     public static class SurveyViewHolder extends RecyclerView.ViewHolder {
         MaterialTextView title, status, date, responsesCount;
@@ -236,5 +196,10 @@ public class SurveyAdapter extends RecyclerView.Adapter<SurveyAdapter.SurveyView
             tagChipGroup = itemView.findViewById(R.id.item_CHIPGROUP_tags);
             responsesLoading = itemView.findViewById(R.id.item_responses_loading);
         }
+    }
+
+    private int dpToPx(int dp) {
+        return (int) TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_DIP, dp, context.getResources().getDisplayMetrics());
     }
 }

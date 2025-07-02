@@ -18,6 +18,7 @@ public class OpenResponsesActivity extends AppCompatActivity {
     private MaterialToolbar toolbar;
     private RecyclerView recyclerView;
     private MaterialTextView emptyLabel;
+    private MaterialTextView questionTitleLBL;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,7 +39,8 @@ public class OpenResponsesActivity extends AppCompatActivity {
         }
 
         String title = getIntent().getStringExtra("questionTitle");
-        toolbar.setTitle(title);
+        //toolbar.setTitle(title);
+        questionTitleLBL.setText(title);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         if (responses != null && !responses.isEmpty()) {
@@ -52,6 +54,7 @@ public class OpenResponsesActivity extends AppCompatActivity {
 
     private void findViews() {
         toolbar = findViewById(R.id.topAppBar);
+        questionTitleLBL = findViewById(R.id.questionTitleLBL);
         recyclerView = findViewById(R.id.openResponses_recycler);
         emptyLabel = findViewById(R.id.openResponses_LBL_empty);
     }

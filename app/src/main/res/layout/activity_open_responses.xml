@@ -21,7 +21,25 @@
         app:title="@string/view_all_responses"
         app:titleCentered="true"
         app:titleTextAppearance="@style/Custom.Widget.Toolbar.TitleStyle"
-        app:titleTextColor="@color/blackish" />
+        app:titleTextColor="@color/blackish">
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/questionTitleLBL"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/view_all_responses"
+            android:maxLines="2"
+            android:ellipsize="end"
+            android:gravity="center"
+            android:layout_marginEnd="48dp"
+            android:autoSizeTextType="uniform"
+            android:autoSizeMinTextSize="12sp"
+            android:autoSizeMaxTextSize="16sp"
+            android:autoSizeStepGranularity="1sp"
+            android:textStyle="bold"
+            android:textAppearance="@style/TextAppearance.Material3.ActionBar.Title"/>
+
+    </com.google.android.material.appbar.MaterialToolbar>
 
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/openResponses_LBL_empty"

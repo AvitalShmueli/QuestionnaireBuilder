@@ -94,7 +94,7 @@ public class AnalyzeResponsesActivity extends AppCompatActivity {
                                     if (question instanceof OpenEndedQuestion) {
                                         OpenEndedQuestion openQuestion = (OpenEndedQuestion) question;
 
-                                        // 👇 Append (not overwrite) responses!
+                                        // Append (not overwrite) responses!
                                         openQuestion.getAllResponses().addAll(values);
                                     }
 
@@ -111,9 +111,14 @@ public class AnalyzeResponsesActivity extends AppCompatActivity {
                                 if (openQuestion.getAllResponses().isEmpty()) {
                                     openQuestion.setAnalysisResult("No analysis to display");
                                 } else {
-                                    String combinedText = android.text.TextUtils.join("\n", openQuestion.getAllResponses());
+                                    String questionTitle = openQuestion.getQuestionTitle();
 
-                                    AILogicManager.getInstance().analyzeOpenAnswer(combinedText, new OnAnalysisCompleteListener() {
+                                    StringBuilder combinedText = new StringBuilder();
+                                    for (String response : openQuestion.getAllResponses()) {
+                                        combinedText.append("- ").append(response).append("\n");
+                                    }
+
+                                    AILogicManager.getInstance().analyzeOpenAnswer(questionTitle, String.valueOf(combinedText), new OnAnalysisCompleteListener() {
                                         @Override
                                         public void onAnalysisComplete(String summary) {
                                             openQuestion.setAnalysisResult(summary);

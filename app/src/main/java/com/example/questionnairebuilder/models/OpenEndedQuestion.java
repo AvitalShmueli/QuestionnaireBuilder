@@ -34,6 +34,7 @@ public class OpenEndedQuestion extends Question{
     public String getAnalysisResult() {
         return analysisResult;
     }
+
     public List<String> getAllResponses() {
         return allResponses;
     }

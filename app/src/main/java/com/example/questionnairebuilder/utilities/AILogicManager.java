@@ -29,12 +29,13 @@ public class AILogicManager {
         return instance;
     }
 
-    public void analyzeOpenAnswer(String userResponse, OnAnalysisCompleteListener listener) {
-        String prompt = "As an AI survey analyst, analyze the following open-ended responses written by different users. " +
-                "Identify the most common themes, trends, and sentiments. " +
-                "Write one short paragraph summarizing the insights in natural English, up to 50 words. " +
-                "Do not use lists or quote the users directly.\n\nResponses:\n" + userResponse;
-
+    public void analyzeOpenAnswer(String questionText, String usersResponses, OnAnalysisCompleteListener listener) {
+        String prompt = "You are an AI analyst for surveys. Analyze the following open-ended responses to the question below. " +
+                "Your task is to identify shared themes, overall sentiment, and key trends in how users responded. " +
+                "Summarize the findings in natural English in one short paragraph (maximum 50 words). " +
+                "Avoid quoting users or inventing responses. Only use the responses provided.\n\n" +
+                "Question:\n" + questionText + "\n\n" +
+                "Responses:\n" + usersResponses;
 
         Content content = new Content.Builder()
                 .addText(prompt)

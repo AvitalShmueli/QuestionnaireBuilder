@@ -2,6 +2,9 @@ package com.example.questionnairebuilder;
 
 import android.app.AlertDialog;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.Paint;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -11,6 +14,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CompoundButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -18,7 +22,9 @@ import android.widget.Toast;
 import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.AppCompatImageButton;
 import androidx.appcompat.widget.AppCompatSpinner;
+import androidx.core.content.ContextCompat;
 
 import com.example.questionnairebuilder.interfaces.UpdateSurveyDetailsCallback;
 import com.example.questionnairebuilder.listeners.OnCountListener;
@@ -30,10 +36,13 @@ import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.datepicker.CalendarConstraints;
 import com.google.android.material.datepicker.DateValidatorPointForward;
 import com.google.android.material.datepicker.MaterialDatePicker;
+import com.google.android.material.imageview.ShapeableImageView;
 import com.google.android.material.materialswitch.MaterialSwitch;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textview.MaterialTextView;
 import com.google.firebase.Timestamp;
+import com.google.zxing.BarcodeFormat;
+import com.journeyapps.barcodescanner.BarcodeEncoder;
 
 
 import java.text.ParseException;
@@ -52,6 +61,7 @@ public class SurveyManagementActivity extends AppCompatActivity {
     private Menu mMenu;
     private LinearLayout management_LL_edit;
     private LinearLayout management_LL_analyze;
+    private LinearLayout management_LL_share;
     private MaterialTextView management_LBL_totalResponses;
     private MaterialTextView management_LBL_completedResponses;
     private MaterialTextView management_LBL_createdDate;
@@ -202,6 +212,7 @@ public class SurveyManagementActivity extends AppCompatActivity {
         });
         setupEditClick();
         setupAnalyzeClick();
+        setUpShareClick();
         initSpinner();
 
         management_SW_alert.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -226,6 +237,52 @@ public class SurveyManagementActivity extends AppCompatActivity {
 
         management_LBL_totalResponses.setText(String.valueOf(totalResponseCount));
         management_LBL_completedResponses.setText(String.valueOf(totalCompletedResponseCount));
+    }
+
+    private void setUpShareClick() {
+        management_LL_share.setOnClickListener(v ->
+        {
+            String surveyId = survey.getID();
+            String surveyLink = "https://questionnairebuilder-7b883.web.app/survey?id=" + surveyId;
+
+            View dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_share_survey, null);
+            ShapeableImageView qrImageView = dialogView.findViewById(R.id.share_qr_image);
+            MaterialTextView linkTextView = dialogView.findViewById(R.id.share_link_text);
+            AppCompatImageButton copyButton = dialogView.findViewById(R.id.share_copy_button);
+            linkTextView.setText(survey.getSurveyTitle());
+            linkTextView.setTextColor(ContextCompat.getColor(this, android.R.color.holo_blue_dark));
+            linkTextView.setPaintFlags(linkTextView.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
+            linkTextView.setOnClickListener(v2 -> {
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(surveyLink));
+                startActivity(browserIntent);
+            });
+
+            // Handle copy button click
+            copyButton.setOnClickListener(v1 -> {
+                android.content.ClipboardManager clipboard = (android.content.ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+                android.content.ClipData clip = android.content.ClipData.newPlainText("Survey Link", surveyLink);
+                clipboard.setPrimaryClip(clip);
+                Toast.makeText(this, "Link copied to clipboard", Toast.LENGTH_SHORT).show();
+            });
+
+            // Generate QR Code
+            try {
+                BarcodeEncoder barcodeEncoder = new BarcodeEncoder();
+                Bitmap bitmap = barcodeEncoder.encodeBitmap(surveyLink, BarcodeFormat.QR_CODE, 400, 400);
+                qrImageView.setImageBitmap(bitmap);
+            } catch (Exception e) {
+                e.printStackTrace();
+                Toast.makeText(this, "Failed to generate QR code", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            // Build dialog
+            new AlertDialog.Builder(this)
+                    .setView(dialogView)
+                    .setCancelable(true)
+                    .setNegativeButton("Close", (dialog, which) -> dialog.dismiss())
+                    .show();
+        });
     }
 
     private void setupAnalyzeClick() {
@@ -312,6 +369,7 @@ public class SurveyManagementActivity extends AppCompatActivity {
         toolbar = findViewById(R.id.topAppBar);
         management_LL_edit = findViewById(R.id.management_LL_edit);
         management_LL_analyze = findViewById(R.id.management_LL_analyze);
+        management_LL_share = findViewById(R.id.management_LL_share);
         management_LBL_totalResponses = findViewById(R.id.management_LBL_totalResponses);
         management_LBL_completedResponses = findViewById(R.id.management_LBL_completedResponses);
         management_LBL_createdDate = findViewById(R.id.management_LBL_createdDate);

@@ -73,5 +73,9 @@ dependencies {
     implementation(libs.mpandroidchart)
 
     implementation (libs.lottie)
+
+    implementation (libs.core)
+    implementation (libs.zxing.android.embedded)
+    
     implementation(libs.shimmer)
 }

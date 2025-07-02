@@ -40,7 +40,7 @@
                 android:id="@+id/item_LBL_surveyTitle"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
+                android:layout_marginTop="4dp"
                 android:layout_marginEnd="8dp"
                 android:textColor="@android:color/black"
                 android:textSize="18sp"
@@ -86,7 +86,32 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/item_LBL_surveyDate"
-                tools:text="Responses: 12" />
+                android:text = "@string/responses" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/item_LBL_surveyResponsesCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginVertical="4dp"
+                android:layout_marginStart="4dp"
+                android:textColor="@color/blackish"
+                android:textSize="14sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/item_LBL_surveyDate"
+                app:layout_constraintStart_toEndOf="@id/item_LBL_surveyResponses"
+                tools:text="12" />
+
+            <ProgressBar
+                android:id="@+id/item_responses_loading"
+                style="?android:attr/progressBarStyleSmall"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:layout_marginStart="4dp"
+                android:indeterminateTint="?attr/colorPrimary"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="@id/item_LBL_surveyResponsesCount"
+                app:layout_constraintTop_toBottomOf="@id/item_LBL_surveyDate"/>
+
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.cardview.widget.CardView>

@@ -20,6 +20,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.questionnairebuilder.NewSurveyActivity;
 import com.example.questionnairebuilder.R;
 import com.example.questionnairebuilder.SurveyManagementActivity;
+import com.example.questionnairebuilder.adapters.ShimmerAdapter;
 import com.example.questionnairebuilder.adapters.SurveyAdapter;
 import com.example.questionnairebuilder.databinding.FragmentHomeBinding;
 import com.example.questionnairebuilder.utilities.SharedPreferencesManager;
@@ -37,9 +38,8 @@ public class HomeFragment extends Fragment {
     private View scrollHintBottom;
     private View scrollHintTop;
     private MaterialTextView home_LBL_noActiveSurveys;
-
     private SurveyAdapter surveyAdapter;
-
+    private ShimmerAdapter shimmerAdapter;
     private final boolean testMode = false;
 
     @Override
@@ -55,6 +55,7 @@ public class HomeFragment extends Fragment {
         View root = binding.getRoot();
 
         initUserGreeting();
+        setupRecyclerView();
         initSurveysList();
         initScrollHint();
 
@@ -76,14 +77,13 @@ public class HomeFragment extends Fragment {
         });
     }
 
-    private void initSurveysList(){
+    private void setupRecyclerView(){
         recyclerView = binding.homeLSTSurveys;
         scrollHintBottom = binding.scrollHintBottom;
         scrollHintTop = binding.scrollHintTop;
         home_LBL_noActiveSurveys = binding.homeLBLNoActiveSurveys;
 
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-
+        shimmerAdapter = new ShimmerAdapter(6); // Show 6 shimmer items
         surveyAdapter = new SurveyAdapter(requireContext(), new ArrayList<>(), survey -> {
             // OnSurveyClickListener
             Intent intent = new Intent(getActivity(), SurveyManagementActivity.class);
@@ -96,7 +96,12 @@ public class HomeFragment extends Fragment {
             startActivity(intent);
         });
 
-        recyclerView.setAdapter(surveyAdapter);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        recyclerView.setHasFixedSize(true);
+    }
+
+    private void initSurveysList(){
+        //recyclerView.setAdapter(surveyAdapter);
 
         if(testMode){
             viewModel.getFakeSurveys().observe(getViewLifecycleOwner(), surveys -> {
@@ -109,6 +114,9 @@ public class HomeFragment extends Fragment {
                 home_LBL_noActiveSurveys.setVisibility(surveys.isEmpty() ? VISIBLE : GONE);
             });
         }
+
+        // Observe loading state
+        viewModel.getIsLoadingLiveData().observe(getViewLifecycleOwner(), this::showShimmerLoading);
     }
 
     private void initScrollHint() {
@@ -128,6 +136,10 @@ public class HomeFragment extends Fragment {
 
         //scrollHintTop.setVisibility(canScrollUp ? View.VISIBLE : View.GONE);
         scrollHintBottom.setVisibility(canScrollDown ? VISIBLE : GONE);
+    }
+
+    private void showShimmerLoading(boolean isLoading){
+        recyclerView.setAdapter(isLoading ? shimmerAdapter : surveyAdapter);
     }
 
     @Override

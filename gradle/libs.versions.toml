@@ -26,6 +26,7 @@ reactiveStreams = "1.0.4"
 gson = "2.10.1"
 scenecore = "1.0.0-alpha04"
 zxingAndroidEmbedded = "4.3.0"
+shimmer = "0.5.0"
 
 [libraries]
 core = { module = "com.google.zxing:core", version.ref = "core" }
@@ -57,6 +58,7 @@ reactive-streams = { module = "org.reactivestreams:reactive-streams", version.re
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 scenecore = { group = "androidx.xr.scenecore", name = "scenecore", version.ref = "scenecore" }
 zxing-android-embedded = { module = "com.journeyapps:zxing-android-embedded", version.ref = "zxingAndroidEmbedded" }
+shimmer = { module = "com.facebook.shimmer:shimmer", version.ref = "shimmer" }
 
 
 [plugins]

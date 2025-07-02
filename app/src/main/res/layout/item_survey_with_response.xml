@@ -40,16 +40,17 @@
                 android:id="@+id/item_LBL_surveyTitle"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                tools:text="Survey title #1"
+                android:layout_marginVertical="4dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginEnd="8dp"
+                android:textColor="@android:color/black"
                 android:textSize="18sp"
                 android:textStyle="bold"
-                android:layout_marginVertical="4dp"
-                android:textColor="@android:color/black"
                 app:layout_constraintBottom_toTopOf="@id/item_LBL_surveySent"
                 app:layout_constraintEnd_toStartOf="@id/item_LBL_surveyStatus"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/item_CHIPGROUP_tags"
-                android:layout_marginEnd="8dp"/>
+                tools:text="Survey title #1" />
 
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/item_LBL_surveyStatus"

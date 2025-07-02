@@ -220,9 +220,22 @@ public class DateQuestionResponseFragment extends Fragment implements UnsavedCha
     private void save() {
         if (isValidResponse()) {
             ArrayList<String> selectedDates = new ArrayList<>();
-            selectedDates.add(startDateTXT.getText().toString());
-            if(((DateQuestion)question).getDateMode() == DateSelectionModeEnum.DATE_RANGE)
-                selectedDates.add(endDateTXT.getText().toString());
+            String startDateText = startDateTXT.getText().toString().trim();
+            String endDateText = endDateTXT.getText().toString().trim();
+            if (!startDateText.isEmpty()) {
+                selectedDates.add(startDateText);
+            }
+            if (((DateQuestion)question).getDateMode() == DateSelectionModeEnum.DATE_RANGE && !endDateText.isEmpty()) {
+                selectedDates.add(endDateText);
+            }
+
+            if (selectedDates.isEmpty()) {
+                if (!question.isMandatory()) {
+                    skipQuestion();
+                    return;
+                }
+                return; // For mandatory questions, don't save anything
+            }
 
             if(response == null) {
                 response = new Response()
@@ -240,6 +253,80 @@ public class DateQuestionResponseFragment extends Fragment implements UnsavedCha
     }
 
     private boolean isValidResponse() {
+        boolean hasResponse = false;
+        boolean valid = true;
+        DateQuestion dateQuestion = (DateQuestion) question;
+        DateSelectionModeEnum dateMode = dateQuestion.getDateMode();
+
+        // Clear previous errors
+        startDateLayout.setError(null);
+        if (endDateLayout != null) {
+            endDateLayout.setError(null);
+        }
+
+        if (dateMode == DateSelectionModeEnum.SINGLE_DATE) {
+            Date singleDate = startDatePicker.getSelectedDate();
+            String dateText = startDateTXT.getText() != null ? startDateTXT.getText().toString().trim() : "";
+            hasResponse = !dateText.isEmpty();
+
+            // For non-mandatory questions with no response: always valid
+            if (!question.isMandatory() && !hasResponse) {
+                return true;
+            }
+
+            // For mandatory questions OR when user provided a response: validate
+            if (question.isMandatory() || hasResponse) {
+                if (singleDate == null || !startDatePicker.isSelectedDateValid()) {
+                    startDateLayout.setError(question.isMandatory() ?
+                            "Date is required" : "Date is invalid");
+                    valid = false;
+                }
+            }
+        } else if (dateMode == DateSelectionModeEnum.DATE_RANGE) {
+            Date startDate = startDatePicker.getSelectedDate();
+            Date endDate = endDatePicker != null ? endDatePicker.getSelectedDate() : null;
+
+            String startText = startDateTXT.getText() != null ? startDateTXT.getText().toString().trim() : "";
+            String endText = endDateTXT.getText() != null ? endDateTXT.getText().toString().trim() : "";
+
+            hasResponse = !startText.isEmpty() || !endText.isEmpty();
+
+            // For non-mandatory questions with no response: always valid
+            if (!question.isMandatory() && !hasResponse) {
+                return true;
+            }
+
+            if (question.isMandatory()) {
+                // For mandatory date range: both dates are required
+                if (startDate == null || !startDatePicker.isSelectedDateValid()) {
+                    startDateLayout.setError("Start date is required");
+                    valid = false;
+                }
+                if (endDate == null || (endDatePicker != null && !endDatePicker.isSelectedDateValid())) {
+                    endDateLayout.setError("End date is required");
+                    valid = false;
+                } else if (startDate != null && endDate != null && endDate.before(startDate)) {
+                    endDateLayout.setError("End date cannot be before start date");
+                    valid = false;
+                }
+            } else if (hasResponse) {
+                // For non-mandatory: validate only provided dates
+                if (!startText.isEmpty() && (startDate == null || !startDatePicker.isSelectedDateValid())) {
+                    startDateLayout.setError("Start date is invalid");
+                    valid = false;
+                }
+                if (!endText.isEmpty() && (endDate == null || (endDatePicker != null && !endDatePicker.isSelectedDateValid()))) {
+                    endDateLayout.setError("End date is invalid");
+                    valid = false;
+                } else if (startDate != null && endDate != null && endDate.before(startDate)) {
+                    endDateLayout.setError("End date cannot be before start date");
+                    valid = false;
+                }
+            }
+        }
+
+        return valid;
+/*
         Date start = startDatePicker.getSelectedDate();
         Date end = endDatePicker.getSelectedDate();
 
@@ -262,18 +349,18 @@ public class DateQuestionResponseFragment extends Fragment implements UnsavedCha
             endDateLayout.setError(null);
         }
 
-        return valid;
+        return valid;*/
     }
 
     public boolean hasUnsavedChanges() {
         ArrayList<String> selectedDates = new ArrayList<>();
-        String date1 = startDateTXT.getText().toString();
-        if(!date1.isEmpty())
-            selectedDates.add(date1);
-        if(((DateQuestion)question).getDateMode() == DateSelectionModeEnum.DATE_RANGE) {
-            String date2 = endDateTXT.getText().toString();
-            if(!date2.isEmpty())
-                selectedDates.add(date2);
+        String startDateText = startDateTXT.getText().toString().trim();
+        String endDateText = endDateTXT.getText().toString().trim();
+        if (!startDateText.isEmpty()) {
+            selectedDates.add(startDateText);
+        }
+        if (((DateQuestion)question).getDateMode() == DateSelectionModeEnum.DATE_RANGE && !endDateText.isEmpty()) {
+            selectedDates.add(endDateText);
         }
 
         List<String> originalResponse =  response != null ? response.getResponseValues() : Collections.emptyList();

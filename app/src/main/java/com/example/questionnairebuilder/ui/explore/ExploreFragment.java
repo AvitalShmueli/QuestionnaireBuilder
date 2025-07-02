@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.questionnairebuilder.QuestionsActivity;
 import com.example.questionnairebuilder.R;
+import com.example.questionnairebuilder.adapters.ShimmerAdapter;
 import com.example.questionnairebuilder.adapters.SurveyWithResponseAdapter;
 import com.example.questionnairebuilder.databinding.FragmentExploreBinding;
 import com.example.questionnairebuilder.models.SurveyResponseStatus;
@@ -35,6 +36,7 @@ public class ExploreFragment extends Fragment {
     private int selectedTabPosition = 0;
     private String currentStatusFilter = SurveyResponseStatus.ResponseStatus.PENDING.name();
     private SurveyWithResponseAdapter surveyAdapter;
+    private ShimmerAdapter shimmerAdapter;
     private MaterialTextView explore_LBL_noSurveys;
 
 
@@ -55,6 +57,8 @@ public class ExploreFragment extends Fragment {
 
         createBinding();
         initTabs();
+        setupRecyclerView();
+        showShimmer();
         initSurveysList();
         initScrollHint();
 
@@ -95,9 +99,8 @@ public class ExploreFragment extends Fragment {
         });
     }
 
-    private void initSurveysList() {
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-
+    private void setupRecyclerView(){
+        shimmerAdapter = new ShimmerAdapter(4); // Show 4 shimmer items
         surveyAdapter = new SurveyWithResponseAdapter(requireContext(), new ArrayList<>(), survey -> {
             // OnSurveyClickListener
             //Intent intent = new Intent(getActivity(), SurveyManagementActivity.class);
@@ -112,12 +115,18 @@ public class ExploreFragment extends Fragment {
             startActivity(intent);
         });
 
-        recyclerView.setAdapter(surveyAdapter);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        recyclerView.setHasFixedSize(true);
+    }
+
+    private void initSurveysList() {
+         //recyclerView.setAdapter(surveyAdapter);
 
         viewModel.getFilteredSurveys().observe(getViewLifecycleOwner(), surveysWithResponses  -> {
             surveyAdapter.updateSurveys(surveysWithResponses); // Update UI automatically when LiveData changes
             explore_LBL_noSurveys.setVisibility(surveysWithResponses.isEmpty() ? VISIBLE : GONE);
             //recyclerView.setVisibility(surveysWithResponses.isEmpty() ? GONE : VISIBLE);
+            hideShimmer();
         });
     }
 
@@ -150,6 +159,15 @@ public class ExploreFragment extends Fragment {
 
         viewModel.setStatusFilter(currentStatusFilter); // Trigger filtering in ViewModel
     }
+
+    private void showShimmer() {
+        recyclerView.setAdapter(shimmerAdapter);
+    }
+
+    private void hideShimmer() {
+        recyclerView.setAdapter(surveyAdapter);
+    }
+
 
     @Override
     public void onDestroyView() {

@@ -10,6 +10,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.questionnairebuilder.OpenResponsesActivity;
@@ -22,6 +23,7 @@ import com.example.questionnairebuilder.utilities.RatingDrawableManager;
 import com.example.questionnairebuilder.models.RatingScaleQuestion;
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.charts.PieChart;
+import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
@@ -30,7 +32,6 @@ import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
 import com.github.mikephil.charting.formatter.ValueFormatter;
-import com.github.mikephil.charting.utils.ColorTemplate;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textview.MaterialTextView;
 
@@ -49,6 +50,7 @@ public class AnalyzeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     private static final int TYPE_RATING_SCALE = 5;
     private static final int TYPE_DATE = 6;
 
+    private List<Integer> chartColors;
 
     private List<Question> questionList;
 
@@ -83,6 +85,16 @@ public class AnalyzeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
+
+        chartColors = new ArrayList<>();
+        chartColors.add(ContextCompat.getColor(parent.getContext(), R.color.light_blue_A100));
+        chartColors.add(ContextCompat.getColor(parent.getContext(), R.color.teal));
+        chartColors.add(ContextCompat.getColor(parent.getContext(), R.color.cyan));
+        chartColors.add(ContextCompat.getColor(parent.getContext(), R.color.indigo));
+        chartColors.add(ContextCompat.getColor(parent.getContext(), R.color.purple));
+        chartColors.add(ContextCompat.getColor(parent.getContext(), R.color.light_green));
+        chartColors.add(ContextCompat.getColor(parent.getContext(), R.color.yellow));
+
 
         switch (viewType) {
             case TYPE_OPEN_ENDED:
@@ -201,8 +213,13 @@ public class AnalyzeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         }
 
         PieDataSet dataSet = new PieDataSet(entries, "");
-        dataSet.setColors(ColorTemplate.MATERIAL_COLORS);
+        //dataSet.setColors(ColorTemplate.MATERIAL_COLORS);
+        dataSet.setColors(chartColors);
+
         dataSet.setValueTextSize(14f);
+
+        Legend legend = chart.getLegend();
+        legend.setWordWrapEnabled(true);
 
         PieData pieData = new PieData(dataSet);
         chart.setData(pieData);
@@ -235,8 +252,10 @@ public class AnalyzeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         }
 
         BarDataSet dataSet = new BarDataSet(entries, "Responses by Date");
-        dataSet.setColors(ColorTemplate.MATERIAL_COLORS);
+        //dataSet.setColors(ColorTemplate.MATERIAL_COLORS);
+        dataSet.setColors(chartColors);
         dataSet.setValueTextSize(12f);
+
 
         BarData barData = new BarData(dataSet);
         chart.setData(barData);

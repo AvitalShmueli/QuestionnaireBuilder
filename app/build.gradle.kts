@@ -74,4 +74,7 @@ dependencies {
 
     implementation (libs.lottie)
 
+    implementation (libs.core)
+    implementation (libs.zxing.android.embedded)
+
 }

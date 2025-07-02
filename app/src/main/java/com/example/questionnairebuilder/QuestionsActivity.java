@@ -8,6 +8,7 @@ import static com.example.questionnairebuilder.QuestionResponseActivity.KEY_SURV
 
 import android.app.AlertDialog;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.TypedValue;
@@ -91,7 +92,7 @@ public class QuestionsActivity extends AppCompatActivity {
     private SurveyResponseStatus surveyResponseStatus = null;
     public static List<Question> cachedQuestionList = null;
 
-
+/*
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -129,7 +130,58 @@ public class QuestionsActivity extends AppCompatActivity {
 
         createBinding();
         setupViews();
+    }*/
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        binding = ActivityQuestionsBinding.inflate(getLayoutInflater());
+        View root = binding.getRoot();
+        setContentView(root);
+
+        currentUserId = AuthenticationManager.getInstance().getCurrentUser().getUid();
+
+        Intent intent = getIntent();
+        Uri data = intent.getData();
+        if (data != null && data.getPath() != null && data.getPath().contains("/survey")) {
+            surveyID = data.getQueryParameter("id");
+        } else {
+            surveyID = intent.getStringExtra("surveyID");
+        }
+
+        if (surveyID == null) {
+            Toast.makeText(this, "Survey ID not provided.", Toast.LENGTH_LONG).show();
+            finish();
+            return;
+        }
+
+        canEdit = intent.getBooleanExtra(KEY_EDIT_MODE, false);
+        surveyTitle = intent.getStringExtra("survey_title");
+
+        QuestionTypeManager.init(this);
+        menu = QuestionTypeManager.getMenu();
+
+        FirestoreManager.getInstance().getSurveyResponseStatus(
+                surveyID,
+                currentUserId,
+                new OnSurveyResponseStatusListener() {
+                    @Override
+                    public void onSuccess(SurveyResponseStatus status) {
+                        Log.d("Survey", "Status: " + status.getStatus());
+                        surveyResponseStatus = status;
+                    }
+
+                    @Override
+                    public void onFailure(Exception e) {
+                        Log.e("Survey", "Failed to get response status", e);
+                    }
+                }
+        );
+
+        createBinding();
+        setupViews();
     }
+
 
     private void createBinding(){
         toolbar = binding.topAppBar;

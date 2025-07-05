@@ -1,5 +1,6 @@
 package com.example.questionnairebuilder;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 
@@ -40,6 +41,8 @@ public class MainActivity extends AppCompatActivity {
         String destination = getIntent().getStringExtra("navigateTo");
         if ("navigation_my_surveys".equals(destination)) {
             binding.navView.setSelectedItemId(R.id.navigation_my_surveys);
+        } else if (getIntent().getBooleanExtra("navigate_to_explore", false)) {
+            binding.navView.setSelectedItemId(R.id.navigation_explore);
         }
 
         myToolbar = binding.topAppBar;
@@ -59,5 +62,13 @@ public class MainActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.toolbar_menu_profile, menu);
         return true;
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+        if (intent.getBooleanExtra("navigate_to_explore", false))
+            binding.navView.setSelectedItemId(R.id.navigation_explore);
     }
 }

@@ -1,3 +1,4 @@
+
 package com.example.questionnairebuilder;
 
 import static android.view.View.GONE;
@@ -30,6 +31,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.questionnairebuilder.adapters.QuestionsAdapter;
 import com.example.questionnairebuilder.databinding.ActivityQuestionsBinding;
 import com.example.questionnairebuilder.interfaces.ItemMoveCallback;
+import com.example.questionnairebuilder.interfaces.OneSurveyCallback;
 import com.example.questionnairebuilder.interfaces.QuestionsCallback;
 import com.example.questionnairebuilder.interfaces.ResponsesCallback;
 import com.example.questionnairebuilder.listeners.OnSurveyResponseStatusListener;
@@ -39,6 +41,7 @@ import com.example.questionnairebuilder.models.MultipleChoiceQuestion;
 import com.example.questionnairebuilder.models.OpenEndedQuestion;
 import com.example.questionnairebuilder.models.Question;
 import com.example.questionnairebuilder.models.QuestionTypeEnum;
+import com.example.questionnairebuilder.models.Survey;
 import com.example.questionnairebuilder.utilities.QuestionTypeManager;
 import com.example.questionnairebuilder.models.RatingScaleQuestion;
 import com.example.questionnairebuilder.models.SurveyResponseStatus;
@@ -92,46 +95,7 @@ public class QuestionsActivity extends AppCompatActivity {
     private int totalMandatoryCount = 0;
     private SurveyResponseStatus surveyResponseStatus = null;
     public static List<Question> cachedQuestionList = null;
-
-/*
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        binding = ActivityQuestionsBinding.inflate(getLayoutInflater());
-        View root = binding.getRoot();
-        setContentView(root);
-
-        currentUserId = AuthenticationManager.getInstance().getCurrentUser().getUid();
-
-        Intent previousIntent = getIntent();
-        canEdit = previousIntent.getBooleanExtra(KEY_EDIT_MODE,false);
-
-        QuestionTypeManager.init(this);
-        menu = QuestionTypeManager.getMenu();
-
-        surveyID = getIntent().getStringExtra("surveyID");
-        surveyTitle = getIntent().getStringExtra("survey_title");
-
-        FirestoreManager.getInstance().getSurveyResponseStatus(
-                surveyID,
-                currentUserId,
-                new OnSurveyResponseStatusListener() {
-                    @Override
-                    public void onSuccess(SurveyResponseStatus status) {
-                        Log.d("Survey", "Status: " + status.getStatus());
-                        surveyResponseStatus = status;
-                    }
-
-                    @Override
-                    public void onFailure(Exception e) {
-                        Log.e("Survey", "Failed to get response status", e);
-                    }
-                }
-        );
-
-        createBinding();
-        setupViews();
-    }*/
+    private boolean launchedFromLink = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -144,8 +108,10 @@ public class QuestionsActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         Uri data = intent.getData();
+        launchedFromLink = intent.getBooleanExtra("launched_from_link", false);
         if (data != null && data.getPath() != null && data.getPath().contains("/survey")) {
             surveyID = data.getQueryParameter("id");
+            launchedFromLink = true; // deep link
         } else {
             surveyID = intent.getStringExtra("surveyID");
         }
@@ -156,8 +122,29 @@ public class QuestionsActivity extends AppCompatActivity {
             return;
         }
 
+        if (!canEdit)
+            maybeAddPendingStatus(surveyID);
+
         canEdit = intent.getBooleanExtra(KEY_EDIT_MODE, false);
         surveyTitle = intent.getStringExtra("survey_title");
+        if (surveyTitle == null) {
+            FirestoreManager.getInstance().getSurveyById(surveyID, new OneSurveyCallback() {
+                @Override
+                public void onSurveyLoaded(Survey survey) {
+                    if (survey != null) {
+                        surveyTitle = survey.getSurveyTitle();
+                        toolbar.setTitle(surveyTitle);
+                    } else {
+                        Log.e("QuestionsActivity", "Survey not found for ID: " + surveyID);
+                    }
+                }
+
+                @Override
+                public void onError(Exception e) {
+                    Log.e("QuestionsActivity", "Failed to fetch survey", e);
+                }
+            });
+        }
 
         QuestionTypeManager.init(this);
         menu = QuestionTypeManager.getMenu();
@@ -379,9 +366,19 @@ public class QuestionsActivity extends AppCompatActivity {
     }
 
     private void onBack() {
-        if(questionsAdapter.getQuestionsToUpdate().isEmpty())
-            finish();
-        else showCancelConfirmationDialog();
+        if (questionsAdapter.getQuestionsToUpdate().isEmpty()) {
+            if (launchedFromLink) {
+                Intent intent = new Intent(this, MainActivity.class);
+                intent.putExtra("navigate_to_explore", true);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+                finish();
+            } else {
+                finish();
+            }
+        } else {
+            showCancelConfirmationDialog();
+        }
     }
 
     private void showQuestionTypeMenu(View v) {
@@ -656,6 +653,35 @@ public class QuestionsActivity extends AppCompatActivity {
             }
         });
     }
+
+    private void maybeAddPendingStatus(String surveyId) {
+        String userId = AuthenticationManager.getInstance().getCurrentUser().getUid();
+        String docId = surveyId + "_" + userId;
+
+        FirestoreManager.getInstance().getSurveyResponseStatus(surveyId, userId, new OnSurveyResponseStatusListener() {
+            @Override
+            public void onSuccess(SurveyResponseStatus status) {
+                // Do nothing - status already exists
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                // Only create if document doesn't exist
+                SurveyResponseStatus newStatus = new SurveyResponseStatus();
+                newStatus.setSurveyId(surveyId);
+                newStatus.setUserId(userId);
+                newStatus.setStatus(SurveyResponseStatus.ResponseStatus.PENDING);
+                newStatus.setStartedAt(new Date());
+                newStatus.setCompletedAt(null);
+
+                FirestoreManager.getInstance()
+                        .createSurveyResponseStatus(newStatus)
+                        .addOnSuccessListener(aVoid -> Log.d("Survey", "Pending status created"))
+                        .addOnFailureListener(ex -> Log.e("Survey", "Failed to create pending status", ex));
+            }
+        });
+    }
+
 
     private void adjustRecyclerViewPadding(){
         if (questions_BTN_complete.getVisibility() == View.VISIBLE) {

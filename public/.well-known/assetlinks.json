@@ -1,0 +1,14 @@
+[
+    {
+        "relation": [
+            "delegate_permission/common.handle_all_urls"
+        ],
+        "target": {
+            "namespace": "android_app",
+            "package_name": "com.example.questionnairebuilder",
+            "sha256_cert_fingerprints": [
+                "F7:D4:D5:A3:4B:D2:C6:6B:2F:C2:4F:D6:E4:63:40:0A:6D:6B:6A:55:EC:06:7C:48:84:96:5C:66:04:CD:2E:47:85"
+            ]
+        }
+    }
+]

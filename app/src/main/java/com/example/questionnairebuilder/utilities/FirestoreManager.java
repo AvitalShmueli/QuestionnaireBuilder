@@ -487,20 +487,26 @@ public class FirestoreManager {
                 })
                 .addOnFailureListener(e -> listener.onFetched(null));
     }
-
+/*
     /**
      * Create or update a SurveyResponseStatus document for a user-survey pair
      * @param status survey's response status item to create or update
      *  @param onSuccess callback on success
      *  @param onFailure callback on failure
      */
-    public void addSurveyResponseStatus(SurveyResponseStatus status, OnSuccessListener<Void> onSuccess, OnFailureListener onFailure) {
+   /* public void addSurveyResponseStatus(SurveyResponseStatus status, OnSuccessListener<Void> onSuccess, OnFailureListener onFailure) {
         String docId = status.getSurveyId() + "_" + status.getUserId();
         surveyResponseStatusRef.document(docId)
                 .set(status)
                 .addOnSuccessListener(onSuccess)
                 .addOnFailureListener(onFailure);
+    }*/
+
+    public Task<Void> createSurveyResponseStatus(SurveyResponseStatus status) {
+        String docId = status.getSurveyId() + "_" + status.getUserId();
+        return surveyResponseStatusRef.document(docId).set(status);
     }
+
 
     /**
      * Update status field only (e.g. to mark completed)

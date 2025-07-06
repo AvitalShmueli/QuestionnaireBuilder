@@ -21,6 +21,7 @@ import com.example.questionnairebuilder.adapters.ShimmerAdapter;
 import com.example.questionnairebuilder.adapters.SurveyWithResponseAdapter;
 import com.example.questionnairebuilder.databinding.FragmentExploreBinding;
 import com.example.questionnairebuilder.models.SurveyResponseStatus;
+import com.example.questionnairebuilder.utilities.AppLogger;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.textview.MaterialTextView;
 
@@ -103,15 +104,10 @@ public class ExploreFragment extends Fragment {
         shimmerAdapter = new ShimmerAdapter(4); // Show 4 shimmer items
         surveyAdapter = new SurveyWithResponseAdapter(requireContext(), new ArrayList<>(), survey -> {
             // OnSurveyClickListener
-            //Intent intent = new Intent(getActivity(), SurveyManagementActivity.class);
             Intent intent = new Intent(getActivity(), QuestionsActivity.class);
             intent.putExtra(QuestionsActivity.KEY_EDIT_MODE, false);
             intent.putExtra("survey_title", survey.getSurveyTitle());
             intent.putExtra("surveyID", survey.getID());
-            //intent.putExtra("status", survey.getStatus().toString());
-            //intent.putExtra("created_date", new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(survey.getCreated()));
-            //intent.putExtra("modified_date", new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(survey.getModified()));
-            //intent.putExtra("responses_total", survey.getSurveyViewers() != null ? survey.getSurveyViewers().size() : 0);
             startActivity(intent);
         });
 
@@ -120,12 +116,9 @@ public class ExploreFragment extends Fragment {
     }
 
     private void initSurveysList() {
-         //recyclerView.setAdapter(surveyAdapter);
-
         viewModel.getFilteredSurveys().observe(getViewLifecycleOwner(), surveysWithResponses  -> {
             surveyAdapter.updateSurveys(surveysWithResponses); // Update UI automatically when LiveData changes
             explore_LBL_noSurveys.setVisibility(surveysWithResponses.isEmpty() ? VISIBLE : GONE);
-            //recyclerView.setVisibility(surveysWithResponses.isEmpty() ? GONE : VISIBLE);
             hideShimmer();
         });
     }
@@ -168,11 +161,20 @@ public class ExploreFragment extends Fragment {
         recyclerView.setAdapter(surveyAdapter);
     }
 
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt("selected_tab", selectedTabPosition);
+    }
 
     @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        binding = null;
+    public void onResume() {
+        super.onResume();
+        // Re-apply filter in case data didn't refresh
+        getStatusFromTab(selectedTabPosition);
+        Bundle bundle = new Bundle();
+        bundle.putString("screen_name", "Explore");
+        AppLogger.logEvent("screen_opened", bundle);
     }
 
     @Override
@@ -188,16 +190,8 @@ public class ExploreFragment extends Fragment {
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
-        // Re-apply filter in case data didn't refresh
-        getStatusFromTab(selectedTabPosition);
+    public void onDestroyView() {
+        super.onDestroyView();
+        binding = null;
     }
-
-    @Override
-    public void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putInt("selected_tab", selectedTabPosition);
-    }
-
 }

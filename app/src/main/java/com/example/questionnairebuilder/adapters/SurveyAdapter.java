@@ -36,7 +36,6 @@ import java.util.Map;
 
 public class SurveyAdapter extends RecyclerView.Adapter<SurveyAdapter.SurveyViewHolder> {
     private final Context context;
-    //private List<Survey> surveys;
     private List<SurveyWithResponseCount> surveysWithCount;
     private OnSurveyClickListener listener;
     private String currentUserId;
@@ -47,14 +46,11 @@ public class SurveyAdapter extends RecyclerView.Adapter<SurveyAdapter.SurveyView
         void onSurveyClick(Survey survey);
     }
 
-    public SurveyAdapter(Context context, List<Survey> surveys, OnSurveyClickListener listener) {
+    public SurveyAdapter(Context context, OnSurveyClickListener listener) {
         this.context = context;
-        //this.surveys = surveys;
         this.listener = listener;
         this.surveysWithCount = new ArrayList<>();
         currentUserId = AuthenticationManager.getInstance().getCurrentUser().getUid();
-
-        setHasStableIds(true);
 
         statusesMap.put(SurveyResponseStatus.ResponseStatus.PENDING,context.getString(R.string.pending));
         statusesMap.put(SurveyResponseStatus.ResponseStatus.IN_PROGRESS,context.getString(R.string.in_progress));
@@ -65,12 +61,6 @@ public class SurveyAdapter extends RecyclerView.Adapter<SurveyAdapter.SurveyView
         this.surveysWithCount = surveysWithCount;
         notifyDataSetChanged();
     }
-
-    /*
-    public void updateSurveys(List<Survey> newSurveys) {
-        this.surveys = newSurveys;
-        notifyDataSetChanged();
-    }*/
 
     @NonNull
     @Override
@@ -83,7 +73,7 @@ public class SurveyAdapter extends RecyclerView.Adapter<SurveyAdapter.SurveyView
     public void onBindViewHolder(@NonNull SurveyViewHolder holder, int position) {
         SurveyWithResponseCount surveyWithCount = surveysWithCount.get(position);
         Survey survey = surveyWithCount.getSurvey();
-        //Survey survey = surveys.get(position);
+
         holder.title.setText(survey.getSurveyTitle());
         holder.status.setText(survey.getStatus().toString());
 
@@ -92,24 +82,6 @@ public class SurveyAdapter extends RecyclerView.Adapter<SurveyAdapter.SurveyView
         holder.date.setText(strDueDate);
 
         bindTagsToChipGroup(survey.getTags(), holder.tagChipGroup);
-
-        /*FirestoreManager.getInstance().getSurveyResponseStatusCount(
-                survey.getID(),
-                Arrays.asList(SurveyResponseStatus.ResponseStatus.IN_PROGRESS, SurveyResponseStatus.ResponseStatus.COMPLETED),
-                new OnCountListener() {
-                    @Override
-                    public void onCountSuccess(int count) {
-                        String strResponses = context.getString(R.string.responses) + ": " + count;
-                        holder.responses.setText(strResponses);
-                    }
-
-                    @Override
-                    public void onCountFailure(Exception e) {
-                        // Handle the error - set to 0 as default
-                        String strResponses = context.getString(R.string.responses) + ": " + 0;
-                        holder.responses.setText(strResponses);
-                    }
-                });*/
 
         if (surveyWithCount.isLoading()) {
             // Show small loading spinner next to "Responses:"
@@ -131,9 +103,7 @@ public class SurveyAdapter extends RecyclerView.Adapter<SurveyAdapter.SurveyView
 
     @Override
     public int getItemCount() {
-        //return surveys.size();
         return surveysWithCount.size();
-
     }
 
     private void bindTagsToChipGroup(List<Survey.SurveyTag> tags, ChipGroup chipGroup) {

@@ -18,8 +18,6 @@ import java.util.UUID;
 
 public class MySurveysViewModel extends ViewModel {
 
-    //private final MutableLiveData<List<Survey>> surveysLiveData = new MutableLiveData<>();
-    //private final MutableLiveData<List<Survey>> fakeSurveysLiveData = new MutableLiveData<>();
     private final MutableLiveData<List<SurveyWithResponseCount>> surveysLiveData = new MutableLiveData<>();
     private final MutableLiveData<List<SurveyWithResponseCount>> fakeSurveysLiveData = new MutableLiveData<>();
     private MutableLiveData<Boolean> isLoadingLiveData = new MutableLiveData<>();
@@ -40,14 +38,6 @@ public class MySurveysViewModel extends ViewModel {
         return isLoadingLiveData;
     }
 
-    /*public LiveData<List<Survey>> getSurveys() {
-        return surveysLiveData;
-    }
-
-    public LiveData<List<Survey>> getFakeSurveys() {
-        return fakeSurveysLiveData;
-    }*/
-
     public LiveData<List<SurveyWithResponseCount>> getSurveys() {
         return surveysLiveData;
     }
@@ -58,7 +48,6 @@ public class MySurveysViewModel extends ViewModel {
 
     public void startListeningFake() {
         // Dummy data
-        //List<Survey> fakeSurveys = new ArrayList<>();
         List<SurveyWithResponseCount> fakeSurveys = new ArrayList<>();
         for (int i = 1; i <= 5; i++) {
             Survey survey = new Survey();
@@ -74,12 +63,7 @@ public class MySurveysViewModel extends ViewModel {
 
     public void startListening() {
         isLoadingLiveData.setValue(true);
-        //listenerRegistration = FirestoreManager.getInstance().listenToMySurveys(mCurrentUserId.getValue(),new SurveysCallback() {
         listenerRegistration = FirestoreManager.getInstance().listenToMySurveysWithResponseCount(mCurrentUserId.getValue(),new SurveysWithCountCallback(){
-            /*@Override
-            public void onSurveysLoaded(List<Survey> surveys) {
-                surveysLiveData.setValue(surveys);
-            }*/
 
             @Override
             public void onSurveysLoaded(List<SurveyWithResponseCount> surveysWithCount) {

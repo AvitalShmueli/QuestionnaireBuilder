@@ -1,5 +1,7 @@
 package com.example.questionnairebuilder.ui.home;
 
+import android.util.Log;
+
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
@@ -20,8 +22,6 @@ public class HomeViewModel extends ViewModel {
 
     private final MutableLiveData<String> mUsername = new MutableLiveData<>();
     private final MutableLiveData<String> mCurrentUserId;
-    //private final MutableLiveData<List<Survey>> surveysLiveData = new MutableLiveData<>();
-    //private final MutableLiveData<List<Survey>> fakeSurveysLiveData = new MutableLiveData<>();
     private final MutableLiveData<List<SurveyWithResponseCount>> surveysLiveData = new MutableLiveData<>();
     private final MutableLiveData<List<SurveyWithResponseCount>> fakeSurveysLiveData = new MutableLiveData<>();
     private MutableLiveData<Boolean> isLoadingLiveData = new MutableLiveData<>();
@@ -57,14 +57,6 @@ public class HomeViewModel extends ViewModel {
         return isLoadingLiveData;
     }
 
-    /*public LiveData<List<Survey>> getSurveys() {
-        return surveysLiveData;
-    }
-
-    public LiveData<List<Survey>> getFakeSurveys() {
-        return fakeSurveysLiveData;
-    }*/
-
     public LiveData<List<SurveyWithResponseCount>> getSurveys() {
         return surveysLiveData;
     }
@@ -75,7 +67,6 @@ public class HomeViewModel extends ViewModel {
 
     public void startListeningFake() {
         // Dummy data
-        //List<Survey> fakeSurveys = new ArrayList<>();
         List<SurveyWithResponseCount> fakeSurveys = new ArrayList<>();
         for (int i = 1; i <= 5; i++) {
             Survey survey = new Survey();
@@ -91,13 +82,7 @@ public class HomeViewModel extends ViewModel {
 
     public void startListening() {
         isLoadingLiveData.setValue(true);
-        //listenerRegistration = FirestoreManager.getInstance().listenToMyActiveSurveys(mCurrentUserId.getValue(), new SurveysCallback() {
         listenerRegistration = FirestoreManager.getInstance().listenToMyActiveSurveysWithResponseCount(mCurrentUserId.getValue(), new SurveysWithCountCallback() {
-           /* @Override
-            public void onSurveysLoaded(List<Survey> surveys) {
-                surveysLiveData.setValue(surveys);
-            }*/
-
             @Override
             public void onSurveysLoaded(List<SurveyWithResponseCount> surveysWithCount) {
                 currentSurveys = new ArrayList<>(surveysWithCount);
@@ -116,6 +101,7 @@ public class HomeViewModel extends ViewModel {
 
             @Override
             public void onError(Exception e) {
+                Log.e("pttt", "Failed to load active surveys: " + e.getMessage());
                 isLoadingLiveData.setValue(false);
             }
         });

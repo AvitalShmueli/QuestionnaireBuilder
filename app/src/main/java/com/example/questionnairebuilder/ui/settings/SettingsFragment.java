@@ -17,6 +17,7 @@ import android.view.ViewGroup;
 
 import com.example.questionnairebuilder.WelcomeActivity;
 import com.example.questionnairebuilder.databinding.FragmentSettingsBinding;
+import com.example.questionnairebuilder.utilities.AppLogger;
 import com.example.questionnairebuilder.utilities.AuthenticationManager;
 import com.example.questionnairebuilder.utilities.SharedPreferencesManager;
 
@@ -50,6 +51,14 @@ public class SettingsFragment extends Fragment {
         });
 
         return root;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Bundle bundle = new Bundle();
+        bundle.putString("screen_name", "Settings");
+        AppLogger.logEvent("screen_opened", bundle);
     }
 
     @Override

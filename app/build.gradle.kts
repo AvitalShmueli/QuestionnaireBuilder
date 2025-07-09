@@ -3,6 +3,7 @@ plugins {
 
     // Add the Google services Gradle plugin
     id("com.google.gms.google-services")
+    id("com.google.firebase.crashlytics")
 }
 
 android {
@@ -58,6 +59,7 @@ dependencies {
     // Firebase:
     implementation(platform(libs.firebase.bom)) // Import the Firebase BoM
     implementation(libs.firebase.analytics)
+    implementation(libs.firebase.crashlytics)
     implementation(libs.firebase.auth)
     implementation(libs.firebase.ui.auth)
     implementation(libs.firebase.storage)

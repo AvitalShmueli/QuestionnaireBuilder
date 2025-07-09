@@ -20,10 +20,10 @@ import com.example.questionnairebuilder.SurveyManagementActivity;
 import com.example.questionnairebuilder.adapters.ShimmerAdapter;
 import com.example.questionnairebuilder.adapters.SurveyAdapter;
 import com.example.questionnairebuilder.databinding.FragmentMySurveysBinding;
+import com.example.questionnairebuilder.utilities.AppLogger;
 import com.google.android.material.textview.MaterialTextView;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Locale;
 
 public class MySurveysFragment extends Fragment {
@@ -71,7 +71,7 @@ public class MySurveysFragment extends Fragment {
 
     private void setupRecyclerView(){
         shimmerAdapter = new ShimmerAdapter(6); // Show 6 shimmer items
-        surveyAdapter = new SurveyAdapter(requireContext(), new ArrayList<>(), survey -> {
+        surveyAdapter = new SurveyAdapter(requireContext(), survey -> {
             // OnSurveyClickListener
             Intent intent = new Intent(getActivity(), SurveyManagementActivity.class);
             intent.putExtra("survey_title", survey.getSurveyTitle());
@@ -88,8 +88,6 @@ public class MySurveysFragment extends Fragment {
     }
 
     private void initSurveysList(){
-        //recyclerView.setAdapter(surveyAdapter);
-
         if(testMode){
             viewModel.getFakeSurveys().observe(getViewLifecycleOwner(), surveys -> {
                 surveyAdapter.updateSurveys(surveys); // Update UI automatically when LiveData changes
@@ -130,9 +128,11 @@ public class MySurveysFragment extends Fragment {
     }
 
     @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        binding = null;
+    public void onResume() {
+        super.onResume();
+        Bundle bundle = new Bundle();
+        bundle.putString("screen_name", "My Surveys");
+        AppLogger.logEvent("screen_opened", bundle);
     }
 
     @Override
@@ -150,5 +150,11 @@ public class MySurveysFragment extends Fragment {
     public void onStop() {
         super.onStop();
         viewModel.stopListening();
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        binding = null;
     }
 }

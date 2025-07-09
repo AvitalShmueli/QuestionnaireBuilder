@@ -23,11 +23,11 @@ import com.example.questionnairebuilder.SurveyManagementActivity;
 import com.example.questionnairebuilder.adapters.ShimmerAdapter;
 import com.example.questionnairebuilder.adapters.SurveyAdapter;
 import com.example.questionnairebuilder.databinding.FragmentHomeBinding;
+import com.example.questionnairebuilder.utilities.AppLogger;
 import com.example.questionnairebuilder.utilities.SharedPreferencesManager;
 import com.google.android.material.textview.MaterialTextView;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Locale;
 import java.util.Objects;
 
@@ -84,7 +84,7 @@ public class HomeFragment extends Fragment {
         home_LBL_noActiveSurveys = binding.homeLBLNoActiveSurveys;
 
         shimmerAdapter = new ShimmerAdapter(6); // Show 6 shimmer items
-        surveyAdapter = new SurveyAdapter(requireContext(), new ArrayList<>(), survey -> {
+        surveyAdapter = new SurveyAdapter(requireContext(), survey -> {
             // OnSurveyClickListener
             Intent intent = new Intent(getActivity(), SurveyManagementActivity.class);
             intent.putExtra("survey_title", survey.getSurveyTitle());
@@ -101,8 +101,6 @@ public class HomeFragment extends Fragment {
     }
 
     private void initSurveysList(){
-        //recyclerView.setAdapter(surveyAdapter);
-
         if(testMode){
             viewModel.getFakeSurveys().observe(getViewLifecycleOwner(), surveys -> {
                 surveyAdapter.updateSurveys(surveys); // Update UI automatically when LiveData changes
@@ -134,7 +132,6 @@ public class HomeFragment extends Fragment {
         boolean canScrollUp = recyclerView.canScrollVertically(-1); // up
         boolean canScrollDown = recyclerView.canScrollVertically(1); // down
 
-        //scrollHintTop.setVisibility(canScrollUp ? View.VISIBLE : View.GONE);
         scrollHintBottom.setVisibility(canScrollDown ? VISIBLE : GONE);
     }
 
@@ -143,9 +140,11 @@ public class HomeFragment extends Fragment {
     }
 
     @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        binding = null;
+    public void onResume() {
+        super.onResume();
+        Bundle bundle = new Bundle();
+        bundle.putString("screen_name", "Home");
+        AppLogger.logEvent("screen_opened", bundle);
     }
 
     @Override
@@ -163,5 +162,11 @@ public class HomeFragment extends Fragment {
     public void onStop() {
         super.onStop();
         viewModel.stopListening();
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        binding = null;
     }
 }

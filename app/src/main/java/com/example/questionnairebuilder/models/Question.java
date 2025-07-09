@@ -5,8 +5,6 @@ import android.util.Log;
 import com.example.questionnairebuilder.interfaces.OnQuestionDeleteCallback;
 import com.example.questionnairebuilder.utilities.FirestoreManager;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 public abstract class Question {
     private String questionID;

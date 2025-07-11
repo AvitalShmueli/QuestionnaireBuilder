@@ -20,7 +20,6 @@ import com.example.questionnairebuilder.SurveyManagementActivity;
 import com.example.questionnairebuilder.adapters.ShimmerAdapter;
 import com.example.questionnairebuilder.adapters.SurveyAdapter;
 import com.example.questionnairebuilder.databinding.FragmentMySurveysBinding;
-import com.example.questionnairebuilder.utilities.AppLogger;
 import com.google.android.material.textview.MaterialTextView;
 
 import java.text.SimpleDateFormat;
@@ -130,9 +129,6 @@ public class MySurveysFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        Bundle bundle = new Bundle();
-        bundle.putString("screen_name", "My Surveys");
-        AppLogger.logEvent("screen_opened", bundle);
     }
 
     @Override

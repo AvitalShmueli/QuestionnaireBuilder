@@ -20,5 +20,5 @@ android.useAndroidX=true
 # thereby reducing the size of the R class for that library
 android.nonTransitiveRClass=true
 
-GRAFANA_TENANT_ID=your_tenant_id_here
-GRAFANA_API_TOKEN=your_api_token_here
+GRAFANA_TENANT_ID=your_tenant_id
+GRAFANA_API_TOKEN=your_api_token

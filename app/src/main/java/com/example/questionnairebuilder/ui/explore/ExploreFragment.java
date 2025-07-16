@@ -21,7 +21,6 @@ import com.example.questionnairebuilder.adapters.ShimmerAdapter;
 import com.example.questionnairebuilder.adapters.SurveyWithResponseAdapter;
 import com.example.questionnairebuilder.databinding.FragmentExploreBinding;
 import com.example.questionnairebuilder.models.SurveyResponseStatus;
-import com.example.questionnairebuilder.utilities.AppLogger;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.textview.MaterialTextView;
 
@@ -172,9 +171,6 @@ public class ExploreFragment extends Fragment {
         super.onResume();
         // Re-apply filter in case data didn't refresh
         getStatusFromTab(selectedTabPosition);
-        Bundle bundle = new Bundle();
-        bundle.putString("screen_name", "Explore");
-        AppLogger.logEvent("screen_opened", bundle);
     }
 
     @Override

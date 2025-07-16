@@ -10,6 +10,8 @@ import com.google.firebase.vertexai.java.GenerativeModelFutures;
 import com.google.firebase.vertexai.type.Content;
 import com.google.firebase.vertexai.type.GenerateContentResponse;
 
+import org.json.JSONObject;
+
 import java.util.concurrent.Executors;
 
 public class AILogicManager {
@@ -47,11 +49,27 @@ public class AILogicManager {
             @Override
             public void onSuccess(GenerateContentResponse response) {
                 String result = response.getText();
+                try {
+                    JSONObject details = new JSONObject();
+                    details.put("question_text", questionText);
+                    details.put("analyzed_result", result);
+                    GrafanaLogger.info("AILogicManager", "Analyzed open question responses", details);
+                } catch (Exception e) {
+                    GrafanaLogger.error("AILogicManager", "Failed to log success JSON");
+                }
                 listener.onAnalysisComplete(result);
             }
 
             @Override
             public void onFailure(Throwable t) {
+                try {
+                    JSONObject errLog = new JSONObject();
+                    errLog.put("question_text", questionText);
+                    errLog.put("error", t.getMessage());
+                    GrafanaLogger.error("AILogicManager", "Failed to analyzed open question responses", errLog);
+                } catch (Exception ex) {
+                    GrafanaLogger.error("AILogicManager", "Failed to log error JSON");
+                }
                 listener.onError(new Exception(t));
             }
         }, Executors.newSingleThreadExecutor());

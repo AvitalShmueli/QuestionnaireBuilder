@@ -78,6 +78,7 @@ public class GrafanaLogger {
 
     public static void info(String tag, String message, JSONObject extraJson) {
         new Thread(() -> sendLog("info", tag, message, extraJson)).start();
+        Log.i("pttt" + tag, message);
     }
 
     public static void warning(String tag, String message) {
@@ -86,6 +87,7 @@ public class GrafanaLogger {
 
     public static void warning(String tag, String message, JSONObject extraJson) {
         new Thread(() -> sendLog("warning", tag, message, extraJson)).start();
+        Log.w("pttt" + tag, message);
     }
 
     public static void error(String tag, String message) {
@@ -94,5 +96,6 @@ public class GrafanaLogger {
 
     public static void error(String tag, String message, JSONObject extraJson) {
         new Thread(() -> sendLog("error", tag, message, extraJson)).start();
+        Log.e("pttt" + tag, message);
     }
 }

@@ -76,7 +76,11 @@ dependencies {
     // analysis:
     implementation(libs.mpandroidchart)
 
+    // Lottie:
     implementation (libs.lottie)
+
+    //Glide
+    implementation(libs.glide)
 
     implementation (libs.core)
     implementation (libs.zxing.android.embedded)

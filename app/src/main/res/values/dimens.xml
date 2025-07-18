@@ -23,4 +23,6 @@
     <dimen name="toolbar_text_horizontal_padding">8dp</dimen>
     <dimen name="extended_fab_vertical_margin">32dp</dimen>
     <dimen name="no_surveys_margin">48dp</dimen>
+    <dimen name="toolbar_icon_size">32dp</dimen>
+    <dimen name="toolbar_icon_stroke_width">4dp</dimen>
 </resources>

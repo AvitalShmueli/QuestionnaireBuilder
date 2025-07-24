@@ -14,6 +14,7 @@ import androidx.activity.OnBackPressedCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.widget.ContentLoadingProgressBar;
 
 import com.example.questionnairebuilder.databinding.ActivitySignUpBinding;
 import com.example.questionnairebuilder.models.User;
@@ -27,6 +28,8 @@ public class SignUpActivity extends AppCompatActivity {
     private ActivitySignUpBinding binding;
     private Uri selectedImageUri;
     private MaterialToolbar toolBar;
+    private ContentLoadingProgressBar progressBar;
+    private View loadingOverlay;
     private final ActivityResultLauncher<Intent> imagePickerLauncher =
             registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
                 if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
@@ -42,6 +45,8 @@ public class SignUpActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
 
         toolBar = findViewById(R.id.topAppBar);
+        progressBar = findViewById(R.id.signUp_progressBar);
+        loadingOverlay = findViewById(R.id.signUp_loadingOverlay);
 
         SharedPreferencesManager.init(this);
 
@@ -101,6 +106,8 @@ public class SignUpActivity extends AppCompatActivity {
         }
 
         binding.signUpBTNRegister.setEnabled(false);
+        loadingOverlay.setVisibility(View.VISIBLE);
+        progressBar.setVisibility(View.VISIBLE);
 
         // Register user with Firebase Auth
         AuthenticationManager.getInstance().registerUser(email, password, task -> {
@@ -117,6 +124,8 @@ public class SignUpActivity extends AppCompatActivity {
                 }
             } else {
                 binding.signUpBTNRegister.setEnabled(true);
+                loadingOverlay.setVisibility(View.GONE);
+                progressBar.setVisibility(View.GONE);
 
                 // Show error message on label
                 binding.signUpLBLError.setText(task.getException().getMessage());
@@ -137,9 +146,20 @@ public class SignUpActivity extends AppCompatActivity {
             if (success) {
                 Toast.makeText(this, "Registration successful!", Toast.LENGTH_SHORT).show();
                 SharedPreferencesManager.getInstance().putString(USERNAME, user.getUsername());
-                startActivity(new Intent(this, MainActivity.class));
+                Intent intent;
+                if (getIntent().getBooleanExtra("launched_from_link", false)) {
+                    intent = new Intent(this, QuestionsActivity.class);
+                    intent.putExtra("surveyID", getIntent().getStringExtra("surveyID"));
+                    intent.putExtra("launched_from_link", true);
+                } else {
+                    intent = new Intent(this, MainActivity.class);
+                }
+                startActivity(intent);
                 finish();
             } else {
+                loadingOverlay.setVisibility(View.GONE);
+                progressBar.setVisibility(View.GONE);
+                binding.signUpBTNRegister.setEnabled(true);
                 Toast.makeText(this, "Failed to save user data", Toast.LENGTH_SHORT).show();
             }
         });

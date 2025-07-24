@@ -92,11 +92,17 @@ public class LoginActivity extends AppCompatActivity {
         binding.loginBTNLogin.setEnabled(true);
         if (task.isSuccessful()) {
             String uid = task.getResult().getUser().getUid();
-
             FirestoreManager.getInstance().getUserData(uid, user -> {
                 if (user != null) {
                     SharedPreferencesManager.getInstance().putString(USERNAME, user.getUsername());
-                    Intent intent = new Intent(this, MainActivity.class);
+                    Intent intent;
+                    if (getIntent().getBooleanExtra("launched_from_link", false)) {
+                        intent = new Intent(this, QuestionsActivity.class);
+                        intent.putExtra("surveyID", getIntent().getStringExtra("surveyID"));
+                        intent.putExtra("launched_from_link", true);
+                    } else {
+                        intent = new Intent(this, MainActivity.class);
+                    }
                     startActivity(intent);
                     finish();
                 } else {

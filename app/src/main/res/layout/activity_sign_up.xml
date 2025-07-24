@@ -108,15 +108,33 @@
                 android:id="@+id/signUp_LBL_error"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@android:color/holo_red_dark"
-                android:visibility="gone"
-                android:textStyle="bold"
                 android:layout_marginTop="8dp"
+                android:textColor="@android:color/holo_red_dark"
+                android:textStyle="bold"
+                android:visibility="gone"
                 tools:text="Error message here" />
 
         </LinearLayout>
 
 
     </ScrollView>
+
+    <FrameLayout
+        android:id="@+id/signUp_loadingOverlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#88000000"
+        android:gravity="center"
+        android:visibility="gone">
+
+        <androidx.core.widget.ContentLoadingProgressBar
+            android:id="@+id/signUp_progressBar"
+            style="@android:style/Widget.DeviceDefault.Light.ProgressBar.Large"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:indeterminate="true"
+            android:visibility="visible" />
+    </FrameLayout>
 
 </RelativeLayout>

@@ -47,6 +47,7 @@ import com.example.questionnairebuilder.models.RatingScaleQuestion;
 import com.example.questionnairebuilder.models.SurveyResponseStatus;
 import com.example.questionnairebuilder.utilities.AuthenticationManager;
 import com.example.questionnairebuilder.utilities.FirestoreManager;
+import com.example.questionnairebuilder.utilities.SharedPreferencesManager;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.button.MaterialButton;
@@ -104,8 +105,6 @@ public class QuestionsActivity extends AppCompatActivity {
         View root = binding.getRoot();
         setContentView(root);
 
-        currentUserId = AuthenticationManager.getInstance().getCurrentUser().getUid();
-
         Intent intent = getIntent();
         Uri data = intent.getData();
         launchedFromLink = intent.getBooleanExtra("launched_from_link", false);
@@ -114,6 +113,17 @@ public class QuestionsActivity extends AppCompatActivity {
             launchedFromLink = true; // deep link
         } else {
             surveyID = intent.getStringExtra("surveyID");
+        }
+
+        try {
+            currentUserId = AuthenticationManager.getInstance().getCurrentUser().getUid();
+        } catch (Exception e) {
+            Intent welcomeIntent = new Intent(this, WelcomeActivity.class);
+            welcomeIntent.putExtra("surveyID", surveyID);
+            welcomeIntent.putExtra("launched_from_link", true);
+            startActivity(welcomeIntent);
+            finish();
+            return;
         }
 
         if (surveyID == null) {
@@ -171,7 +181,7 @@ public class QuestionsActivity extends AppCompatActivity {
     }
 
 
-    private void createBinding(){
+    private void createBinding() {
         toolbar = binding.topAppBar;
         question_LL_add_first_question = binding.questionLLAddFirstQuestion;
         question_FAB_add = binding.questionFABAdd;
@@ -197,7 +207,7 @@ public class QuestionsActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.action_done) {
-            if(questionsAdapter.hasUnsavedChanges()) {
+            if (questionsAdapter.hasUnsavedChanges()) {
                 Set<Question> changedQuestions = questionsAdapter.getQuestionsToUpdate();
 
                 // Only save questions that still exist in the current list
@@ -227,7 +237,7 @@ public class QuestionsActivity extends AppCompatActivity {
     }
 
     private void saveToDatabase(Set<Question> questionsToUpdate) {
-        for(Question q : questionsToUpdate){
+        for (Question q : questionsToUpdate) {
             q.save();
         }
     }
@@ -249,7 +259,7 @@ public class QuestionsActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         questionsAdapter = new QuestionsAdapter(questionsList);
         questionsAdapter.setCallbackQuestionSelected(question -> {
-            if(canEdit)
+            if (canEdit)
                 changeActivityEditQuestion(question);
             else changeActivityResponse(question);
         });
@@ -258,7 +268,7 @@ public class QuestionsActivity extends AppCompatActivity {
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
-                if(questions_FAB_start.getVisibility() == VISIBLE) {
+                if (questions_FAB_start.getVisibility() == VISIBLE) {
                     super.onScrolled(recyclerView, dx, dy);
                     if (dy > 10 && questions_FAB_start.isExtended()) {
                         questions_FAB_start.shrink();
@@ -267,7 +277,7 @@ public class QuestionsActivity extends AppCompatActivity {
                     }
                 }
 
-                if(question_FAB_add_bottom.getVisibility() == VISIBLE) {
+                if (question_FAB_add_bottom.getVisibility() == VISIBLE) {
                     if (dy > 10 && question_FAB_add_bottom.isExtended()) {
                         question_FAB_add_bottom.shrink();
                     } else if (dy < -10 && !question_FAB_add_bottom.isExtended()) {
@@ -299,8 +309,7 @@ public class QuestionsActivity extends AppCompatActivity {
             questionsAdapter.setOnStartDragListener(viewHolder -> {
                 touchHelper.startDrag(viewHolder);
             });
-        }
-        else{
+        } else {
             questions_BTN_complete.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -310,10 +319,10 @@ public class QuestionsActivity extends AppCompatActivity {
                                 @Override
                                 public void onSuccess(Void unused) {
                                     Log.d("pttt", "Status updated to completed");
-                                    Toast.makeText(getApplicationContext(),getString(R.string.thank_you),LENGTH_SHORT).show();
+                                    Toast.makeText(getApplicationContext(), getString(R.string.thank_you), LENGTH_SHORT).show();
                                     finish();
                                 }
-                            },e -> {
+                            }, e -> {
                                 //TODO
                             }
                     );
@@ -326,7 +335,7 @@ public class QuestionsActivity extends AppCompatActivity {
                     changeActivityResponse(nextQuestion); // you already have this method
                 }
 
-                if(questions_FAB_start.getText().equals(getString(R.string.start_survey))){
+                if (questions_FAB_start.getText().equals(getString(R.string.start_survey))) {
                     FirestoreManager.getInstance().updateSurveyResponseStatus(
                             surveyID, currentUserId, SurveyResponseStatus.ResponseStatus.IN_PROGRESS,
                             new OnSuccessListener<Void>() {
@@ -334,7 +343,7 @@ public class QuestionsActivity extends AppCompatActivity {
                                 public void onSuccess(Void unused) {
                                     Log.d("Survey", "Status updated to in progress");
                                 }
-                            },e -> {
+                            }, e -> {
                                 //TODO
                                 Log.d("pttt Survey", "ERROR while updating status");
                             }
@@ -391,7 +400,7 @@ public class QuestionsActivity extends AppCompatActivity {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
                 String selectedItem;
-                if(item.getTitle() != null) {
+                if (item.getTitle() != null) {
                     selectedItem = item.getTitle().toString();
                     changeActivityNewQuestion(QuestionTypeManager.getKeyByValue(selectedItem));
                     return true;
@@ -409,7 +418,7 @@ public class QuestionsActivity extends AppCompatActivity {
         args.putString("questionType", type.toString());
         args.putString("surveyID", surveyID);
         args.putInt("order", questionsAdapter.getItemCount() + 1);
-        intent.putExtra(EditQuestionActivity.KEY_QUESTION_ARGS,args);
+        intent.putExtra(EditQuestionActivity.KEY_QUESTION_ARGS, args);
         startActivity(intent);
     }
 
@@ -420,7 +429,7 @@ public class QuestionsActivity extends AppCompatActivity {
         intent.putExtra(EditQuestionActivity.KEY_QUESTION_HEADER, questionOrder);
 
         Bundle args = createQuestionArgsBundle(q);
-        intent.putExtra(EditQuestionActivity.KEY_QUESTION_ARGS,args);
+        intent.putExtra(EditQuestionActivity.KEY_QUESTION_ARGS, args);
 
         startActivity(intent);
     }
@@ -429,38 +438,38 @@ public class QuestionsActivity extends AppCompatActivity {
         Intent intent = new Intent(this, QuestionResponseActivity.class);
 
         String questionOrder = "Q" + q.getOrder();
-        intent.putExtra(QuestionResponseActivity.KEY_TOTAL_QUESTIONS,totalCount);
+        intent.putExtra(QuestionResponseActivity.KEY_TOTAL_QUESTIONS, totalCount);
         intent.putExtra(QuestionResponseActivity.KEY_QUESTION_HEADER, questionOrder);
 
         if (surveyResponseStatus != null)
-            intent.putExtra(KEY_SURVEY_RESPONSE_STATUS,surveyResponseStatus.getStatus().name());
+            intent.putExtra(KEY_SURVEY_RESPONSE_STATUS, surveyResponseStatus.getStatus().name());
 
         Bundle args = createQuestionArgsBundle(q);
-        intent.putExtra(QuestionResponseActivity.KEY_QUESTION_ARGS,args);
+        intent.putExtra(QuestionResponseActivity.KEY_QUESTION_ARGS, args);
 
         startActivity(intent);
     }
 
-    private Bundle createQuestionArgsBundle(Question q){
+    private Bundle createQuestionArgsBundle(Question q) {
         Bundle args = new Bundle();
-        args.putString("questionTitle",q.getQuestionTitle());
-        args.putString("questionID",q.getQuestionID());
-        args.putString("surveyID",q.getSurveyID());
+        args.putString("questionTitle", q.getQuestionTitle());
+        args.putString("questionID", q.getQuestionID());
+        args.putString("surveyID", q.getSurveyID());
         args.putString("questionType", q.getType().toString());
-        args.putBoolean("mandatory",q.isMandatory());
-        args.putInt("order",q.getOrder());
-        args.putString("image",q.getImage());
+        args.putBoolean("mandatory", q.isMandatory());
+        args.putInt("order", q.getOrder());
+        args.putString("image", q.getImage());
         if (q instanceof OpenEndedQuestion) {
-            args.putBoolean("multipleLineAnswer",((OpenEndedQuestion)q).isMultipleLineAnswer());
+            args.putBoolean("multipleLineAnswer", ((OpenEndedQuestion) q).isMultipleLineAnswer());
         }
         if (q instanceof ChoiceQuestion) {
             args.putStringArrayList("choices", ((ChoiceQuestion) q).getChoices());
-            args.putBoolean("other",((ChoiceQuestion)q).isOther());
+            args.putBoolean("other", ((ChoiceQuestion) q).isOther());
         }
         if (q instanceof MultipleChoiceQuestion)
-            args.putInt("allowedSelectionNum",((MultipleChoiceQuestion)q).getAllowedSelectionNum());
+            args.putInt("allowedSelectionNum", ((MultipleChoiceQuestion) q).getAllowedSelectionNum());
         if (q instanceof DateQuestion)
-            args.putString("dateSelectionMode",((DateQuestion)q).getDateMode().name());
+            args.putString("dateSelectionMode", ((DateQuestion) q).getDateMode().name());
         if (q instanceof RatingScaleQuestion) {
             args.putInt("ratingScaleLevel", ((RatingScaleQuestion) q).getRatingScaleLevel());
             args.putString("iconResourceName", ((RatingScaleQuestion) q).getIconResourceName());
@@ -483,11 +492,10 @@ public class QuestionsActivity extends AppCompatActivity {
                     Log.e("pttt", "Failed to load questions: " + e.getMessage());
                 }
             });
-        }
-        else {
+        } else {
             startListeningForQuestions();
         }
-        if(!canEdit)
+        if (!canEdit)
             fetchUserResponses();
     }
 
@@ -559,6 +567,7 @@ public class QuestionsActivity extends AppCompatActivity {
 
     /**
      * merge between new questions, updated questions and deleted questions
+     *
      * @param remoteQuestions - fetched question from Firestore
      */
     private void mergeLocalAndRemoteQuestionsWithDeletion(List<Question> remoteQuestions) {
@@ -613,7 +622,7 @@ public class QuestionsActivity extends AppCompatActivity {
                 answeredMandatoryCount = (int) answeredQuestions.values().stream()
                         .filter(Boolean.TRUE::equals)
                         .count();
-                String questionsProgress = getString(R.string.survey_responses_subtitle, Objects.requireNonNullElse(answeredCount,0), Objects.requireNonNullElse(totalCount,0));
+                String questionsProgress = getString(R.string.survey_responses_subtitle, Objects.requireNonNullElse(answeredCount, 0), Objects.requireNonNullElse(totalCount, 0));
                 runOnUiThread(() -> {
                     questionsAdapter.setAnsweredQuestionIds(answeredQuestions.keySet());
                     toolbar.setSubtitle(questionsProgress);
@@ -621,26 +630,24 @@ public class QuestionsActivity extends AppCompatActivity {
                         questions_FAB_start.setText(getString(R.string.start_survey));
                         questions_FAB_start.setIconResource(R.drawable.ic_start);
                     } else {
-                        if(answeredMandatoryCount == totalMandatoryCount /*answeredCount == totalCount || (answeredCount >= totalMandatoryCount && answeredCount > 0)*/) {
-                            if(surveyResponseStatus == null || surveyResponseStatus.getStatus() != SurveyResponseStatus.ResponseStatus.COMPLETED) {
+                        if (answeredMandatoryCount == totalMandatoryCount /*answeredCount == totalCount || (answeredCount >= totalMandatoryCount && answeredCount > 0)*/) {
+                            if (surveyResponseStatus == null || surveyResponseStatus.getStatus() != SurveyResponseStatus.ResponseStatus.COMPLETED) {
                                 questions_BTN_complete.setVisibility(VISIBLE);
                                 questions_LBL_completed.setVisibility(GONE);
-                            }
-                            else {
+                            } else {
                                 questions_BTN_complete.setVisibility(GONE);
                                 questions_LBL_completed.setText(formatDateTime(surveyResponseStatus.getCompletedAt()));
                                 questions_LBL_completed.setVisibility(VISIBLE);
                             }
                             adjustRecyclerViewPadding();
-                        }
-                        else {
+                        } else {
                             questions_FAB_start.setText(getString(R.string.continue_survey));
                             questions_FAB_start.setIconResource(R.drawable.ic_resume);
                             questions_BTN_complete.setVisibility(GONE);
                             questions_LBL_completed.setVisibility(GONE);
                         }
                     }
-                    if(questionsList.isEmpty() || (answeredMandatoryCount == totalMandatoryCount && answeredCount > 0)/*answeredCount == totalCount*/)
+                    if (questionsList.isEmpty() || (answeredMandatoryCount == totalMandatoryCount && answeredCount > 0)/*answeredCount == totalCount*/)
                         questions_FAB_start.setVisibility(GONE);
                     else
                         questions_FAB_start.setVisibility(VISIBLE);
@@ -683,7 +690,7 @@ public class QuestionsActivity extends AppCompatActivity {
     }
 
 
-    private void adjustRecyclerViewPadding(){
+    private void adjustRecyclerViewPadding() {
         if (questions_BTN_complete.getVisibility() == View.VISIBLE) {
             int bottomPadding = (int) TypedValue.applyDimension(
                     TypedValue.COMPLEX_UNIT_DIP,
@@ -703,11 +710,11 @@ public class QuestionsActivity extends AppCompatActivity {
         }
     }
 
-    private String formatDateTime(Date date){
+    private String formatDateTime(Date date) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
         SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
         String datePart = dateFormat.format(date);
         String timePart = timeFormat.format(date);
-        return getString(R.string.survey_submitted, Objects.requireNonNullElse(datePart, ""),Objects.requireNonNullElse(timePart, ""));
+        return getString(R.string.survey_submitted, Objects.requireNonNullElse(datePart, ""), Objects.requireNonNullElse(timePart, ""));
     }
 }

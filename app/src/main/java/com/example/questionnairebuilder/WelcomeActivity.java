@@ -24,6 +24,8 @@ public class WelcomeActivity extends AppCompatActivity {
     private ShapeableImageView welcome_IMG_language;
     private MaterialButton welcome_BTN_login;
     private MaterialButton welcome_BTN_signUp;
+    private String surveyId;
+    private Boolean isFromDeepLink;
 
 
     @Override
@@ -32,6 +34,9 @@ public class WelcomeActivity extends AppCompatActivity {
         setContentView(R.layout.activity_welcome);
 
         findViews();
+
+        surveyId = getIntent().getStringExtra("surveyID");
+        isFromDeepLink = getIntent().getBooleanExtra("launched_from_link", false);
 
         animateEntrance(welcome_IMG_language, 0);
         animateEntrance(welcome_BTN_login, 0);
@@ -48,12 +53,16 @@ public class WelcomeActivity extends AppCompatActivity {
 
     private void moveToLogin() {
         Intent intent = new Intent(WelcomeActivity.this, LoginActivity.class);
+        intent.putExtra("surveyID", surveyId);
+        intent.putExtra("launched_from_link", isFromDeepLink);
         startActivity(intent);
         finish();
     }
 
     private void moveToSignUp() {
         Intent intent = new Intent(WelcomeActivity.this, SignUpActivity.class);
+        intent.putExtra("surveyID", surveyId);
+        intent.putExtra("launched_from_link", isFromDeepLink);
         startActivity(intent);
         finish();
     }

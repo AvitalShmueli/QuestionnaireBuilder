@@ -128,13 +128,20 @@ public class NewSurveyActivity extends AppCompatActivity {
             chip.setChipIconVisible(true);
             chip.setOnClickListener(v -> {
                 if (selectedTags.contains(tag)) {
+                    // Deselecting tag
                     selectedTags.remove(tag);
                     chip.setChipBackgroundColorResource(R.color.light_blue);
                     chip.setTextColor(ContextCompat.getColor(this, R.color.dark_blue));
                 } else {
-                    selectedTags.add(tag);
-                    chip.setChipBackgroundColorResource(R.color.blue);
-                    chip.setTextColor(ContextCompat.getColor(this, R.color.white));
+                    // Trying to select a new tag
+                    if (selectedTags.size() >= 3) {
+                        Toast.makeText(this, "You can select up to 3 tags", Toast.LENGTH_SHORT).show();
+                        chip.setChecked(false); // prevent visually staying checked
+                    } else {
+                        selectedTags.add(tag);
+                        chip.setChipBackgroundColorResource(R.color.blue);
+                        chip.setTextColor(ContextCompat.getColor(this, R.color.white));
+                    }
                 }
             });
             tagChipGroup.addView(chip);

@@ -68,7 +68,12 @@ public class QuestionResponseActivity extends AppCompatActivity {
 
             Intent previousIntent = getIntent();
             String title = previousIntent.getStringExtra(KEY_QUESTION_HEADER);
-            surveyResponseStatus = SurveyResponseStatus.ResponseStatus.valueOf(previousIntent.getStringExtra(KEY_SURVEY_RESPONSE_STATUS));
+            String statusString = previousIntent.getStringExtra(KEY_SURVEY_RESPONSE_STATUS);
+            if (statusString != null) {
+                surveyResponseStatus = SurveyResponseStatus.ResponseStatus.valueOf(statusString);
+            } else {
+                surveyResponseStatus = SurveyResponseStatus.ResponseStatus.PENDING;
+            }
             totalQuestionsCount = previousIntent.getIntExtra(KEY_TOTAL_QUESTIONS,-1);
 
             Bundle args = previousIntent.getBundleExtra(KEY_QUESTION_ARGS);

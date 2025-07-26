@@ -320,7 +320,15 @@ public class QuestionsActivity extends AppCompatActivity {
                                 public void onSuccess(Void unused) {
                                     Log.d("pttt", "Status updated to completed");
                                     Toast.makeText(getApplicationContext(), getString(R.string.thank_you), LENGTH_SHORT).show();
-                                    finish();
+                                    if (launchedFromLink) {
+                                        Intent exploreIntent = new Intent(getApplicationContext(), MainActivity.class);
+                                        exploreIntent.putExtra("navigate_to_explore", true);
+                                        exploreIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                                        startActivity(exploreIntent);
+                                        finish();
+                                    } else {
+                                        finish();
+                                    }
                                 }
                             }, e -> {
                                 //TODO

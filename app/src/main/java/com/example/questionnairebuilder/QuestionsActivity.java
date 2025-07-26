@@ -85,6 +85,7 @@ public class QuestionsActivity extends AppCompatActivity {
     private MaterialTextView questions_LBL_completed;
     private String surveyID;
     private String surveyTitle;
+    private Survey.SurveyStatus currentSurveyStatus = Survey.SurveyStatus.Draft;
     private String currentUserId;
     private QuestionsAdapter questionsAdapter;
     private List<Question> questionsList = new ArrayList<>();
@@ -143,6 +144,7 @@ public class QuestionsActivity extends AppCompatActivity {
                 public void onSurveyLoaded(Survey survey) {
                     if (survey != null) {
                         surveyTitle = survey.getSurveyTitle();
+                        currentSurveyStatus = survey.getStatus();
                         toolbar.setTitle(surveyTitle);
                     } else {
                         Log.e("QuestionsActivity", "Survey not found for ID: " + surveyID);
@@ -338,6 +340,10 @@ public class QuestionsActivity extends AppCompatActivity {
             });
 
             questions_FAB_start.setOnClickListener(v -> {
+                if (currentSurveyStatus == Survey.SurveyStatus.Close) {
+                    Toast.makeText(getApplicationContext(), "Sorry, the survey is already closed\nThank you for participating", LENGTH_SHORT).show();
+                    return;
+                }
                 Question nextQuestion = questionsAdapter.findFirstUnansweredQuestion();
                 if (nextQuestion != null) {
                     changeActivityResponse(nextQuestion); // you already have this method

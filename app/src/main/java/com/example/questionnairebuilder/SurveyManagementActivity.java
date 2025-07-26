@@ -1,5 +1,8 @@
 package com.example.questionnairebuilder;
 
+import static android.widget.Toast.LENGTH_LONG;
+import static android.widget.Toast.LENGTH_SHORT;
+
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -97,7 +100,7 @@ public class SurveyManagementActivity extends AppCompatActivity {
         getAllSurveyData();
     }
 
-    private void getAllSurveyData(){
+    private void getAllSurveyData() {
         String title = getIntent().getStringExtra("survey_title");
         if (title != null) {
             toolbar.setTitle(title);
@@ -139,7 +142,7 @@ public class SurveyManagementActivity extends AppCompatActivity {
 
             @Override
             public void onError(Exception e) {
-                Log.e("pttt","Failed to load survey: " + e.getMessage());
+                Log.e("pttt", "Failed to load survey: " + e.getMessage());
             }
         });
     }
@@ -154,7 +157,7 @@ public class SurveyManagementActivity extends AppCompatActivity {
 
             @Override
             public void onCountFailure(Exception e) {
-                Log.e("pttt",e.getMessage());
+                Log.e("pttt", e.getMessage());
             }
         });
     }
@@ -169,6 +172,7 @@ public class SurveyManagementActivity extends AppCompatActivity {
                         totalResponseCount = count;
                         management_LBL_totalResponses.setText(String.valueOf(count));
                     }
+
                     @Override
                     public void onCountFailure(Exception e) {
                         Log.e("Survey", "Failed to get total responses count", e);
@@ -177,7 +181,7 @@ public class SurveyManagementActivity extends AppCompatActivity {
         );
     }
 
-    private void getCompletedResponsesCounter(){
+    private void getCompletedResponsesCounter() {
         FirestoreManager.getInstance().getSurveyResponseStatusCount(
                 surveyID,
                 Collections.singletonList(SurveyResponseStatus.ResponseStatus.COMPLETED),
@@ -187,6 +191,7 @@ public class SurveyManagementActivity extends AppCompatActivity {
                         totalCompletedResponseCount = count;
                         management_LBL_completedResponses.setText(String.valueOf(count));
                     }
+
                     @Override
                     public void onCountFailure(Exception e) {
                         Log.e("Survey", "Failed to get completed responses count", e);
@@ -218,7 +223,7 @@ public class SurveyManagementActivity extends AppCompatActivity {
         management_SW_alert.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if(survey != null && isChecked != survey.isNewResponseAlert()) {
+                if (survey != null && isChecked != survey.isNewResponseAlert()) {
                     updates.put("newResponseAlert", isChecked);
                     if (mMenu != null) {
                         MenuItem saveMenuItem = mMenu.findItem(R.id.action_save);
@@ -240,48 +245,51 @@ public class SurveyManagementActivity extends AppCompatActivity {
     }
 
     private void setUpShareClick() {
-        management_LL_share.setOnClickListener(v ->
-        {
-            String surveyId = survey.getID();
-            String surveyLink = "https://questionnairebuilder-7b883.web.app/survey?id=" + surveyId;
+        management_LL_share.setOnClickListener(v -> {
+            if (survey.getStatus() == Survey.SurveyStatus.Published) {
+                String surveyId = survey.getID();
+                String surveyLink = "https://questionnairebuilder-7b883.web.app/survey?id=" + surveyId;
 
-            View dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_share_survey, null);
-            ShapeableImageView qrImageView = dialogView.findViewById(R.id.share_qr_image);
-            MaterialTextView linkTextView = dialogView.findViewById(R.id.share_link_text);
-            AppCompatImageButton copyButton = dialogView.findViewById(R.id.share_copy_button);
-            linkTextView.setText(survey.getSurveyTitle());
-            linkTextView.setTextColor(ContextCompat.getColor(this, android.R.color.holo_blue_dark));
-            linkTextView.setPaintFlags(linkTextView.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
-            linkTextView.setOnClickListener(v2 -> {
-                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(surveyLink));
-                startActivity(browserIntent);
-            });
+                View dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_share_survey, null);
+                ShapeableImageView qrImageView = dialogView.findViewById(R.id.share_qr_image);
+                MaterialTextView linkTextView = dialogView.findViewById(R.id.share_link_text);
+                AppCompatImageButton copyButton = dialogView.findViewById(R.id.share_copy_button);
+                linkTextView.setText(survey.getSurveyTitle());
+                linkTextView.setTextColor(ContextCompat.getColor(this, android.R.color.holo_blue_dark));
+                linkTextView.setPaintFlags(linkTextView.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
+                linkTextView.setOnClickListener(v2 -> {
+                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(surveyLink));
+                    startActivity(browserIntent);
+                });
 
-            // Handle copy button click
-            copyButton.setOnClickListener(v1 -> {
-                android.content.ClipboardManager clipboard = (android.content.ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
-                android.content.ClipData clip = android.content.ClipData.newPlainText("Survey Link", surveyLink);
-                clipboard.setPrimaryClip(clip);
-                Toast.makeText(this, "Link copied to clipboard", Toast.LENGTH_SHORT).show();
-            });
+                // Handle copy button click
+                copyButton.setOnClickListener(v1 -> {
+                    android.content.ClipboardManager clipboard = (android.content.ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+                    android.content.ClipData clip = android.content.ClipData.newPlainText("Survey Link", surveyLink);
+                    clipboard.setPrimaryClip(clip);
+                    Toast.makeText(this, "Link copied to clipboard", LENGTH_SHORT).show();
+                });
 
-            // Generate QR Code
-            try {
-                BarcodeEncoder barcodeEncoder = new BarcodeEncoder();
-                Bitmap bitmap = barcodeEncoder.encodeBitmap(surveyLink, BarcodeFormat.QR_CODE, 400, 400);
-                qrImageView.setImageBitmap(bitmap);
-            } catch (Exception e) {
-                e.printStackTrace();
-                Toast.makeText(this, "Failed to generate QR code", Toast.LENGTH_SHORT).show();
-                return;
+                // Generate QR Code
+                try {
+                    BarcodeEncoder barcodeEncoder = new BarcodeEncoder();
+                    Bitmap bitmap = barcodeEncoder.encodeBitmap(surveyLink, BarcodeFormat.QR_CODE, 400, 400);
+                    qrImageView.setImageBitmap(bitmap);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Toast.makeText(this, "Failed to generate QR code", LENGTH_SHORT).show();
+                    return;
+                }
+
+                // Build dialog
+                new AlertDialog.Builder(this)
+                        .setView(dialogView)
+                        .setCancelable(true)
+                        .setNegativeButton("Close", (dialog, which) -> dialog.dismiss())
+                        .show();
+            } else {
+                Toast.makeText(getApplicationContext(), "Cannot share survey\nPlease change survey's status to \"Published\" and than click the \"Save\" button", LENGTH_LONG).show();
             }
-
-            // Build dialog
-            new AlertDialog.Builder(this)
-                    .setView(dialogView)
-                    .setCancelable(true)
-                    .setNegativeButton("Close", (dialog, which) -> dialog.dismiss())
-                    .show();
         });
     }
 
@@ -294,9 +302,9 @@ public class SurveyManagementActivity extends AppCompatActivity {
     }
 
     private void initSpinner() {
-        statusesMap.put(Survey.SurveyStatus.Draft,getString(R.string.draft));
-        statusesMap.put(Survey.SurveyStatus.Published,getString(R.string.published));
-        statusesMap.put(Survey.SurveyStatus.Close,getString(R.string.close));
+        statusesMap.put(Survey.SurveyStatus.Draft, getString(R.string.draft));
+        statusesMap.put(Survey.SurveyStatus.Published, getString(R.string.published));
+        statusesMap.put(Survey.SurveyStatus.Close, getString(R.string.close));
 
         statusAdapter = new ArrayAdapter<>(
                 this,
@@ -316,7 +324,7 @@ public class SurveyManagementActivity extends AppCompatActivity {
                 }
 
                 String selectedStatus = (String) parent.getItemAtPosition(position);
-                if(!selectedStatus.equals(survey.getStatus().name())) {
+                if (!selectedStatus.equals(survey.getStatus().name())) {
                     Log.d("pttt Spinner", "Selected status: " + selectedStatus);
 
                     // Map back to enum
@@ -350,18 +358,18 @@ public class SurveyManagementActivity extends AppCompatActivity {
 
     private void setupEditClick() {
         management_LL_edit.setOnClickListener(v -> {
-            if(totalResponseCount > 0)
+            if (totalResponseCount > 0)
                 showEditWarningDialog();
             else
                 navigateToEditScreen();
         });
     }
 
-    private void navigateToEditScreen(){
+    private void navigateToEditScreen() {
         Intent intent = new Intent(SurveyManagementActivity.this, QuestionsActivity.class);
         intent.putExtra(QuestionsActivity.KEY_EDIT_MODE, true);
-        intent.putExtra("surveyID",survey.getID());
-        intent.putExtra("survey_title",survey.getSurveyTitle());
+        intent.putExtra("surveyID", survey.getID());
+        intent.putExtra("survey_title", survey.getSurveyTitle());
         startActivity(intent);
     }
 
@@ -407,7 +415,7 @@ public class SurveyManagementActivity extends AppCompatActivity {
             localCal.set(Calendar.MILLISECOND, 0);
 
             // Convert local midnight to UTC midnight
-            Log.d("DatePickerHelper","Timezone offset: "+localCal.getTimeZone().getOffset(localCal.getTimeInMillis())/3600000+"");
+            Log.d("DatePickerHelper", "Timezone offset: " + localCal.getTimeZone().getOffset(localCal.getTimeInMillis()) / 3600000 + "");
             long utcMillis = localCal.getTimeInMillis() + localCal.getTimeZone().getOffset(localCal.getTimeInMillis());
             builder.setSelection(utcMillis);
         } else {
@@ -439,7 +447,7 @@ public class SurveyManagementActivity extends AppCompatActivity {
                 e.printStackTrace();
                 return;
             }
-            if(dueDate != null && survey != null && !dueDate.equals(survey.getDueDate())){
+            if (dueDate != null && survey != null && !dueDate.equals(survey.getDueDate())) {
                 updates.put("dueDate", dueDate);
                 management_LBL_dueDate.setText(formattedDate);
                 if (mMenu != null) {
@@ -468,20 +476,20 @@ public class SurveyManagementActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.action_save) {
-            if(!updates.isEmpty()){
-                updates.put("modified",new Timestamp(new Date()));
+            if (!updates.isEmpty()) {
+                updates.put("modified", new Timestamp(new Date()));
                 FirestoreManager.getInstance().updateSurvey(survey.getID(), updates, new UpdateSurveyDetailsCallback() {
                     @Override
                     public void onSuccess(Survey updatedSurvey) {
                         survey = updatedSurvey;
                         toolbar.setTitle(survey.getSurveyTitle());
-                        Toast.makeText(getApplicationContext(),getString(R.string.survey_updated_successfully),Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(), getString(R.string.survey_updated_successfully), LENGTH_SHORT).show();
                         updates.clear();
                     }
 
                     @Override
                     public void onFailure(Exception e) {
-                        Toast.makeText(getApplicationContext(),getString(R.string.survey_update_failed),Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(), getString(R.string.survey_update_failed), LENGTH_SHORT).show();
                     }
                 });
             }
@@ -491,7 +499,7 @@ public class SurveyManagementActivity extends AppCompatActivity {
     }
 
     private void onBack() {
-        if(updates.isEmpty())
+        if (updates.isEmpty())
             finish();
         else showCancelConfirmationDialog();
     }
@@ -522,7 +530,7 @@ public class SurveyManagementActivity extends AppCompatActivity {
                 .show();
     }
 
-    private void showDescriptionDialog(){
+    private void showDescriptionDialog() {
         // Inflate the custom layout
         LayoutInflater inflater = LayoutInflater.from(this); // or getActivity() for a Fragment
         View dialogView = inflater.inflate(R.layout.dialog_input, null);
@@ -541,7 +549,7 @@ public class SurveyManagementActivity extends AppCompatActivity {
                 .setView(dialogView)
                 .setPositiveButton("OK", (dialog, which) -> {
                     String enteredText = inputEditText.getText().toString().trim();
-                    if(!enteredText.equals(survey.getDescription())) {
+                    if (!enteredText.equals(survey.getDescription())) {
                         management_LBL_description.setText(enteredText);
                         updates.put("description", enteredText);
                         if (mMenu != null) {
@@ -559,7 +567,7 @@ public class SurveyManagementActivity extends AppCompatActivity {
         dialog.show();
     }
 
-    private void showTitleDialog(){
+    private void showTitleDialog() {
         // Inflate the custom layout
         LayoutInflater inflater = LayoutInflater.from(this); // or getActivity() for a Fragment
         View dialogView = inflater.inflate(R.layout.dialog_input, null);
@@ -578,7 +586,7 @@ public class SurveyManagementActivity extends AppCompatActivity {
                 .setView(dialogView)
                 .setPositiveButton("OK", (dialog, which) -> {
                     String enteredText = inputEditText.getText().toString().trim();
-                    if(!enteredText.equals(survey.getDescription())) {
+                    if (!enteredText.equals(survey.getDescription())) {
                         management_LBL_title.setText(enteredText);
                         updates.put("surveyTitle", enteredText);
                         if (mMenu != null) {

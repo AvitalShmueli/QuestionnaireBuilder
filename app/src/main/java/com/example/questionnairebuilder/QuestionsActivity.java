@@ -138,6 +138,7 @@ public class QuestionsActivity extends AppCompatActivity {
 
         canEdit = intent.getBooleanExtra(KEY_EDIT_MODE, false);
         surveyTitle = intent.getStringExtra("survey_title");
+        currentSurveyStatus = Survey.SurveyStatus.valueOf(intent.getStringExtra("survey_status"));
         if (surveyTitle == null) {
             FirestoreManager.getInstance().getSurveyById(surveyID, new OneSurveyCallback() {
                 @Override
@@ -263,7 +264,13 @@ public class QuestionsActivity extends AppCompatActivity {
         questionsAdapter.setCallbackQuestionSelected(question -> {
             if (canEdit)
                 changeActivityEditQuestion(question);
-            else changeActivityResponse(question);
+            else {
+                if (currentSurveyStatus == Survey.SurveyStatus.Close) {
+                    Toast.makeText(getApplicationContext(), "Sorry, the survey is already closed\nThank you for participating", LENGTH_SHORT).show();
+                    return;
+                }
+                changeActivityResponse(question);
+            }
         });
         recyclerView.setAdapter(questionsAdapter);
 

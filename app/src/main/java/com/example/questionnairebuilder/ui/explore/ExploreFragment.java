@@ -107,6 +107,7 @@ public class ExploreFragment extends Fragment {
             intent.putExtra(QuestionsActivity.KEY_EDIT_MODE, false);
             intent.putExtra("survey_title", survey.getSurveyTitle());
             intent.putExtra("surveyID", survey.getID());
+            intent.putExtra("survey_status", survey.getStatus().name());
             startActivity(intent);
         });
 

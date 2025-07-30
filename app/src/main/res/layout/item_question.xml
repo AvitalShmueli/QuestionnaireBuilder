@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:tools="http://schemas.android.com/tools"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_margin="4dp">
 
     <androidx.cardview.widget.CardView
@@ -11,8 +11,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/card_elevation"
-        android:minHeight="40dp"
         android:elevation="@dimen/card_elevation"
+        android:minHeight="40dp"
         app:cardBackgroundColor="?android:attr/windowBackground"
         app:cardCornerRadius="@dimen/corner_radius"
         app:cardElevation="@dimen/card_elevation">
@@ -20,48 +20,49 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="8dp"
-            android:layout_gravity="center">
+            android:layout_gravity="center"
+            android:layout_margin="8dp">
 
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/rv_mandatory_star"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/mandatory_star"
                 android:layout_alignTop="@id/rv_title"
-                android:textStyle="bold"
+                android:layout_marginEnd="@dimen/input_horizontal_margin"
+                android:text="@string/mandatory_star"
                 android:textColor="@color/design_default_color_error"
                 android:textSize="@dimen/input_text_size"
+                android:textStyle="bold"
                 android:visibility="visible"
-                android:layout_marginEnd="@dimen/input_horizontal_margin"
-                app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"/>
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/rv_title"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                tools:text="Title"
-                android:textStyle="bold"
+                android:layout_marginStart="@dimen/input_horizontal_margin"
                 android:textColor="@color/black"
                 android:textSize="@dimen/input_text_size"
-                android:layout_marginStart="@dimen/input_horizontal_margin"
-                app:layout_constraintTop_toTopOf="parent"
+                android:textStyle="bold"
                 app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/answeredIndicator"
                 app:layout_constraintStart_toEndOf="@id/rv_mandatory_star"
-                app:layout_constraintEnd_toStartOf="@id/answeredIndicator" />
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="Title" />
 
             <com.google.android.material.imageview.ShapeableImageView
                 android:id="@+id/rv_dragHandle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
+                android:paddingHorizontal="8dp"
                 android:src="@drawable/drag_handle"
                 android:tint="?attr/colorPrimary"
-                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"/>
+                app:layout_constraintTop_toTopOf="parent" />
 
 
             <com.google.android.material.imageview.ShapeableImageView
@@ -70,11 +71,11 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
                 android:src="@drawable/ic_check"
-                app:tint="@color/green"
                 android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@id/rv_dragHandle"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"/>
+                app:tint="@color/green" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -15,7 +15,6 @@ import com.example.questionnairebuilder.interfaces.QuestionsCallback;
 import com.example.questionnairebuilder.interfaces.UnsavedChangesHandler;
 import com.example.questionnairebuilder.models.ChoiceQuestion;
 import com.example.questionnairebuilder.models.DateQuestion;
-import com.example.questionnairebuilder.models.DateSelectionModeEnum;
 import com.example.questionnairebuilder.models.MultipleChoiceQuestion;
 import com.example.questionnairebuilder.models.OpenEndedQuestion;
 import com.example.questionnairebuilder.models.Question;
@@ -24,7 +23,6 @@ import com.example.questionnairebuilder.models.SurveyResponseStatus;
 import com.example.questionnairebuilder.utilities.QuestionTypeManager;
 import com.example.questionnairebuilder.models.RatingScaleQuestion;
 import com.example.questionnairebuilder.models.Response;
-import com.example.questionnairebuilder.models.SingleChoiceQuestion;
 import com.example.questionnairebuilder.ui.response_types.ChoiceQuestionResponseFragment;
 import com.example.questionnairebuilder.ui.response_types.DateQuestionResponseFragment;
 import com.example.questionnairebuilder.ui.response_types.OpenQuestionResponseFragment;
@@ -35,7 +33,6 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.firebase.Timestamp;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -234,7 +231,6 @@ public class QuestionResponseActivity extends AppCompatActivity {
                             Log.d("Survey", "Status updated to in progress");
                         }
                     },e -> {
-                        //TODO
                         Log.d("pttt Survey", "ERROR while updating status");
                     }
             );
@@ -266,45 +262,6 @@ public class QuestionResponseActivity extends AppCompatActivity {
             args.putString("iconResourceName", ((RatingScaleQuestion) q).getIconResourceName());
         }
         return args;
-    }
-
-    // TODO: remove
-    private List<Question> questionListDemo(){
-        List<Question> list = new ArrayList<>();
-        list.add(new OpenEndedQuestion("Q1 - What is your name?").setMandatory(true));
-        list.add(new OpenEndedQuestion("Q2 - How old are you?"));
-        list.add(new DateQuestion("Q3? - Birth date").setDateMode(DateSelectionModeEnum.SINGLE_DATE).setMandatory(true));
-        list.add(new DateQuestion("Q4? - Vacation dates").setDateMode(DateSelectionModeEnum.DATE_RANGE).setMandatory(false));
-        list.add(new SingleChoiceQuestion("Q5? Yes No Mandatory Question?", QuestionTypeEnum.YES_NO)
-                .addChoice("Yes")
-                .addChoice("No")
-                .setMandatory(true)
-        );
-        list.add(new RatingScaleQuestion("Q6? Rating question")
-                .setIconResourceName("ic_heart_filled")
-                .setRatingScaleLevel(3)
-                .setMandatory(true)
-        );
-        list.add(new OpenEndedQuestion("Q7?"));
-        list.add(new OpenEndedQuestion("Q8?"));
-        list.add(new OpenEndedQuestion("Q9?"));
-        list.add(new OpenEndedQuestion("Q10?"));
-        list.add(new OpenEndedQuestion("Q11?"));
-        list.add(new OpenEndedQuestion("Q12?"));
-        list.add(new MultipleChoiceQuestion("Q13? Multi selection")
-                .setAllowedSelectionNum(2)
-                .addChoice("Option A")
-                .addChoice("Option B")
-                .addChoice("Option C")
-                .addChoice("Option D")
-                .setMandatory(true)
-        );
-        list.add(new SingleChoiceQuestion("Q14?", QuestionTypeEnum.DROPDOWN));
-        list.add(new SingleChoiceQuestion("Q15? Yes No Question?", QuestionTypeEnum.YES_NO)
-                .addChoice("Yes")
-                .addChoice("No")
-        );
-        return list;
     }
 
     public boolean isSurveyResponseCompleted(){

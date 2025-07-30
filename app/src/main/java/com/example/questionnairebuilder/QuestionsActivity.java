@@ -47,7 +47,6 @@ import com.example.questionnairebuilder.models.RatingScaleQuestion;
 import com.example.questionnairebuilder.models.SurveyResponseStatus;
 import com.example.questionnairebuilder.utilities.AuthenticationManager;
 import com.example.questionnairebuilder.utilities.FirestoreManager;
-import com.example.questionnairebuilder.utilities.SharedPreferencesManager;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.button.MaterialButton;
@@ -133,12 +132,14 @@ public class QuestionsActivity extends AppCompatActivity {
             return;
         }
 
-        if (!canEdit)
-            maybeAddPendingStatus(surveyID);
-
         canEdit = intent.getBooleanExtra(KEY_EDIT_MODE, false);
+
+        if (!canEdit) {
+            maybeAddPendingStatus(surveyID);
+            currentSurveyStatus = Survey.SurveyStatus.valueOf(intent.getStringExtra("survey_status"));
+        }
+
         surveyTitle = intent.getStringExtra("survey_title");
-        currentSurveyStatus = Survey.SurveyStatus.valueOf(intent.getStringExtra("survey_status"));
         if (surveyTitle == null) {
             FirestoreManager.getInstance().getSurveyById(surveyID, new OneSurveyCallback() {
                 @Override

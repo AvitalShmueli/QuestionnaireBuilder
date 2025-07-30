@@ -796,20 +796,6 @@ public class FirestoreManager {
                     listener.onFetched(null);
                 });
     }
-/*
-    /**
-     * Create or update a SurveyResponseStatus document for a user-survey pair
-     * @param status survey's response status item to create or update
-     *  @param onSuccess callback on success
-     *  @param onFailure callback on failure
-     */
-   /* public void addSurveyResponseStatus(SurveyResponseStatus status, OnSuccessListener<Void> onSuccess, OnFailureListener onFailure) {
-        String docId = status.getSurveyId() + "_" + status.getUserId();
-        surveyResponseStatusRef.document(docId)
-                .set(status)
-                .addOnSuccessListener(onSuccess)
-                .addOnFailureListener(onFailure);
-    }*/
 
     public Task<Void> createSurveyResponseStatus(SurveyResponseStatus status) {
         String docId = status.getSurveyId() + "_" + status.getUserId();

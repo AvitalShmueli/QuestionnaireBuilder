@@ -169,7 +169,12 @@ public class DatePickerHelper {
         sdf.setLenient(false); // Ensures 32/13/2025 is rejected
 
         try {
-            sdf.parse(date); // Will throw ParseException if invalid
+            Date inputDate = sdf.parse(date); // Will throw ParseException if invalid
+            Date today = new Date();
+
+            today = sdf.parse(sdf.format(today));
+            if (!allowPastDates && inputDate != null)
+                return !inputDate.before(today);
             return true;
         } catch (ParseException e) {
             return false;

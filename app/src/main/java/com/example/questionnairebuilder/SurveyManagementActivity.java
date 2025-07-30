@@ -400,7 +400,6 @@ public class SurveyManagementActivity extends AppCompatActivity {
             selectedDate = sdf.parse(management_LBL_dueDate.getText().toString());
         } catch (ParseException e) {
             e.printStackTrace();
-            selectedDate = survey.getDueDate();
             return;
         }
         MaterialDatePicker.Builder<Long> builder = MaterialDatePicker.Builder.datePicker()
@@ -415,7 +414,7 @@ public class SurveyManagementActivity extends AppCompatActivity {
             localCal.set(Calendar.MILLISECOND, 0);
 
             // Convert local midnight to UTC midnight
-            Log.d("DatePickerHelper", "Timezone offset: " + localCal.getTimeZone().getOffset(localCal.getTimeInMillis()) / 3600000 + "");
+            Log.d("DatePickerHelper", "Timezone offset: " + localCal.getTimeZone().getOffset(localCal.getTimeInMillis()) / 3600000 );
             long utcMillis = localCal.getTimeInMillis() + localCal.getTimeZone().getOffset(localCal.getTimeInMillis());
             builder.setSelection(utcMillis);
         } else {

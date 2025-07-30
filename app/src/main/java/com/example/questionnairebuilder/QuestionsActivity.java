@@ -683,7 +683,6 @@ public class QuestionsActivity extends AppCompatActivity {
 
     private void maybeAddPendingStatus(String surveyId) {
         String userId = AuthenticationManager.getInstance().getCurrentUser().getUid();
-        String docId = surveyId + "_" + userId;
 
         FirestoreManager.getInstance().getSurveyResponseStatus(surveyId, userId, new OnSurveyResponseStatusListener() {
             @Override

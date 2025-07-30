@@ -17,7 +17,6 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CompoundButton;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -288,10 +287,11 @@ public class SurveyManagementActivity extends AppCompatActivity {
                         .setNegativeButton("Close", (dialog, which) -> dialog.dismiss())
                         .show();
             } else {
-                Toast.makeText(getApplicationContext(), "Cannot share survey\nPlease change survey's status to \"Published\" and than click the \"Save\" button", LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), "Survey not shared. Set status to 'Published' and click 'Save'.", LENGTH_LONG).show();
             }
         });
     }
+
 
     private void setupAnalyzeClick() {
         management_LL_analyze.setOnClickListener(v -> {

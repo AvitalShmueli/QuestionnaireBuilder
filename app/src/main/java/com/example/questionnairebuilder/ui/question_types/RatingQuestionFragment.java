@@ -275,10 +275,6 @@ public class RatingQuestionFragment extends Fragment implements UnsavedChangesHa
 
     @Override
     public boolean hasUnsavedChanges() {
-        // TODO: compare to stored question
-        /*return ratingQuestion_TXT_question.getText() != null &&
-                !ratingQuestion_TXT_question.getText().toString().trim().isEmpty();*/
-
         String currentText = ratingQuestion_TXT_question.getText() != null
                 ? ratingQuestion_TXT_question.getText().toString().trim()
                 : "";

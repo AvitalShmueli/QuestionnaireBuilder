@@ -132,13 +132,6 @@ public class QuestionsActivity extends AppCompatActivity {
             return;
         }
 
-        canEdit = intent.getBooleanExtra(KEY_EDIT_MODE, false);
-
-        if (!canEdit) {
-            maybeAddPendingStatus(surveyID);
-            currentSurveyStatus = Survey.SurveyStatus.valueOf(intent.getStringExtra("survey_status"));
-        }
-
         surveyTitle = intent.getStringExtra("survey_title");
         if (surveyTitle == null) {
             FirestoreManager.getInstance().getSurveyById(surveyID, new OneSurveyCallback() {
@@ -158,6 +151,13 @@ public class QuestionsActivity extends AppCompatActivity {
                     Log.e("QuestionsActivity", "Failed to fetch survey", e);
                 }
             });
+        }
+
+        canEdit = intent.getBooleanExtra(KEY_EDIT_MODE, false);
+
+        if (!canEdit) {
+            maybeAddPendingStatus(surveyID);
+            //currentSurveyStatus = Survey.SurveyStatus.valueOf(intent.getStringExtra("survey_status"));
         }
 
         QuestionTypeManager.init(this);
@@ -341,7 +341,6 @@ public class QuestionsActivity extends AppCompatActivity {
                                     }
                                 }
                             }, e -> {
-                                //TODO
                             }
                     );
                 }
@@ -366,7 +365,6 @@ public class QuestionsActivity extends AppCompatActivity {
                                     Log.d("Survey", "Status updated to in progress");
                                 }
                             }, e -> {
-                                //TODO
                                 Log.d("pttt Survey", "ERROR while updating status");
                             }
                     );

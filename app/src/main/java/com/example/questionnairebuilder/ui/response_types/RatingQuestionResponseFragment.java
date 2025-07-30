@@ -65,7 +65,6 @@ public class RatingQuestionResponseFragment extends Fragment implements UnsavedC
      * @param questionArgs bundle of question's details.
      * @return A new instance of fragment RatingQuestionResponseFragment.
      */
-    // TODO: Rename and change types and number of parameters
     public static RatingQuestionResponseFragment newInstance(Bundle questionArgs) {
         RatingQuestionResponseFragment fragment = new RatingQuestionResponseFragment();
         fragment.setArguments(questionArgs);

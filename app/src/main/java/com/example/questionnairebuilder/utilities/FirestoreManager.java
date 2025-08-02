@@ -91,7 +91,7 @@ public class FirestoreManager {
 
     public void addSurvey(Survey survey) {
         surveysRef.document(survey.getID()).set(survey)
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                .addOnSuccessListener(new OnSuccessListener<>() {
                     @Override
                     public void onSuccess(Void unused) {
                         try {
@@ -114,6 +114,8 @@ public class FirestoreManager {
                     } catch (Exception ex) {
                         GrafanaLogger.error("FirestoreManager", "Failed to log error JSON");
                     }
+
+                    throw new RuntimeException("Failed to save survey " + e.getMessage());
                 });
     }
 
@@ -192,7 +194,7 @@ public class FirestoreManager {
     }
 
     public ListenerRegistration listenToAllSurveys(SurveysCallback callback) {
-        return surveysRef.addSnapshotListener(new EventListener<QuerySnapshot>() {
+        return surveysRef.addSnapshotListener(new EventListener<>() {
             @Override
             public void onEvent(@Nullable QuerySnapshot snapshots, @Nullable FirebaseFirestoreException e) {
                 if (e != null) {
@@ -478,7 +480,7 @@ public class FirestoreManager {
 
     public void addQuestion(Question question) {
         questionsRef.document(question.getQuestionID()).set(question)
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                .addOnSuccessListener(new OnSuccessListener<>() {
                     @Override
                     public void onSuccess(Void unused) {
                         try {
@@ -505,6 +507,8 @@ public class FirestoreManager {
                         } catch (Exception ex) {
                             GrafanaLogger.error("FirestoreManager", "Failed to log error JSON");
                         }
+
+                        throw new RuntimeException("Failed to save question " + e.getMessage());
                     }
                 });
     }
@@ -710,6 +714,8 @@ public class FirestoreManager {
                                 } catch (Exception ex) {
                                     GrafanaLogger.error("FirestoreManager", "Failed to log error JSON");
                                 }
+
+                                throw new RuntimeException("Failed to save new questions order " + e.getMessage());
                             });
                 })
                 .addOnFailureListener(e -> {
@@ -721,6 +727,8 @@ public class FirestoreManager {
                     } catch (Exception ex) {
                         GrafanaLogger.error("FirestoreManager", "Failed to log error JSON");
                     }
+
+                    throw new RuntimeException("Failed to load questions for reordering for survey " + e.getMessage());
                 });
     }
 
@@ -758,6 +766,8 @@ public class FirestoreManager {
                         } catch (Exception ex) {
                             GrafanaLogger.error("FirestoreManager", "Failed to log error JSON");
                         }
+
+                        throw new RuntimeException("Failed to save user " + e.getMessage());
                     }
                 });
     }
@@ -799,7 +809,7 @@ public class FirestoreManager {
 
     public Task<Void> createSurveyResponseStatus(SurveyResponseStatus status) {
         String docId = status.getSurveyId() + "_" + status.getUserId();
-        return surveyResponseStatusRef.document(docId).set(status).addOnSuccessListener(new OnSuccessListener<Void>() {
+        return surveyResponseStatusRef.document(docId).set(status).addOnSuccessListener(new OnSuccessListener<>() {
             @Override
             public void onSuccess(Void unused) {
                 try {
@@ -851,7 +861,7 @@ public class FirestoreManager {
 
         surveyResponseStatusRef.document(docId)
                 .update(updates)
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                .addOnSuccessListener(new OnSuccessListener<>() {
                     @Override
                     public void onSuccess(Void unused) {
                         try {
@@ -966,7 +976,7 @@ public class FirestoreManager {
 
     public void addResponse(Response response) {
         responsesRef.document(response.getResponseID()).set(response)
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                .addOnSuccessListener(new OnSuccessListener<>() {
                     @Override
                     public void onSuccess(Void unused) {
                         try {
@@ -997,6 +1007,8 @@ public class FirestoreManager {
                         } catch (Exception ex) {
                             GrafanaLogger.error("FirestoreManager", "Failed to log error JSON");
                         }
+
+                        throw new RuntimeException("Failed to save response " + e.getMessage());
                     }
                 });
     }
@@ -1007,7 +1019,7 @@ public class FirestoreManager {
                 .whereEqualTo("userID", userID)
                 .limit(1)
                 .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                .addOnCompleteListener(new OnCompleteListener<>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
@@ -1106,7 +1118,7 @@ public class FirestoreManager {
         Query query = questionsRef.whereEqualTo("surveyID", surveyID);
         AggregateQuery countQuery = query.count();
         countQuery.get(AggregateSource.SERVER)
-                .addOnCompleteListener(new OnCompleteListener<AggregateQuerySnapshot>() {
+                .addOnCompleteListener(new OnCompleteListener<>() {
                     @Override
                     public void onComplete(@NonNull Task<AggregateQuerySnapshot> task) {
                         if (task.isSuccessful()) {
@@ -1189,9 +1201,11 @@ public class FirestoreManager {
                         return;
                     }
                     List<SurveyResponseStatus> list = new ArrayList<>();
-                    for (DocumentSnapshot doc : querySnapshot.getDocuments()) {
-                        SurveyResponseStatus srs = doc.toObject(SurveyResponseStatus.class);
-                        list.add(srs);
+                    if (querySnapshot != null) {
+                        for (DocumentSnapshot doc : querySnapshot.getDocuments()) {
+                            SurveyResponseStatus srs = doc.toObject(SurveyResponseStatus.class);
+                            list.add(srs);
+                        }
                     }
 
                     GrafanaLogger.info("FirestoreManager", "Response statuses loaded for userId: " + userId);

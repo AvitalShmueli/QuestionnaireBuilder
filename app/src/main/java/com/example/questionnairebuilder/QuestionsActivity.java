@@ -304,6 +304,7 @@ public class QuestionsActivity extends AppCompatActivity {
 
         // Skip button (handled later depending on list size)
         questions_BTN_skip.setOnClickListener(v -> {
+            Toast.makeText(this,"You can add questions later",LENGTH_SHORT).show();
             Intent intent = new Intent(this, SurveyManagementActivity.class);
             intent.putExtra("surveyID", surveyID);
             intent.putExtra("survey_title", surveyTitle);
@@ -316,16 +317,14 @@ public class QuestionsActivity extends AppCompatActivity {
             ItemTouchHelper touchHelper = new ItemTouchHelper(new ItemMoveCallback(questionsAdapter));
             touchHelper.attachToRecyclerView(recyclerView);
 
-            questionsAdapter.setOnStartDragListener(viewHolder -> {
-                touchHelper.startDrag(viewHolder);
-            });
+            questionsAdapter.setOnStartDragListener(touchHelper::startDrag);
         } else {
             questions_BTN_complete.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     FirestoreManager.getInstance().updateSurveyResponseStatus(
                             surveyID, currentUserId, SurveyResponseStatus.ResponseStatus.COMPLETED,
-                            new OnSuccessListener<Void>() {
+                            new OnSuccessListener<>() {
                                 @Override
                                 public void onSuccess(Void unused) {
                                     Log.d("pttt", "Status updated to completed");
@@ -359,7 +358,7 @@ public class QuestionsActivity extends AppCompatActivity {
                 if (questions_FAB_start.getText().equals(getString(R.string.start_survey))) {
                     FirestoreManager.getInstance().updateSurveyResponseStatus(
                             surveyID, currentUserId, SurveyResponseStatus.ResponseStatus.IN_PROGRESS,
-                            new OnSuccessListener<Void>() {
+                            new OnSuccessListener<>() {
                                 @Override
                                 public void onSuccess(Void unused) {
                                     Log.d("Survey", "Status updated to in progress");
@@ -535,8 +534,6 @@ public class QuestionsActivity extends AppCompatActivity {
         questionsListener = FirestoreManager.getInstance().listenToSurveyQuestions(surveyID, new QuestionsCallback() {
             @Override
             public void onQuestionsLoaded(List<Question> questions) {
-                //questionList = questions;
-                //questionAdapter.updateQuestions(questionList);
                 if (cachedQuestionList != null) {
                     questionsList = cachedQuestionList;
                 } else {

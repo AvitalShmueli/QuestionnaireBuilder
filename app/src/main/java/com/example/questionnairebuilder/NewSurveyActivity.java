@@ -1,5 +1,7 @@
 package com.example.questionnairebuilder;
 
+import static android.widget.Toast.LENGTH_SHORT;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Toast;
@@ -87,6 +89,8 @@ public class NewSurveyActivity extends AppCompatActivity {
 
                 survey.save();
 
+                Toast.makeText(this,"The survey saved as draft",LENGTH_SHORT).show();
+
                 Intent intent = new Intent(NewSurveyActivity.this, QuestionsActivity.class);
                 intent.putExtra("surveyID",survey.getID());
                 intent.putExtra("survey_title",survey.getSurveyTitle());
@@ -135,7 +139,7 @@ public class NewSurveyActivity extends AppCompatActivity {
                 } else {
                     // Trying to select a new tag
                     if (selectedTags.size() >= 3) {
-                        Toast.makeText(this, "You can select up to 3 tags", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, "You can select up to 3 tags", LENGTH_SHORT).show();
                         chip.setChecked(false); // prevent visually staying checked
                     } else {
                         selectedTags.add(tag);
@@ -196,7 +200,7 @@ public class NewSurveyActivity extends AppCompatActivity {
             newSurvey_TIL_date.setError(null);
 
         if (selectedTags.isEmpty()) {
-            Toast.makeText(this, "Please select at least one tag", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Please select at least one tag", LENGTH_SHORT).show();
             valid = false;
         }
 

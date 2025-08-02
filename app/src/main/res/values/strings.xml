@@ -93,6 +93,7 @@
     <string name="close">Close</string>
     <string name="select">Select</string>
     <string name="done">Done</string>
+    <string name="ok">OK</string>
     <string name="reorder">Reorder</string>
     <string name="discard_reordering_title">Unsaved order changes</string>
     <string name="discard_reordering_msg">You’ve changed the order of your questions, but haven’t saved it.\nLeaving now will keep any edits or deletions, but discard the new order.</string>
@@ -124,6 +125,6 @@
     <string name="no_questions_available_for_analysis">No questions available for analysis</string>
     <string name="copy_link">copy link</string>
     <string name="share_survey">Share Survey</string>
-    <string name="warning">Warning!</string>
-    <string name="survey_already_has_response">This survey already has responses. Editing may affect the responses that were already collected.</string>
+    <string name="editing_unavailable">Editing Unavailable</string>
+    <string name="survey_already_has_response">This survey already has responses. You cannot edit this survey.</string>
 </resources>

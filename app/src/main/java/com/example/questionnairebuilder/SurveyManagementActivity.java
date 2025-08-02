@@ -227,7 +227,7 @@ public class SurveyManagementActivity extends AppCompatActivity {
                     if (mMenu != null) {
                         MenuItem saveMenuItem = mMenu.findItem(R.id.action_save);
                         if (saveMenuItem != null) {
-                            saveMenuItem.setVisible(true); // or true
+                            saveMenuItem.setVisible(true);
                         }
                     }
 
@@ -484,6 +484,11 @@ public class SurveyManagementActivity extends AppCompatActivity {
                         toolbar.setTitle(survey.getSurveyTitle());
                         Toast.makeText(getApplicationContext(), getString(R.string.survey_updated_successfully), LENGTH_SHORT).show();
                         updates.clear();
+
+                        MenuItem saveMenuItem = mMenu.findItem(R.id.action_save);
+                        if (saveMenuItem != null) {
+                            saveMenuItem.setVisible(false);
+                        }
                     }
 
                     @Override
@@ -518,13 +523,13 @@ public class SurveyManagementActivity extends AppCompatActivity {
 
     private void showEditWarningDialog() {
         new AlertDialog.Builder(this)
-                .setTitle(R.string.warning)
+                .setTitle(R.string.editing_unavailable)
                 .setMessage(R.string.survey_already_has_response)
-                .setPositiveButton(R.string.edit, (dialog, which) -> {
+                /*.setPositiveButton(R.string.edit, (dialog, which) -> {
                     dialog.dismiss();
                     navigateToEditScreen();
-                })
-                .setNegativeButton(R.string.cancel, (dialog, which) -> dialog.dismiss())
+                })*/
+                .setNegativeButton(R.string.ok, (dialog, which) -> dialog.dismiss())
                 .setCancelable(true)
                 .show();
     }

@@ -157,7 +157,6 @@ public class QuestionsActivity extends AppCompatActivity {
 
         if (!canEdit) {
             maybeAddPendingStatus(surveyID);
-            //currentSurveyStatus = Survey.SurveyStatus.valueOf(intent.getStringExtra("survey_status"));
         }
 
         QuestionTypeManager.init(this);

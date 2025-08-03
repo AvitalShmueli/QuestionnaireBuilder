@@ -2,11 +2,15 @@
 
 Final project for a bachelor's degree in software engineering, in Afeka - the academic college of Engineering in Tel-Aviv.
 
+
+---
+
 ## 🧩 Project Overview
 
 **Questionnaire Builder** is a user-friendly Android app designed to streamline the entire survey lifecycle - from creation to distribution and response analysis - in one unified platform.
 
 The app supports various question types (open-ended, multiple choice, rating, date, and more), QR and deep link sharing, real-time participation, and built-in analytics with dynamic charts and AI-powered summaries.
+
 
 ---
 
@@ -64,6 +68,8 @@ The app supports various question types (open-ended, multiple choice, rating, da
 - Open-ended AI-powered summary with Gemini (Firebase AI Logic) up to 50 words
 - View full response list or summary per question
 
+<br>
+
 ---
 ## 🧱 Technology Stack
 
@@ -74,7 +80,7 @@ The app supports various question types (open-ended, multiple choice, rating, da
 | Database     | Firebase Firestore (Cloud NoSQL)                        |
 | Architecture | Client-Server, Modular Components                       |
 
----
+<br>
 
 ## 🧰 Tools & Libraries
 
@@ -88,6 +94,8 @@ The app supports various question types (open-ended, multiple choice, rating, da
 | Glide               | Load and cache user images          |
 | Material Components | Modern Android UI                   |
 | Grafana Loki        | Store logs                          |
+
+<br>
 
 ---
 
@@ -133,13 +141,15 @@ The app supports various question types (open-ended, multiple choice, rating, da
 
 > 🔐 Only authenticated users can create or respond to surveys.
 
+<br>
+
 ---
 
 ## 📌 Code Snippets
 
 #### Create a link and QR code for a survey
 
-_SurveyManagementActivity_
+_SurveyManagementActivity.java_
 
 ```java
 
@@ -195,7 +205,7 @@ private void setUpShareClick() {
 
 #### Load Responses of the survey for a user
 
-_QuestionsActivity (response mode)_
+_QuestionsActivity.java (response mode)_
 
 ```java
 
@@ -248,7 +258,7 @@ private void fetchUserResponses() {
 
 ```
 
-_FirestoreManager_
+_FirestoreManager.java_
 
 ```java
 
@@ -292,7 +302,7 @@ public void getUserResponsesForSurvey(String surveyId, String userId, ResponsesC
 
 #### Display user's pending and completed surveys
 
-_ExploreFragment_
+_ExploreFragment.java_
 
 ```java
 
@@ -344,7 +354,7 @@ private void initSurveysList() {
 
 ```
 
-_ExploreViewModel_
+_ExploreViewModel.java_
 
 ```java
 
@@ -442,7 +452,7 @@ private void applyFilter() {
 
 ```
 
-_FirestoreManager_
+_FirestoreManager.java_
 
 ```java
 
@@ -484,7 +494,7 @@ public ListenerRegistration listenToSurveyResponseStatuses(String userId, Survey
 
 #### Display user's surveys
 
-_MySurveysFragment_
+_MySurveysFragment.java_
 
 ```java
 
@@ -500,7 +510,7 @@ private void initSurveysList(){
 
 ```
 
-_MySurveysViewModel_
+_MySurveysViewModel.java_
 
 ```java
 
@@ -533,7 +543,7 @@ public void startListening() {
 
 ```
 
-_FirestoreManager_
+_FirestoreManager.java_
 
 ```java
 
@@ -575,7 +585,7 @@ public ListenerRegistration listenToMySurveysWithResponseCount(String currentUse
 
 #### Analyzing answers to open-ended questions using AI
 
-_AILogicManager_
+_AILogicManager.java_
 
 ```java
 
@@ -636,12 +646,15 @@ See the [LICENSE](LICENSE) file for full details.
 
 ## 👨‍💻 Authors
 
+
 **Avital Shmueli**   
 
 🌐 [GitHub](https://github.com/AvitalShmueli)  
 🔗 [LinkedIn](https://linkedin.com/in/avital-shmueli-62547b1a4)
 
+
 **Hadar Zimberg**  
 
 🌐 [GitHub](https://github.com/HadarZimberg)  
 🔗 [LinkedIn](https://linkedin.com/in/hadar-zimberg)
+

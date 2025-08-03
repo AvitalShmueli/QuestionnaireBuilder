@@ -114,7 +114,7 @@ The app supports various question types (open-ended, multiple choice, rating, da
     - Android App Link
     - QR Code (automatically generated)
 
-<img src="screenshots/create_new_survey.png" alt="create_new_survey" style="width:60%;">
+<img src="screenshots/create_new_survey.jpg" alt="create_new_survey" style="width:60%;">
 
 ---
 
@@ -126,7 +126,7 @@ The app supports various question types (open-ended, multiple choice, rating, da
 4. Answer the questions and **submit** your response
 5. After submission, the survey moves to the **Completed** tab
 
-<img src="screenshots/respond_to_survey.png" alt="respond_to_survey" style="width:60%;">
+<img src="screenshots/respond_to_survey.jpg" alt="respond_to_survey" style="width:60%;">
 
 ---
 
@@ -137,7 +137,7 @@ The app supports various question types (open-ended, multiple choice, rating, da
 3. Visual summaries are shown (pie, bar, or line charts depending on question type)
 4. Open-ended answers are summarized using **Gemini AI** (up to 50 words)
 
-<img src="screenshots/analyze_responses.png" alt="analyze_responses" style="width:60%;">
+<img src="screenshots/analyze_responses.jpg" alt="analyze_responses" style="width:60%;">
 
 > 🔐 Only authenticated users can create or respond to surveys.
 

@@ -147,7 +147,7 @@ The app supports various question types (open-ended, multiple choice, rating, da
 
 ## 📌 Code Snippets
 
-#### Create a link and QR code for a survey
+#### 1. Create a link and QR code for a survey
 
 _SurveyManagementActivity.java_
 
@@ -203,7 +203,7 @@ private void setUpShareClick() {
     
 ```
 
-#### Load Responses of the survey for a user
+#### 2. Load Responses of the survey for a user
 
 _QuestionsActivity.java (response mode)_
 
@@ -300,7 +300,7 @@ public void getUserResponsesForSurvey(String surveyId, String userId, ResponsesC
 
 ```
 
-#### Display user's pending and completed surveys
+#### 3. Display user's pending and completed surveys
 
 _ExploreFragment.java_
 
@@ -492,7 +492,7 @@ public ListenerRegistration listenToSurveyResponseStatuses(String userId, Survey
 
 ```
 
-#### Display user's surveys
+#### 4. Display user's surveys
 
 _MySurveysFragment.java_
 
@@ -583,7 +583,7 @@ public ListenerRegistration listenToMySurveysWithResponseCount(String currentUse
 
 ```
 
-#### Analyzing answers to open-ended questions using AI
+#### 5. Analyzing answers to open-ended questions using AI
 
 _AILogicManager.java_
 

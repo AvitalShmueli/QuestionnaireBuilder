@@ -657,4 +657,3 @@ See the [LICENSE](LICENSE) file for full details.
 
 🌐 [GitHub](https://github.com/HadarZimberg)  
 🔗 [LinkedIn](https://linkedin.com/in/hadar-zimberg)
-
